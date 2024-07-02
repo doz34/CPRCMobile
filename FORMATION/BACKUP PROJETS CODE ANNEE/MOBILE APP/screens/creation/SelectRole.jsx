@@ -1,84 +1,78 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
-  TouchableWithoutFeedback,
-  TouchableOpacity, // Importation de TouchableWithoutFeedback
-  StyleSheet,
-  Image,
-  ImageBackground,
+  TouchableOpacity,
   ActivityIndicator,
-  Dimensions,
-} from "react-native";
-import axios from "axios";
-import { UserContext } from "../../context/UserContext";
-import styles from "./styles";
-import { LinearGradient } from "expo-linear-gradient";
-import Swiper from "react-native-swiper";
-import MyTextComponent from "./MyText";
+  Image,
+  ImageBackground
+} from 'react-native';
+import axios from 'axios';
+import { UserContext } from '../../context/UserContext';
+import styles from './styles';
+import { LinearGradient } from 'expo-linear-gradient';
+import Swiper from 'react-native-swiper';
+import MyTextComponent from './MyText';
 
-const SelectRoleScreen = ({ navigation }) => {
+const SelectRoleScreen = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const [isAdvantagesModalVisible, setIsAdvantagesModalVisible] = useState(false);
   const [isDisadvantagesModalVisible, setIsDisadvantagesModalVisible] = useState(false);
+  const idPerso = route.params.idPerso;
 
-  const AdvantagesModal = ({ role, onClose }) => {
-    return (
-      <View style={styles.modalMainContainer}>
-        <View style={styles.modalContainer}>
-          <LinearGradient
-            colors={['#7ED56F', '#28B485']}
-            style={styles.modalContentContainer}
-          >
-            <Text style={styles.modalTitle}>AVANTAGES :</Text>
-            <MyTextComponent text={role.avantages} style={styles.modalText} />
-            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
-              <Text style={styles.modalCloseButtonText}>Fermer</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
+  const AdvantagesModal = ({ role, onClose }) => (
+    <View style={styles.modalMainContainer}>
+      <View style={styles.modalContainer}>
+        <LinearGradient
+          colors={['#7ED56F', '#28B485']}
+          style={styles.modalContentContainer}
+        >
+          <Text style={styles.modalTitle}>AVANTAGES :</Text>
+          <MyTextComponent text={role.avantages} style={styles.modalText} />
+          <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+            <Text style={styles.modalCloseButtonText}>Fermer</Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
-    );
-  };
+    </View>
+  );
 
-  const DisadvantagesModal = ({ role, onClose }) => {
-    return (
-      <View style={styles.modalMainContainer}>
-        <View style={styles.modalContainer}>
-          <LinearGradient
-            colors={['#FF416C', '#FF4B2B']}
-            style={styles.modalContentContainer}
-          >
-            <Text style={styles.modalTitle}>INCONVÉNIENTS :</Text>
-            <MyTextComponent text={role.inconvenients} style={styles.modalText} />
-            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
-              <Text style={styles.modalCloseButtonText}>Fermer</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
+  const DisadvantagesModal = ({ role, onClose }) => (
+    <View style={styles.modalMainContainer}>
+      <View style={styles.modalContainer}>
+        <LinearGradient
+          colors={['#FF416C', '#FF4B2B']}
+          style={styles.modalContentContainer}
+        >
+          <Text style={styles.modalTitle}>INCONVÉNIENTS :</Text>
+          <MyTextComponent text={role.inconvenients} style={styles.modalText} />
+          <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+            <Text style={styles.modalCloseButtonText}>Fermer</Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
-    );
-  };
+    </View>
+  );
 
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get(
-          "http://192.168.1.17:3000/api/user/roles",
+          'http://192.168.1.17:3000/api/user/roles',
           {
-            headers: { Authorization: `Bearer ${user?.token}` },
+            headers: { Authorization: `Bearer ${user?.token}` }
           }
         );
         const rolesWithImages = response.data.map((role) => ({
           ...role,
-          role_img: `http://192.168.1.17:3000/${role.role_img}`,
+          role_img: `http://192.168.1.17:3000/${role.role_img}`
         }));
         setRoles(rolesWithImages);
       } catch (error) {
-        console.error("Erreur lors de la récupération des rôles :", error);
+        console.error('Erreur lors de la récupération des rôles :', error);
       } finally {
         setLoading(false);
       }
@@ -93,25 +87,23 @@ const SelectRoleScreen = ({ navigation }) => {
     try {
       const selectedRole = roles[currentRoleIndex];
       const requestBody = {
-        idRole: selectedRole.id_role,
-        // Include idParcours if it's required by your application logic
-        // idParcours: selectedRole.id_parcours, // Uncomment and set the correct value if needed
+        idRole: selectedRole.id_role
       };
-  
-      const response = await axios.post(
-        "http://192.168.1.17:3000/api/character/creer-personnage",
+
+      const response = await axios.put(
+        `http://192.168.1.17:3000/api/character/update-role/${idPerso}`,
         requestBody,
         {
-          headers: { Authorization: `Bearer ${user.token}` },
+          headers: { Authorization: `Bearer ${user.token}` }
         }
       );
-  
-      if (response.status === 201) {
-        console.log("Personnage créé avec succès:", response.data);
-        navigation.navigate("CulturalOrigin", { idPerso: response.data.id_perso });
+
+      if (response.status === 200) {
+        console.log('Rôle mis à jour avec succès :', response.data);
+        navigation.navigate('CulturalOrigin', { idPerso });
       }
     } catch (error) {
-      console.error("Erreur lors de la création du personnage :", error);
+      console.error('Erreur lors de la mise à jour du rôle du personnage :', error);
     }
   };
 
@@ -121,7 +113,7 @@ const SelectRoleScreen = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/Inscription.png")}
+      source={require('../../assets/Inscription.png')}
       style={styles.backgroundImage}
     >
       <Swiper
@@ -134,16 +126,16 @@ const SelectRoleScreen = ({ navigation }) => {
             <Image source={{ uri: role.role_img }} style={styles.roleImageWrapper} />
             {/* Titre du rôle */}
             <Text style={styles.title}>{role.nom_role}</Text>
-  
+
             {/* Description en bref */}
             <LinearGradient
-              colors={["#C0C0C0", "#484848"]}
+              colors={['#C0C0C0', '#484848']}
               style={styles.descriptionContainer}
             >
               <Text style={styles.briefTitle}>EN BREF :</Text>
               <MyTextComponent text={role.desc_role_short} style={styles.descriptionText} />
             </LinearGradient>
-  
+
             {/* Avantages et Inconvénients */}
             <View style={styles.advantagesDisadvantagesContainer}>
               <TouchableOpacity
@@ -158,7 +150,7 @@ const SelectRoleScreen = ({ navigation }) => {
                   <MyTextComponent text={role.avantages} style={styles.advantagesText} />
                 </LinearGradient>
               </TouchableOpacity>
-  
+
               <TouchableOpacity
                 onPress={() => setIsDisadvantagesModalVisible(true)}
                 style={styles.thirdContainer}
@@ -175,34 +167,31 @@ const SelectRoleScreen = ({ navigation }) => {
           </View>
         ))}
       </Swiper>
-  
+
       {/* Boutons */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate("RoleDescription", {
-              role: roles[currentRoleIndex],
+            navigation.navigate('RoleDescription', {
+              role: roles[currentRoleIndex]
             })
           }
           style={styles.learnMoreButton}
         >
           <Text style={styles.buttonText}>En savoir plus</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-      onPress={onRoleSelect}
-      style={styles.selectButton}
-    >
-      <Text style={styles.buttonText}>Sélectionner</Text>
-    </TouchableOpacity>
+        <TouchableOpacity onPress={onRoleSelect} style={styles.selectButton}>
+          <Text style={styles.buttonText}>Sélectionner</Text>
+        </TouchableOpacity>
       </View>
-  
+
       {isAdvantagesModalVisible && (
         <AdvantagesModal
           role={roles[currentRoleIndex]}
           onClose={() => setIsAdvantagesModalVisible(false)}
         />
       )}
-  
+
       {isDisadvantagesModalVisible && (
         <DisadvantagesModal
           role={roles[currentRoleIndex]}
