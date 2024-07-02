@@ -73,34 +73,34 @@ const GenPathEnding = ({ navigation, route }) => {
 
       switch (id_role) {
         case 1:
-          navigation.navigate("RolePathRockerboy");
+          navigation.navigate("RolePathRockerboyDisclaimer");
           break;
         case 2:
-          navigation.navigate("RolePathSolo");
+          navigation.navigate("RolePathSoloDisclaimer");
           break;
         case 3:
-          navigation.navigate("RolePathCorpo");
+          navigation.navigate("RolePathCorpoDisclaimer");
           break;
         case 4:
-          navigation.navigate("RolePathTechie");
+          navigation.navigate("RolePathTechieDisclaimer");
           break;
         case 5:
-          navigation.navigate("RolePathMedTech");
+          navigation.navigate("RolePathMedTechDisclaimer");
           break;
         case 6:
-          navigation.navigate("RolePathMedia");
+          navigation.navigate("RolePathMediaDisclaimer");
           break;
         case 7:
-          navigation.navigate("RolePathLawman");
+          navigation.navigate("RolePathLawmanDisclaimer");
           break;
         case 8:
-          navigation.navigate("RolePathNetrunner");
+          navigation.navigate("RolePathNetrunnerDisclaimer");
           break;
         case 9:
-          navigation.navigate("RolePathFixer");
+          navigation.navigate("RolePathFixerDisclaimer");
           break;
         case 10:
-          navigation.navigate("RolePathNomad");
+          navigation.navigate("RolePathNomadDisclaimer");
           break;
         default:
           alert("Rôle inconnu");

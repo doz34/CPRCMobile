@@ -26,6 +26,7 @@ import GenPathEnemies from './screens/creation/character_path/GenPathEnemies';
 import GenPathLove from './screens/creation/character_path/GenPathLove';
 import GenPathObjective from './screens/creation/character_path/GenPathObjective';
 import GenPathEnding from './screens/creation/character_path/GenPathEnding';
+import RolePathRockerboyDisclaimer from './screens/creation/role_path/RolePathRockerboyDisclaimer';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -73,6 +74,7 @@ const App = () => {
           <Stack.Screen name="GenPathLove" component={GenPathLove} />
           <Stack.Screen name="GenPathObjective" component={GenPathObjective} />
           <Stack.Screen name="GenPathEnding" component={GenPathEnding} />
+          <Stack.Screen name="RolePathRockerboyDisclaimer" component={RolePathRockerboyDisclaimer} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
