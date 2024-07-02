@@ -16,6 +16,7 @@ import { UserProvider } from './context/UserContext';
 import GenPathDescScreen from './screens/creation/character_path/GenPathDesc';
 import GenPathPersonalityScreen from './screens/creation/character_path/GenPathPersonality';
 import GenPathClothingScreen from './screens/creation/character_path/GenPathClothing';
+import MyCharacters from './screens/account/MyCharacters';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -53,6 +54,7 @@ const App = () => {
           <Stack.Screen name="CulturalOrigin" component={CulturalOrigin} />
           <Stack.Screen name="GenPathPersonality" component={GenPathPersonalityScreen} />
           <Stack.Screen name="GenPathClothing" component={GenPathClothingScreen} />
+          <Stack.Screen name="MyCharacters" component={MyCharacters} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
