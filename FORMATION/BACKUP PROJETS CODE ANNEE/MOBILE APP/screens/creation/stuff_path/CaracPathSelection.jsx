@@ -103,11 +103,21 @@ const CaracPathSelection = ({ navigation, route }) => {
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       console.log("Save response:", response.data);
-      Alert.alert("Succès", "Le set de caractéristiques a été enregistré avec succès.");
+  
+      // Appeler la route pour mettre à jour les stats
+      console.log("Updating stats...");
+      const statsResponse = await axios.post(
+        `http://192.168.1.17:3000/api/character/update-stats`,
+        { idPerso },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      console.log("Stats update response:", statsResponse.data);
+  
+      Alert.alert("Succès", "Le set de caractéristiques et les stats ont été enregistrés avec succès.");
       navigation.navigate("CaracPathDerivatedCarac", { idPerso });
     } catch (error) {
-      console.error("Erreur lors de la sauvegarde du set de caractéristiques:", error);
-      alert("Erreur lors de la sauvegarde du set de caractéristiques.");
+      console.error("Erreur lors de la sauvegarde du set de caractéristiques ou de la mise à jour des stats:", error);
+      alert("Erreur lors de la sauvegarde du set de caractéristiques ou de la mise à jour des stats.");
     }
   };
 
