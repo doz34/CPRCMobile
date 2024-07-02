@@ -7,6 +7,7 @@ import {
   ImageBackground,
   ScrollView,
   Modal,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
@@ -15,12 +16,12 @@ import styles from "./character_styles/GenPathObjective.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import MyTextSimple from "../MyTextSimple";
 
-const GenPathObjective = ({ navigation }) => {
+const GenPathObjective = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [objectives, setObjectives] = useState([]);
   const [selectedObjective, setSelectedObjective] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [idPerso, setIdPerso] = useState(null);
+  const [idPerso, setIdPerso] = useState(user?.idPerso || route.params?.idPerso);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -46,23 +47,9 @@ const GenPathObjective = ({ navigation }) => {
         } else {
           alert("Aucun objectif disponible");
         }
-
-        const lastCharacterResponse = await axios.get(
-          "http://192.168.1.17:3000/api/character/last",
-          {
-            headers: { Authorization: `Bearer ${user?.token}` },
-          }
-        );
-        const lastCharacterData = lastCharacterResponse.data;
-
-        if (!lastCharacterData?.id_perso) {
-          throw new Error("Character ID not found");
-        }
-
-        setIdPerso(lastCharacterData.id_perso);
       } catch (error) {
         console.error("Erreur lors de la récupération des objectifs:", error);
-        alert("Erreur lors de la récupération des objectifs ou du dernier personnage.");
+        alert("Erreur lors de la récupération des objectifs.");
       } finally {
         setLoading(false);
       }
@@ -90,6 +77,9 @@ const GenPathObjective = ({ navigation }) => {
       return;
     }
 
+    console.log("ID du personnage:", idPerso);
+    console.log("ID de l'objectif:", selectedObjective.id_objectif);
+
     try {
       const response = await axios.put(
         `http://192.168.1.17:3000/api/character/update-objective/${idPerso}`,
@@ -98,8 +88,9 @@ const GenPathObjective = ({ navigation }) => {
       );
 
       if (response.status === 200) {
+        console.log("Objectif mis à jour avec succès:", response.data);
         alert("Objectif mis à jour avec succès!");
-        navigation.navigate("GenPathEnding");
+        navigation.navigate("GenPathEnding", { idPerso: idPerso }); // Transmettre l'ID du personnage
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }

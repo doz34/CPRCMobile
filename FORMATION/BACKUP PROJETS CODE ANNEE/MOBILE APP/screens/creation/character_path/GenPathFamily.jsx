@@ -87,7 +87,7 @@ const GenPathFamily = ({ navigation, route }) => {
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-        navigation.navigate("GenPathFriends");
+        navigation.navigate("GenPathFriends", { idPerso: idPerso }); // Transmettre l'ID du personnage
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);

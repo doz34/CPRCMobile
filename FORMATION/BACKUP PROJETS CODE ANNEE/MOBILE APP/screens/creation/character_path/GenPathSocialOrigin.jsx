@@ -67,12 +67,12 @@ const GenPathSocialOrigin = ({ navigation, route }) => {
       alert('ID du personnage non défini.');
       return;
     }
-
+  
     if (!selectedOrigin || isNaN(parseInt(selectedOrigin.id_origine_sociale, 10))) {
       alert('Veuillez sélectionner une origine sociale avant de continuer.');
       return;
     }
-
+  
     try {
       const response = await axios.put(
         `http://192.168.1.17:3000/api/character/update-socialorigin/${idPerso}`,
@@ -84,7 +84,7 @@ const GenPathSocialOrigin = ({ navigation, route }) => {
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-        navigation.navigate("GenPathEnvironment");
+        navigation.navigate("GenPathEnvironment", { idPerso: idPerso }); // Transmettre l'ID du personnage
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);

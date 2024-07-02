@@ -15,15 +15,17 @@ const GenPathLove = ({ navigation, route }) => {
   const [selectedTragedies, setSelectedTragedies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [idPerso, setIdPerso] = useState(route.params?.idPerso);
+  const [idPerso, setIdPerso] = useState(user?.idPerso || route.params?.idPerso);
 
   const fetchData = async (endpoint, setState) => {
     setLoading(true);
     try {
+      console.log(`Fetching data from ${endpoint}`);
       const response = await axios.get(`http://192.168.1.17:3000/api/${endpoint}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setState(response.data);
+      console.log(`Data fetched from ${endpoint}:`, response.data);
     } catch (error) {
       console.error(`Erreur lors de la récupération des données de ${endpoint}:`, error);
       alert(`Erreur lors de la récupération des données de ${endpoint}.`);
@@ -36,22 +38,24 @@ const GenPathLove = ({ navigation, route }) => {
     if (user?.token) {
       fetchData('tragedies', setLoves);
 
-      if (!idPerso) {
-        const fetchLastCharacter = async () => {
-          try {
-            const response = await axios.get('http://192.168.1.17:3000/api/character/last', {
-              headers: { Authorization: `Bearer ${user?.token}` },
-            });
-            if (response.data) {
-              setIdPerso(response.data.id_perso);
-            }
-          } catch (error) {
-            console.error("Erreur lors de la récupération du dernier personnage:", error);
-            alert('Erreur lors de la récupération du dernier personnage.');
-          }
-        };
-        fetchLastCharacter();
-      }
+      // if (!idPerso) {
+//   const fetchLastCharacter = async () => {
+//     try {
+//       console.log("Fetching last character");
+//       const response = await axios.get('http://192.168.1.17:3000/api/character/last', {
+//         headers: { Authorization: `Bearer ${user?.token}` },
+//       });
+//       if (response.data) {
+//         setIdPerso(response.data.id_perso);
+//         console.log("Last character fetched:", response.data);
+//       }
+//     } catch (error) {
+//       console.error("Erreur lors de la récupération du dernier personnage:", error);
+//       alert('Erreur lors de la récupération du dernier personnage.');
+//     }
+//   };
+//   fetchLastCharacter();
+// }
     }
   }, [user?.token]);
 
@@ -85,18 +89,20 @@ const GenPathLove = ({ navigation, route }) => {
     }
 
     try {
-      // Supprimer les tragédies amoureuses existantes
+      console.log("Deleting existing love tragedies for character:", idPerso);
       await axios.delete(`http://192.168.1.17:3000/api/custom_amour/${idPerso}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
 
       if (numTragedies === 0) {
+        console.log("Updating character with no love tragedies");
         await axios.put(
           `http://192.168.1.17:3000/api/character/update-no-love/${idPerso}`,
           { no_amour: true },
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
       } else {
+        console.log("Updating character with love tragedies");
         await axios.put(
           `http://192.168.1.17:3000/api/character/update-no-love/${idPerso}`,
           { no_amour: false },
@@ -108,6 +114,11 @@ const GenPathLove = ({ navigation, route }) => {
             alert(`Veuillez remplir toutes les informations pour l'amour ${i + 1}.`);
             return;
           }
+
+          console.log(`Adding love tragedy ${i + 1} for character:`, {
+            love: selectedLoves[i],
+            tragedy: selectedTragedies[i]
+          });
 
           const loveResponse = await axios.post(
             `http://192.168.1.17:3000/api/nom_amour`,
@@ -128,7 +139,7 @@ const GenPathLove = ({ navigation, route }) => {
       }
 
       Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-      navigation.navigate("GenPathObjective");
+      navigation.navigate("GenPathObjective", { idPerso });
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);
       alert('Erreur lors de la mise à jour du personnage.');

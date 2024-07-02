@@ -1,4 +1,3 @@
-// GenPathEnvironment.jsx
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground, ScrollView, Modal, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -84,7 +83,7 @@ const GenPathEnvironment = ({ navigation, route }) => {
       );
       if (response.status === 200) {
         Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-        navigation.navigate("GenPathFamily");
+        navigation.navigate("GenPathFamily", { idPerso: idPerso }); // Transmettre l'ID du personnage
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);

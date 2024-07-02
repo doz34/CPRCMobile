@@ -64,28 +64,28 @@ const GenPathEnemies = ({ navigation, route }) => {
       fetchData("soutien_ennemi", setSupports);
       fetchData("rencontre_ennemi", setReactions);
 
-      if (!idPerso) {
-        const fetchLastCharacter = async () => {
-          try {
-            const response = await axios.get(
-              "http://192.168.1.17:3000/api/character/last",
-              {
-                headers: { Authorization: `Bearer ${user?.token}` },
-              }
-            );
-            if (response.data) {
-              setIdPerso(response.data.id_perso);
-            }
-          } catch (error) {
-            console.error(
-              "Erreur lors de la récupération du dernier personnage:",
-              error
-            );
-            alert("Erreur lors de la récupération du dernier personnage.");
-          }
-        };
-        fetchLastCharacter();
-      }
+      // if (!idPerso) {
+    //   const fetchLastCharacter = async () => {
+    //     try {
+    //       const response = await axios.get(
+    //         "http://192.168.1.17:3000/api/character/last",
+    //         {
+    //           headers: { Authorization: `Bearer ${user?.token}` },
+    //         }
+    //       );
+    //       if (response.data) {
+    //         setIdPerso(response.data.id_perso);
+    //       }
+    //     } catch (error) {
+    //       console.error(
+    //         "Erreur lors de la récupération du dernier personnage:",
+    //         error
+    //       );
+    //       alert("Erreur lors de la récupération du dernier personnage.");
+    //     }
+    //   };
+    //   fetchLastCharacter();
+    // }
     }
   }, [user?.token]);
 
@@ -118,7 +118,10 @@ const GenPathEnemies = ({ navigation, route }) => {
     setSelectedEnemies(newEnemies);
 
     // Vérification des conditions pour afficher le modal de support
-    if (field === "support" && (value.id_soutenn === 5 || value.id_soutenn === 6)) {
+    if (
+      field === "support" &&
+      (value.id_soutenn === 5 || value.id_soutenn === 6)
+    ) {
       setCurrentSupportIndex(index);
       fetchLancers(value.id_soutenn);
       setSupportModalVisible(true);
@@ -154,7 +157,7 @@ const GenPathEnemies = ({ navigation, route }) => {
       alert("ID du personnage non défini.");
       return;
     }
-
+  
     if (numEnemies === 0) {
       try {
         // Supprimer les ennemis existants
@@ -164,23 +167,23 @@ const GenPathEnemies = ({ navigation, route }) => {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-
+  
         // Mettre à jour le personnage pour indiquer qu'il n'a pas d'ennemis
         await axios.put(
           `http://192.168.1.17:3000/api/character/update-no-enemies/${idPerso}`,
           { no_ennemi: true },
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
-
+  
         Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-        navigation.navigate("GenPathLove");
+        navigation.navigate("GenPathLove", { idPerso: idPerso }); // Transmettre l'ID du personnage
       } catch (error) {
         console.error("Erreur lors de la mise à jour du personnage :", error);
         alert("Erreur lors de la mise à jour du personnage.");
       }
       return;
     }
-
+  
     for (let i = 0; i < numEnemies; i++) {
       const enemy = selectedEnemies[i];
       if (
@@ -192,7 +195,7 @@ const GenPathEnemies = ({ navigation, route }) => {
         return;
       }
     }
-
+  
     try {
       const characterResponse = await axios.get(
         `http://192.168.1.17:3000/api/character/${idPerso}`,
@@ -200,7 +203,7 @@ const GenPathEnemies = ({ navigation, route }) => {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-
+  
       if (characterResponse.data.no_ennemi === false) {
         await axios.delete(
           `http://192.168.1.17:3000/api/custom_ennemi/${idPerso}`,
@@ -209,22 +212,22 @@ const GenPathEnemies = ({ navigation, route }) => {
           }
         );
       }
-
+  
       await axios.put(
         `http://192.168.1.17:3000/api/character/update-no-enemies/${idPerso}`,
         { no_ennemi: false },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
-
+  
       for (let i = 0; i < numEnemies; i++) {
         const enemy = selectedEnemies[i];
-
+  
         const enemyResponse = await axios.post(
           `http://192.168.1.17:3000/api/nom_ennemi`,
           { nom: enemy.name },
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
-
+  
         await axios.post(
           `http://192.168.1.17:3000/api/custom_ennemi`,
           {
@@ -240,9 +243,9 @@ const GenPathEnemies = ({ navigation, route }) => {
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
       }
-
+  
       Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-      navigation.navigate("GenPathLove");
+      navigation.navigate("GenPathLove", { idPerso: idPerso }); // Transmettre l'ID du personnage
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);
       alert("Erreur lors de la mise à jour du personnage.");

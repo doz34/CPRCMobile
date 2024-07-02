@@ -109,7 +109,6 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
     }
     setConfirmNameModalVisible(false);
   };
-  
 
   const renderButton = (title, onPress, buttonStyle) => (
     <TouchableOpacity style={buttonStyle} onPress={onPress}>
@@ -209,7 +208,6 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
 
   const sortCharacters = (key, direction) => {
     const sortedData = [...characters].sort((a, b) => {
@@ -246,7 +244,7 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
     >
       <Text style={styles.modalText}>Sélectionnez un personnage :</Text>
       <View style={styles.sortContainer}>
-        <Picker
+      <Picker
           selectedValue={sortBy}
           onValueChange={(itemValue) => {
             setSortBy(itemValue);
@@ -262,217 +260,226 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
           selectedValue={sortDirection}
           onValueChange={(itemValue) => {
             setSortDirection(itemValue);
-            sortCharacters(sortBy, itemValue);}}
-            style={styles.picker}
-          >
-            <Picker.Item label="Ascendant" value="ascending" />
-            <Picker.Item label="Descendant" value="descending" />
-          </Picker>
+            sortCharacters(sortBy, itemValue);
+          }}
+          style={styles.picker}
+        >
+          <Picker.Item label="Ascendant" value="ascending" />
+          <Picker.Item label="Descendant" value="descending" />
+        </Picker>
+      </View>
+      <FlatList
+        data={sortedCharacters}
+        renderItem={({ item }) => <CharacterItem character={item} />}
+        keyExtractor={(item) => item.id_perso.toString()}
+        style={styles.characterList}
+      />
+      {renderButton(
+        "Annuler",
+        () => setSelectCharacterModalVisible(false),
+        styles.cancelButton
+      )}
+    </LinearGradient>
+  );
+
+  const handleSelectCharacter = (character) => {
+    console.log("Selected Character:", character);
+    setSelectedCharacter(character);
+    setConfirmModalVisible(true);
+    setSelectCharacterModalVisible(false);
+  };
+
+  const fetchCharacterDetails = async (idPerso) => {
+    try {
+      const response = await axios.get(
+        `http://192.168.1.17:3000/api/character/${idPerso}`,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des détails du personnage:", error);
+      alert('Erreur lors de la récupération des détails du personnage.');
+      return null;
+    }
+  };
+
+  const handleContinueWithCharacter = async () => {
+    if (!selectedCharacter) {
+      alert('Aucun personnage sélectionné.');
+      return;
+    }
+  
+    console.log("Selected Character:", {
+      id_perso: selectedCharacter.id_perso,
+      id_role: selectedCharacter.id_role,
+      id_origine: selectedCharacter.id_origine,
+      id_langue: selectedCharacter.id_langue,
+      nom_perso: selectedCharacter.nom_perso,
+      role: selectedCharacter.role // Assurez-vous que ce champ est bien `id_role` et non `nom_role`
+    });
+  
+    // Vérifiez si id_role est défini
+    if (!selectedCharacter.id_role) {
+      alert('Le rôle du personnage sélectionné est introuvable.');
+      return;
+    }
+  
+    // Récupérer les détails du personnage sélectionné
+    const characterDetails = await fetchCharacterDetails(selectedCharacter.id_perso);
+    if (!characterDetails) {
+      return;
+    }
+  
+    // Naviguer vers CulturalOrigin avec les détails du personnage
+    console.log("Navigating to CulturalOrigin with:", {
+      idPerso: characterDetails.id_perso,
+      idOrigine: characterDetails.id_origine || null, // Fallback to null if undefined
+      idLangue: characterDetails.id_langue || null, // Fallback to null if undefined
+      idRole: characterDetails.id_role,
+    });
+  
+    navigation.navigate("CulturalOrigin", {
+      idPerso: characterDetails.id_perso,
+      idOrigine: characterDetails.id_origine || null, // Fallback to null if undefined
+      idLangue: characterDetails.id_langue || null, // Fallback to null if undefined
+      idRole: characterDetails.id_role,
+    });
+  
+    setConfirmModalVisible(false);
+  };
+
+  const renderConfirmCharacterModal = () => {
+    if (!selectedCharacter) return null; // Safety check
+
+    return (
+      <LinearGradient
+        colors={["#868686", "#484848"]}
+        style={styles.modalGradient}
+      >
+        <Text style={styles.modalText}>
+          Confirmez-vous continuer avec {selectedCharacter.nom_perso} ?
+        </Text>
+
+        <View style={styles.selectedCharacterContainer}>
+          <Image
+            source={{
+              uri: selectedCharacter.icon || "../../assets/fallback.png",
+            }}
+            style={styles.characterIcon}
+          />
+          <View style={styles.characterInfo}>
+            <Text style={styles.characterName}>
+              {selectedCharacter.nom_perso}
+            </Text>
+            <Text
+              style={styles.characterDetails}
+            >{`Rôle: ${selectedCharacter.role}`}</Text>
+            <Text style={styles.characterDetails}>{`Créé le: ${new Date(
+              selectedCharacter.date_creation
+            ).toLocaleDateString()}`}</Text>
+          </View>
         </View>
-        <FlatList
-          data={sortedCharacters}
-          renderItem={({ item }) => <CharacterItem character={item} />}
-          keyExtractor={(item) => item.id_perso.toString()}
-          style={styles.characterList}
-        />
+
+        {renderButton(
+          "Continuer",
+          handleContinueWithCharacter,
+          styles.confirmButton
+        )}
         {renderButton(
           "Annuler",
-          () => setSelectCharacterModalVisible(false),
+          () => {
+            setConfirmModalVisible(false);
+            setSelectCharacterModalVisible(true);
+          },
           styles.cancelButton
         )}
       </LinearGradient>
     );
-  
-    const handleSelectCharacter = (character) => {
-      console.log("Selected Character:", character);
-      setSelectedCharacter(character);
-      setConfirmModalVisible(true);
-      setSelectCharacterModalVisible(false);
-    };
-  
-    const renderConfirmCharacterModal = () => {
-      if (!selectedCharacter) return null; // Safety check
-  
-      return (
+  };
+
+  return (
+    <ImageBackground
+      source={require("../../assets/Inscription.png")}
+      style={styles.backgroundImage}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
         <LinearGradient
           colors={["#868686", "#484848"]}
-          style={styles.modalGradient}
+          style={styles.placeholderContainer}
         >
-          <Text style={styles.modalText}>
-            Confirmez-vous continuer avec {selectedCharacter.nom_perso} ?
-          </Text>
-  
-          <View style={styles.selectedCharacterContainer}>
-            <Image
-              source={{
-                uri: selectedCharacter.icon || "../../assets/fallback.png",
-              }}
-              style={styles.characterIcon}
-            />
-            <View style={styles.characterInfo}>
-              <Text style={styles.characterName}>
-                {selectedCharacter.nom_perso}
-              </Text>
-              <Text
-                style={styles.characterDetails}
-              >{`Rôle: ${selectedCharacter.role}`}</Text>
-              <Text style={styles.characterDetails}>{`Créé le: ${new Date(
-                selectedCharacter.date_creation
-              ).toLocaleDateString()}`}</Text>
-            </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.roleDescriptionTitleText}>
+              DÉROULÉ DE LA CRÉATION :
+            </Text>
           </View>
-  
-          {renderButton(
-            "Continuer",
-            handleContinueWithCharacter,
-            styles.confirmButton
-          )}
-          {renderButton(
-            "Annuler",
-            () => {
-              setConfirmModalVisible(false);
-              setSelectCharacterModalVisible(true);
-            },
-            styles.cancelButton
-          )}
+          <ScrollView style={styles.contentContainer}>
+            <MyTextSimple text='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. ...' style={styles.roleDescriptionText} />
+          </ScrollView>
         </LinearGradient>
-      );
-    };
-  
-    const handleContinueWithCharacter = () => {
-      if (!selectedCharacter) {
-        alert('Aucun personnage sélectionné.');
-        return;
-      }
-    
-      console.log("Selected Character:", {
-        id_perso: selectedCharacter.id_perso,
-        id_role: selectedCharacter.id_role,
-        id_origine: selectedCharacter.id_origine,
-        id_langue: selectedCharacter.id_langue,
-        nom_perso: selectedCharacter.nom_perso,
-        role: selectedCharacter.role // Assurez-vous que ce champ est bien `id_role` et non `nom_role`
-      });
-    
-      // Vérifiez si id_role est défini
-      if (!selectedCharacter.id_role) {
-        alert('Le rôle du personnage sélectionné est introuvable.');
-        return;
-      }
-    
-      // Condition pour déterminer la page de destination
-      if (selectedCharacter.id_origine && selectedCharacter.id_langue) {
-        console.log("Navigating to GenPathClothing with:", {
-          idPerso: selectedCharacter.id_perso,
-          idRole: selectedCharacter.id_role,
-        });
-    
-        navigation.navigate("GenPathClothing", {
-          idPerso: selectedCharacter.id_perso,
-          idRole: selectedCharacter.id_role,
-        });
-      } else {
-        console.log("Navigating to CulturalOrigin with:", {
-          idPerso: selectedCharacter.id_perso,
-          idOrigine: selectedCharacter.id_origine,
-          idLangue: selectedCharacter.id_langue,
-          idRole: selectedCharacter.id_role,
-        });
-    
-        navigation.navigate("CulturalOrigin", {
-          idPerso: selectedCharacter.id_perso,
-          idOrigine: selectedCharacter.id_origine || null, // Fallback to null if undefined
-          idLangue: selectedCharacter.id_langue || null, // Fallback to null if undefined
-          idRole: selectedCharacter.id_role,
-        });
-      }
-    
-      setConfirmModalVisible(false);
-    };
-  
-    return (
-      <ImageBackground
-        source={require("../../assets/Inscription.png")}
-        style={styles.backgroundImage}
+      </ScrollView>
+      <TouchableOpacity
+        style={styles.continueButton}
+        onPress={() => setInitialModalVisible(true)}
       >
-        <ScrollView contentContainerStyle={styles.container}>
-          <LinearGradient
-            colors={["#868686", "#484848"]}
-            style={styles.placeholderContainer}
-          >
-            <View style={styles.headerContainer}>
-              <Text style={styles.roleDescriptionTitleText}>
-                DÉROULÉ DE LA CRÉATION :
-              </Text>
-            </View>
-            <ScrollView style={styles.contentContainer}>
-              <MyTextSimple text='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...' style={styles.roleDescriptionText} />
-            </ScrollView>
-          </LinearGradient>
-        </ScrollView>
-        <TouchableOpacity
-              style={styles.continueButton}
-              onPress={() => setInitialModalVisible(true)}
-            >
-              <Text style={styles.buttonText}>Continuer</Text>
-            </TouchableOpacity>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={initialModalVisible}
-          onRequestClose={() => setInitialModalVisible(false)}
-        >
-          <View style={styles.blurredBackground}>{renderInitialModal()}</View>
-        </Modal>
-  
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={createNewModalVisible}
-          onRequestClose={() => setCreateNewModalVisible(false)}
-        >
-          <View style={styles.blurredBackground}>{renderCreateNewModal()}</View>
-        </Modal>
-  
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={confirmNameModalVisible}
-          onRequestClose={() => setConfirmNameModalVisible(false)}
-        >
-          <View style={styles.blurredBackground}>{renderConfirmNameModal()}</View>
-        </Modal>
-  
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={confirmModalVisible}
-          onRequestClose={() => setConfirmModalVisible(false)}
-        >
-          <View style={styles.blurredBackground}>
-            {renderConfirmCharacterModal()}
-          </View>
-        </Modal>
-  
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={selectCharacterModalVisible}
-          onRequestClose={() => setSelectCharacterModalVisible(false)}
-        >
-          <View style={styles.blurredBackground}>
-            {renderSelectCharacterModal()}
-          </View>
-        </Modal>
-      </ImageBackground>
-    );     
-  };
-  
-  export default DisclaimerCharacterScreen;
+        <Text style={styles.buttonText}>Continuer</Text>
+      </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={initialModalVisible}
+        onRequestClose={() => setInitialModalVisible(false)}
+      >
+        <View style={styles.blurredBackground}>{renderInitialModal()}</View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={createNewModalVisible}
+        onRequestClose={() => setCreateNewModalVisible(false)}
+      >
+        <View style={styles.blurredBackground}>{renderCreateNewModal()}</View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmNameModalVisible}
+        onRequestClose={() => setConfirmNameModalVisible(false)}
+      >
+        <View style={styles.blurredBackground}>{renderConfirmNameModal()}</View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmModalVisible}
+        onRequestClose={() => setConfirmModalVisible(false)}
+      >
+        <View style={styles.blurredBackground}>
+          {renderConfirmCharacterModal()}
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={selectCharacterModalVisible}
+        onRequestClose={() => setSelectCharacterModalVisible(false)}
+      >
+        <View style={styles.blurredBackground}>
+          {renderSelectCharacterModal()}
+        </View>
+      </Modal>
+    </ImageBackground>
+  );
+};
+
+export default DisclaimerCharacterScreen;

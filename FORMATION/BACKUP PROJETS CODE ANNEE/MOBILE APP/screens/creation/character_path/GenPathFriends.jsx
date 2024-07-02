@@ -45,6 +45,7 @@ const GenPathFriends = ({ navigation, route }) => {
             });
             if (response.data) {
               setIdPerso(response.data.id_perso);
+              console.log("ID du dernier personnage récupéré:", response.data.id_perso);
             }
           } catch (error) {
             console.error("Erreur lors de la récupération du dernier personnage:", error);
@@ -52,6 +53,8 @@ const GenPathFriends = ({ navigation, route }) => {
           }
         };
         fetchLastCharacter();
+      } else {
+        console.log("ID du personnage transmis:", idPerso);
       }
     }
   }, [user?.token]);
@@ -85,17 +88,22 @@ const GenPathFriends = ({ navigation, route }) => {
       return;
     }
 
+    console.log("ID du personnage avant la mise à jour:", idPerso);
+
     try {
       // Vérifier si le personnage a des amis existants
       const characterResponse = await axios.get(`http://192.168.1.17:3000/api/character/${idPerso}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
 
+      console.log("Données du personnage récupérées:", characterResponse.data);
+
       if (characterResponse.data.no_ami === false) {
         // Supprimer les amis existants
         await axios.delete(`http://192.168.1.17:3000/api/custom_ami/${idPerso}`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
+        console.log("Amis existants supprimés pour le personnage:", idPerso);
       }
 
       if (numFriends === 0) {
@@ -104,12 +112,14 @@ const GenPathFriends = ({ navigation, route }) => {
           { no_ami: true },
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
+        console.log("Mise à jour du personnage sans amis:", idPerso);
       } else {
         await axios.put(
           `http://192.168.1.17:3000/api/character/update-no-friends/${idPerso}`,
           { no_ami: false },
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
+        console.log("Mise à jour du personnage avec amis:", idPerso);
 
         for (let i = 0; i < numFriends; i++) {
           if (!selectedFriends[i] || !selectedRelations[i]) {
@@ -123,6 +133,8 @@ const GenPathFriends = ({ navigation, route }) => {
             { headers: { Authorization: `Bearer ${user.token}` } }
           );
 
+          console.log(`Ami ${i + 1} ajouté avec succès:`, friendResponse.data);
+
           await axios.post(
             `http://192.168.1.17:3000/api/custom_ami`,
             {
@@ -132,11 +144,12 @@ const GenPathFriends = ({ navigation, route }) => {
             },
             { headers: { Authorization: `Bearer ${user.token}` } }
           );
+          console.log(`Relation d'amitié ${i + 1} ajoutée avec succès pour le personnage:`, idPerso);
         }
       }
 
       Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-      navigation.navigate("GenPathEnemies");
+      navigation.navigate("GenPathEnemies", { idPerso: idPerso }); // Transmettre l'ID du personnage
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);
       alert('Erreur lors de la mise à jour du personnage.');

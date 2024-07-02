@@ -15,6 +15,7 @@ const CulturalOrigin = ({ navigation, route }) => {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const { idPerso } = route.params; // Récupération de l'idPerso depuis les paramètres de navigation
 
   const fetchLanguages = async (originId) => {
     setLoading(true);
@@ -85,18 +86,33 @@ const CulturalOrigin = ({ navigation, route }) => {
 
   const onContinue = async () => {
     try {
-      const originId = origins.find(o => o.nom_origine === selectedOrigin).id_origine;
-      const languageId = languages.find(l => l.nom_langue === selectedLanguage).id_langue;
+      const origin = origins.find(o => o.nom_origine === selectedOrigin);
+      const language = languages.find(l => l.nom_langue === selectedLanguage);
+  
+      if (!origin || !language) {
+        alert("Origine culturelle ou langue invalide.");
+        return;
+      }
+  
+      const originId = origin.id_origine;
+      const languageId = language.id_langue;
       const idPerso = route.params.idPerso;
+  
+      console.log("Updating character with ID:", idPerso);
+      console.log("Selected Origin ID:", originId, "Selected Language ID:", languageId);
+  
       const response = await axios.put(
         `http://192.168.1.17:3000/api/character/update-culturalorigin/${idPerso}`,
         { id_origine: originId, id_langue: languageId },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
+  
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         Alert.alert("Succès", "Les Origines Culturelles et la Langue ont bien été sauvegardés !");
-        navigation.navigate("GenPathPersonality");
+        navigation.navigate("GenPathPersonality", { idPerso: idPerso }); // Transmettre l'ID du personnage
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);

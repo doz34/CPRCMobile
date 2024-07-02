@@ -24,7 +24,7 @@ const GenPathClothing = ({ navigation, route }) => {
   const [selectedHaircut, setSelectedHaircut] = useState(null);
   const [selectedAccessory, setSelectedAccessory] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [idPerso, setIdPerso] = useState(null);
+  const [idPerso, setIdPerso] = useState(route.params?.idPerso);
   const [styleDescription, setStyleDescription] = useState("");
   const [modalVisible, setModalVisible] = useState(false); // État pour gérer la visibilité de la modale
 
@@ -149,7 +149,7 @@ const GenPathClothing = ({ navigation, route }) => {
 
       if (response.status === 200) {
         alert("Tenue mise à jour avec succès!");
-        navigation.navigate("GenPathMotRel");
+        navigation.navigate("GenPathMotRel", { idPerso: idPerso }); // Transmettre l'ID du personnage
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }

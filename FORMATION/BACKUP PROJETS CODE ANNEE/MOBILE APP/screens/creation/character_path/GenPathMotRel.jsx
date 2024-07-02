@@ -77,7 +77,7 @@ const GenPathMotRel = ({ navigation, route }) => {
       alert('ID du personnage non défini.');
       return;
     }
-
+  
     // Vérifiez que toutes les valeurs sont bien définies et sont des entiers
     if (
       !selectedValue ||
@@ -92,13 +92,13 @@ const GenPathMotRel = ({ navigation, route }) => {
       alert('Veuillez sélectionner toutes les valeurs avant de continuer.');
       return;
     }
-
+  
     console.log("ID du personnage:", idPerso);
     console.log("ID de la valeur fondamentale:", selectedValue.id_valeur);
     console.log("ID de l'opinion:", selectedOpinion.id_opinion);
     console.log("ID de l'importance qui:", selectedImportanceWho.id_importance_qui);
     console.log("ID de l'importance quoi:", selectedImportanceWhat.id_importance_quoi);
-
+  
     try {
       const response = await axios.put(
         `http://192.168.1.17:3000/api/character/update-motrel/${idPerso}`,
@@ -113,7 +113,7 @@ const GenPathMotRel = ({ navigation, route }) => {
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         Alert.alert("Succès", "Les données ont été enregistrées avec succès.");
-        navigation.navigate("GenPathSocialOrigin");
+        navigation.navigate("GenPathSocialOrigin", { idPerso: idPerso }); // Transmettre l'ID du personnage
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);

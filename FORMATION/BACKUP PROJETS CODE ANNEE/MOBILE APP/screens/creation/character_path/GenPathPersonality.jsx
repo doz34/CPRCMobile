@@ -15,20 +15,19 @@ import styles from "./character_styles/GenPathPersonality.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import MyTextSimple from "../MyTextSimple";
 
-const GenPathPersonality = ({ navigation }) => {
+const GenPathPersonality = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [characters, setCharacters] = useState([]);
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [idPerso, setIdPerso] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false); // État pour gérer la visibilité de la modale
+  const [idPerso, setIdPerso] = useState(route.params.idPerso); // Utiliser l'ID du personnage transmis
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchCharacters = async () => {
       console.log("Fetching characters...");
       setLoading(true);
       try {
-        // Fetch characters
         const charactersResponse = await axios.get(
           "http://192.168.1.17:3000/api/caractere",
           {
@@ -44,31 +43,14 @@ const GenPathPersonality = ({ navigation }) => {
 
         setCharacters(charactersData);
 
-        // Preselect the first character if available
         if (charactersData.length > 0) {
           setSelectedCharacter(charactersData[0]);
         } else {
           alert("Aucun caractère disponible");
         }
-
-        // Fetch the last character created by the user
-        const lastCharacterResponse = await axios.get(
-          "http://192.168.1.17:3000/api/character/last",
-          {
-            headers: { Authorization: `Bearer ${user?.token}` },
-          }
-        );
-        const lastCharacterData = lastCharacterResponse.data;
-        console.log("Last character fetched:", lastCharacterData);
-
-        if (!lastCharacterData?.id_perso) {
-          throw new Error("Character ID not found");
-        }
-
-        setIdPerso(lastCharacterData.id_perso);
       } catch (error) {
         console.error("Erreur lors de la récupération des caractères:", error);
-        alert("Erreur lors de la récupération des caractères ou du dernier personnage.");
+        alert("Erreur lors de la récupération des caractères.");
       } finally {
         setLoading(false);
       }
@@ -95,30 +77,30 @@ const GenPathPersonality = ({ navigation }) => {
   const onSaveCharacter = async () => {
     console.log("Saving character...");
     console.log("Selected Character:", selectedCharacter, "User:", user, "ID Perso:", idPerso);
-  
+
     if (!selectedCharacter?.id_caractere || !user?.token || !idPerso) {
       alert("Character, user token, or user ID is missing.");
       console.error("Missing data - Selected Character:", selectedCharacter, "User:", user, "ID Perso:", idPerso);
       return;
     }
-  
+
     console.log("Updating character for user ID:", idPerso);
-  
+
     try {
       const response = await axios.put(
         `http://192.168.1.17:3000/api/character/update-character/${idPerso}`,
         { id_caractere: selectedCharacter.id_caractere },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
-  
+
       console.log("Server response:", response);
-  
+
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         alert("Caractère mis à jour avec succès!");
         navigation.navigate("GenPathClothing", {
           idPerso: idPerso,
-          idRole: response.data.id_role, // Assurez-vous que id_role est transmis
+          idRole: response.data.id_role,
         });
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
