@@ -115,7 +115,7 @@ const GenPathPersonality = ({ navigation }) => {
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         alert("Caractère mis à jour avec succès!");
-        navigation.navigate("NextScreen");
+        navigation.navigate("GenPathClothing"); // Navigation vers la page "GenPathClothing"
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
