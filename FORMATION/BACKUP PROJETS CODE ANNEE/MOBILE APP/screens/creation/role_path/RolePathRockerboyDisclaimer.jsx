@@ -14,10 +14,11 @@ import { UserContext } from "../../../context/UserContext";
 import styles from "./role_styles/RolePathRockerboyDisclaimer.styles";
 import MyTextSimple from "../MyTextSimple";
 
-const RolePathRockerboyDisclaimer = ({ navigation }) => {
+const RolePathRockerboyDisclaimer = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [idPerso, setIdPerso] = useState(route.params?.idPerso);
 
   useEffect(() => {
     const fetchImageUrl = async () => {
@@ -94,7 +95,7 @@ const RolePathRockerboyDisclaimer = ({ navigation }) => {
       </ScrollView>
       <TouchableOpacity
         style={styles.continueButton}
-        onPress={() => navigation.navigate("RolePathRockerboyJob")}
+        onPress={() => navigation.navigate("RolePathRockerboyJob", { idPerso })}
       >
         <Text style={styles.buttonText}>Continuer</Text>
       </TouchableOpacity>

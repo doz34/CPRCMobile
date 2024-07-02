@@ -57,59 +57,59 @@ const GenPathEnding = ({ navigation, route }) => {
 
   const onContinue = async () => {
     if (!idPerso) {
-      alert("ID du personnage non trouvé.");
-      return;
+        alert("ID du personnage non trouvé.");
+        return;
     }
 
     try {
-      console.log("Fetching character data for ID:", idPerso);
-      const response = await axios.get(
-        `http://192.168.1.17:3000/api/character/${idPerso}`,
-        { headers: { Authorization: `Bearer ${user?.token}` } }
-      );
-      console.log("Character data response:", response.data);
+        console.log("Fetching character data for ID:", idPerso);
+        const response = await axios.get(
+            `http://192.168.1.17:3000/api/character/${idPerso}`,
+            { headers: { Authorization: `Bearer ${user?.token}` } }
+        );
+        console.log("Character data response:", response.data);
 
-      const { id_role } = response.data;
+        const { id_role } = response.data;
 
-      switch (id_role) {
-        case 1:
-          navigation.navigate("RolePathRockerboyDisclaimer");
-          break;
-        case 2:
-          navigation.navigate("RolePathSoloDisclaimer");
-          break;
-        case 3:
-          navigation.navigate("RolePathCorpoDisclaimer");
-          break;
-        case 4:
-          navigation.navigate("RolePathTechieDisclaimer");
-          break;
-        case 5:
-          navigation.navigate("RolePathMedTechDisclaimer");
-          break;
-        case 6:
-          navigation.navigate("RolePathMediaDisclaimer");
-          break;
-        case 7:
-          navigation.navigate("RolePathLawmanDisclaimer");
-          break;
-        case 8:
-          navigation.navigate("RolePathNetrunnerDisclaimer");
-          break;
-        case 9:
-          navigation.navigate("RolePathFixerDisclaimer");
-          break;
-        case 10:
-          navigation.navigate("RolePathNomadDisclaimer");
-          break;
-        default:
-          alert("Rôle inconnu");
-      }
+        switch (id_role) {
+            case 1:
+                navigation.navigate("RolePathRockerboyDisclaimer", { idPerso });
+                break;
+            case 2:
+                navigation.navigate("RolePathSoloDisclaimer", { idPerso });
+                break;
+            case 3:
+                navigation.navigate("RolePathCorpoDisclaimer", { idPerso });
+                break;
+            case 4:
+                navigation.navigate("RolePathTechieDisclaimer", { idPerso });
+                break;
+            case 5:
+                navigation.navigate("RolePathMedTechDisclaimer", { idPerso });
+                break;
+            case 6:
+                navigation.navigate("RolePathMediaDisclaimer", { idPerso });
+                break;
+            case 7:
+                navigation.navigate("RolePathLawmanDisclaimer", { idPerso });
+                break;
+            case 8:
+                navigation.navigate("RolePathNetrunnerDisclaimer", { idPerso });
+                break;
+            case 9:
+                navigation.navigate("RolePathFixerDisclaimer", { idPerso });
+                break;
+            case 10:
+                navigation.navigate("RolePathNomadDisclaimer", { idPerso });
+                break;
+            default:
+                alert("Rôle inconnu");
+        }
     } catch (error) {
-      console.error("Erreur lors de la récupération du rôle:", error.response ? error.response.data : error.message);
-      alert("Erreur lors de la récupération du rôle.");
+        console.error("Erreur lors de la récupération du rôle:", error.response ? error.response.data : error.message);
+        alert("Erreur lors de la récupération du rôle.");
     }
-  };
+};
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
