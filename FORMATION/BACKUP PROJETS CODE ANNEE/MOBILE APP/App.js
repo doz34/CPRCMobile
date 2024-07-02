@@ -35,6 +35,8 @@ import CaracPathDisclaimer from './screens/creation/stuff_path/CaracPathDisclaim
 import CaracPathSelection from './screens/creation/stuff_path/CaracPathSelection';
 import CaracPathDerivatedCarac from './screens/creation/stuff_path/CaracPathDerivatedCarac';
 import CaracPathEnding from './screens/creation/stuff_path/CaracPathEnding';
+import CompPathDisclaimer from './screens/creation/stuff_path/CompPathDisclaimer';
+
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -91,6 +93,7 @@ const App = () => {
           <Stack.Screen name="CaracPathSelection" component={CaracPathSelection} />
           <Stack.Screen name="CaracPathDerivatedCarac" component={CaracPathDerivatedCarac} />
           <Stack.Screen name="CaracPathEnding" component={CaracPathEnding} />
+          <Stack.Screen name="CompPathDisclaimer" component={CompPathDisclaimer} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
