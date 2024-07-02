@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground, ScrollView, Modal } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground, ScrollView, Modal, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
 import axios from "axios";
@@ -14,8 +14,7 @@ const CulturalOrigin = ({ navigation, route }) => {
   const [selectedOrigin, setSelectedOrigin] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [initialOriginId, setInitialOriginId] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false); // État pour gérer la visibilité de la modale
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchLanguages = async (originId) => {
     setLoading(true);
@@ -26,7 +25,6 @@ const CulturalOrigin = ({ navigation, route }) => {
       const languagesData = response.data;
       setLanguages(languagesData);
 
-      // Select the first language by default if available
       if (languagesData.length > 0) {
         setSelectedLanguage(languagesData[0].nom_langue);
       }
@@ -38,31 +36,28 @@ const CulturalOrigin = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    const fetchOrigins = async () => {
-      setLoading(true);
-      try {
-        const originsResponse = await axios.get("http://192.168.1.17:3000/api/origins", {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
+  const fetchOrigins = async () => {
+    setLoading(true);
+    try {
+      const originsResponse = await axios.get("http://192.168.1.17:3000/api/origins", {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      const originsData = originsResponse.data;
+      setOrigins(originsData);
 
-        const originsData = originsResponse.data;
-        setOrigins(originsData);
-
-        // Select the first origin by default if available
-        if (originsData.length > 0) {
-          const initialOrigin = originsData[0];
-          setSelectedOrigin(initialOrigin.nom_origine);
-          setInitialOriginId(initialOrigin.id_origine);
-          await fetchLanguages(initialOrigin.id_origine);
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des origines:", error);
-      } finally {
-        setLoading(false);
+      if (originsData.length > 0) {
+        const initialOrigin = originsData[0];
+        setSelectedOrigin(initialOrigin.nom_origine);
+        await fetchLanguages(initialOrigin.id_origine);
       }
-    };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des origines:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (user?.token) {
       fetchOrigins();
     }
@@ -71,7 +66,6 @@ const CulturalOrigin = ({ navigation, route }) => {
   const handleOriginChange = (itemValue, itemIndex) => {
     setSelectedOrigin(itemValue);
     const originId = origins[itemIndex].id_origine;
-    setInitialOriginId(originId);
     fetchLanguages(originId);
   };
 
@@ -79,7 +73,6 @@ const CulturalOrigin = ({ navigation, route }) => {
     const randomIndex = Math.floor(Math.random() * origins.length);
     const randomOrigin = origins[randomIndex];
     setSelectedOrigin(randomOrigin.nom_origine);
-    setInitialOriginId(randomOrigin.id_origine);
     fetchLanguages(randomOrigin.id_origine);
   };
 
@@ -90,22 +83,19 @@ const CulturalOrigin = ({ navigation, route }) => {
     }
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
   const onContinue = async () => {
     try {
       const originId = origins.find(o => o.nom_origine === selectedOrigin).id_origine;
       const languageId = languages.find(l => l.nom_langue === selectedLanguage).id_langue;
       const idPerso = route.params.idPerso;
       const response = await axios.put(
-        `http://192.168.1.17:3000/api/character/update-personnage/${idPerso}`,
+        `http://192.168.1.17:3000/api/character/update-culturalorigin/${idPerso}`,
         { id_origine: originId, id_langue: languageId },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
+        Alert.alert("Succès", "Les Origines Culturelles et la Langue ont bien été sauvegardés !");
         navigation.navigate("GenPathPersonality");
       }
     } catch (error) {
@@ -122,6 +112,10 @@ const CulturalOrigin = ({ navigation, route }) => {
     setModalVisible(false);
     navigation.navigate("Home");
   };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <ImageBackground
@@ -149,7 +143,7 @@ const CulturalOrigin = ({ navigation, route }) => {
           <Picker
             selectedValue={selectedOrigin}
             style={styles.picker}
-            onValueChange={(itemValue, itemIndex) => handleOriginChange(itemValue, itemIndex)}
+            onValueChange={handleOriginChange}
           >
             {origins.map((origin) => (
               <Picker.Item
@@ -169,7 +163,7 @@ const CulturalOrigin = ({ navigation, route }) => {
           <Picker
             selectedValue={selectedLanguage}
             style={styles.picker}
-            onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
+            onValueChange={setSelectedLanguage}
           >
             {languages.map((language) => (
               <Picker.Item
@@ -192,34 +186,34 @@ const CulturalOrigin = ({ navigation, route }) => {
             <Text style={styles.buttonText}>Continuer</Text>
           </TouchableOpacity>
         </View>
-      </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <LinearGradient
-            colors={["#484848", "#868686"]}
-            style={styles.modalContent}
-          >
-            <Text style={styles.modalTitle}>TERMINER PLUS TARD :</Text>
-            <Text style={styles.modalDescription}>
-              Vous allez retourner au menu sans sauvegarder les informations de cette page. Les informations des pages précédentes ont déjà été sauvegardées, confirmer ?
-            </Text>
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={[styles.modalButton, styles.modalButtonYes]} onPress={confirmQuit}>
-                <Text style={styles.buttonText}>OUI</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, styles.modalButtonNo]} onPress={() => setModalVisible(false)}>
-                <Text style={styles.buttonText}>ANNULER</Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </View>
-      </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <LinearGradient
+              colors={["#484848", "#868686"]}
+              style={styles.modalContent}
+            >
+              <Text style={styles.modalTitle}>TERMINER PLUS TARD :</Text>
+              <Text style={styles.modalDescription}>
+                Vous allez retourner au menu sans sauvegarder les informations de cette page. Les informations des pages précédentes ont déjà été sauvegardées, confirmer ?
+              </Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity style={[styles.modalButton, styles.modalButtonYes]} onPress={confirmQuit}>
+                  <Text style={styles.buttonText}>OUI</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.modalButton, styles.modalButtonNo]} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.buttonText}>ANNULER</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </View>
+        </Modal>
+      </View>
     </ImageBackground>
   );
 };
