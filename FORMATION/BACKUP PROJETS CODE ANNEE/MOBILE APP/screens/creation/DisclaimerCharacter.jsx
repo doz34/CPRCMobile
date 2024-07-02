@@ -6,12 +6,11 @@ import {
   ImageBackground,
   TouchableOpacity,
   Modal,
-  Button,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from './styles';
+import styles from './creation_styles/DisclaimerCharacter.styles';
 import axios from 'axios';
 import { UserContext } from '../../context/UserContext';
 
@@ -91,16 +90,28 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
     setConfirmModalVisible(false);
   };
 
+  const renderButton = (title, onPress, buttonStyle) => (
+    <TouchableOpacity style={buttonStyle} onPress={onPress}>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
   const renderInitialModal = () => (
-    <View style={styles.modalView}>
+    <LinearGradient
+      colors={['#868686', '#484848']}
+      style={styles.modalGradient}
+    >
       <Text style={styles.modalText}>Voulez-vous créer un nouveau personnage ou continuer avec un personnage existant ?</Text>
-      <Button title="Créer un nouveau personnage" onPress={() => handleInitialChoice('new')} />
-      <Button title="Continuer avec un personnage existant" onPress={() => handleInitialChoice('existing')} />
-    </View>
+      {renderButton('Créer un nouveau personnage', () => handleInitialChoice('new'), styles.createCharacterButton)}
+      {renderButton('Continuer avec un personnage existant', () => handleInitialChoice('existing'), styles.continueWithExistingButton)}
+    </LinearGradient>
   );
 
   const renderCreateNewModal = () => (
-    <View style={styles.modalView}>
+    <LinearGradient
+      colors={['#868686', '#484848']}
+      style={styles.modalGradient}
+    >
       <Text style={styles.modalText}>Choisissez un nom pour votre personnage :</Text>
       <TextInput
         style={styles.input}
@@ -108,23 +119,19 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         value={tempCharacterName}
         onChangeText={(text) => setTempCharacterName(text)}
       />
-      <Button title="Confirmer" onPress={handleSubmitName} />
-      <Button title="Annuler" onPress={() => { setCreateNewModalVisible(false); setInitialModalVisible(true); }} />
-    </View>
+      {renderButton('Confirmer', handleSubmitName, styles.confirmButton)}
+      {renderButton('Annuler', () => { setCreateNewModalVisible(false); setInitialModalVisible(true); }, styles.cancelButton)}
+    </LinearGradient>
   );
 
   const renderConfirmModal = () => (
-    <View style={styles.modalView}>
+    <LinearGradient
+      colors={['#868686', '#484848']}
+      style={styles.modalGradient}
+    >
       <Text style={styles.modalText}>Est-ce que le nom "{characterName}" est correct ?</Text>
-      <Button title="Oui" onPress={handleConfirmName} />
-      <Button
-        title="Modifier"
-        onPress={() => {
-          setCreateNewModalVisible(true);
-          setConfirmModalVisible(false);
-        }}
-      />
-    </View>
+      {renderButton('Oui', handleConfirmName, styles.confirmButton)}
+      {renderButton('Modifier', () => { setCreateNewModalVisible(true); setConfirmModalVisible(false); }, styles.modifyButton)}</LinearGradient>
   );
 
   return (
@@ -161,7 +168,9 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         visible={initialModalVisible}
         onRequestClose={() => setInitialModalVisible(false)}
       >
-        {renderInitialModal()}
+        <View style={styles.blurredBackground}>
+          {renderInitialModal()}
+        </View>
       </Modal>
 
       <Modal
@@ -170,7 +179,9 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         visible={createNewModalVisible}
         onRequestClose={() => setCreateNewModalVisible(false)}
       >
-        {renderCreateNewModal()}
+        <View style={styles.blurredBackground}>
+          {renderCreateNewModal()}
+        </View>
       </Modal>
 
       <Modal
@@ -179,7 +190,9 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}
       >
-        {renderConfirmModal()}
+        <View style={styles.blurredBackground}>
+          {renderConfirmModal()}
+        </View>
       </Modal>
     </ImageBackground>
   );

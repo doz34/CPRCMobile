@@ -1,0 +1,133 @@
+import { StyleSheet, Dimensions } from "react-native";
+
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  blurredBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  modalGradient: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -(screenWidth * 0.4) }, { translateY: -(screenHeight * 0.25) }],
+    width: screenWidth * 0.8,
+    padding: 20,
+    borderRadius: 10,
+    borderColor: 'black',
+    borderWidth: 2,
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    padding: 10,
+    marginVertical: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    color: 'black',
+  },
+  createCharacterButton: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginVertical: 5,
+    width: '80%',
+  },
+  continueWithExistingButton: {
+    backgroundColor: 'teal',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginVertical: 5,
+    width: '80%',
+  },
+  confirmButton: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginVertical: 5,
+    width: '80%',
+  },
+  cancelButton: {
+    backgroundColor: 'red',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginVertical: 5,
+    width: '80%',
+  },
+  modifyButton: {
+    backgroundColor: 'teal',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginVertical: 5,
+    width: '80%',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  continueButton: {
+    backgroundColor: "green",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: "80%",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  placeholderContainer: {
+    backgroundColor: 'darkgray',
+    borderRadius: 10,
+    padding: 20,
+    marginHorizontal: 20,
+    marginVertical: 30,
+    opacity: 0.6,
+  },
+  roleDescriptionText: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'justify',
+    padding: 10,
+    lineHeight: 20,
+  },
+  roleDescriptionTitleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+});
+
+export default styles;
