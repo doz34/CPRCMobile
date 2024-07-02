@@ -1,34 +1,52 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-// Importation des écrans depuis votre dossier "screens"
 import HomeScreen from './screens/Home';
 import ConnexionScreen from './screens/Connexion';
 import InscriptionScreen from './screens/Inscription';
+import MyAccount from './screens/account/MyAccount';
+import MyAvatar from './screens/account/MyAvatar';
+import MyInfo from './screens/account/MyInfo';
+import DisclaimerCharacter from './screens/creation/DisclaimerCharacter';
+import SelectRoleScreen from './screens/creation/SelectRole';
+import { UserProvider } from './context/UserContext';
+
+const styles = StyleSheet.create({
+  headerStyle: {
+    backgroundColor: "#fd0d1b",
+  },
+  headerTintColor: "#fff",
+  headerTitleStyle: {
+    fontWeight: "bold",
+  },
+});
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {/* Utiliser les composants importés comme écrans */}
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Connexion" component={ConnexionScreen} />
-        <Stack.Screen name="Inscription" component={InscriptionScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: styles.headerStyle,
+            headerTintColor: styles.headerTintColor,
+            headerTitleStyle: styles.headerTitleStyle,
+          }}
+        >
+          <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Accueil' }} />
+          <Stack.Screen name="Connexion" component={ConnexionScreen} options={{ title: 'Connexion' }} />
+          <Stack.Screen name="Inscription" component={InscriptionScreen} options={{ title: 'Inscription' }} />
+          <Stack.Screen name="MyAccount" component={MyAccount} options={{ title: 'Mon Compte' }} />
+          <Stack.Screen name="MyAvatar" component={MyAvatar} options={{ title: 'Mon Avatar' }} />
+          <Stack.Screen name="MyInfo" component={MyInfo} options={{ title: 'Mes Informations' }} />
+          <Stack.Screen name="DisclaimerCharacter" component={DisclaimerCharacter} options={{ title: 'Disclaimer Character' }} />
+          <Stack.Screen name="SelectRole" component={SelectRoleScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
