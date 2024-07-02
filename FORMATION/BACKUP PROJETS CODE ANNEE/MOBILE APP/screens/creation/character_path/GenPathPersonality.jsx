@@ -6,14 +6,14 @@ import {
   ActivityIndicator,
   ImageBackground,
   ScrollView,
+  Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
 import axios from "axios";
-import styles from "./character_styles/CulturalOrigin.styles";
+import styles from "./character_styles/GenPathPersonality.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import MyTextSimple from "../MyTextSimple";
-import GenPathPersonalityStyles from "./character_styles/GenPathPersonality.styles";
 
 const GenPathPersonality = ({ navigation }) => {
   const { user } = useContext(UserContext);
@@ -21,6 +21,7 @@ const GenPathPersonality = ({ navigation }) => {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [idPerso, setIdPerso] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false); // État pour gérer la visibilité de la modale
 
   useEffect(() => {
     const fetchCharacters = async () => {
@@ -94,28 +95,31 @@ const GenPathPersonality = ({ navigation }) => {
   const onSaveCharacter = async () => {
     console.log("Saving character...");
     console.log("Selected Character:", selectedCharacter, "User:", user, "ID Perso:", idPerso);
-
+  
     if (!selectedCharacter?.id_caractere || !user?.token || !idPerso) {
       alert("Character, user token, or user ID is missing.");
       console.error("Missing data - Selected Character:", selectedCharacter, "User:", user, "ID Perso:", idPerso);
       return;
     }
-
+  
     console.log("Updating character for user ID:", idPerso);
-
+  
     try {
       const response = await axios.put(
         `http://192.168.1.17:3000/api/character/update-character/${idPerso}`,
         { id_caractere: selectedCharacter.id_caractere },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
-
+  
       console.log("Server response:", response);
-
+  
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
         alert("Caractère mis à jour avec succès!");
-        navigation.navigate("GenPathClothing"); // Navigation vers la page "GenPathClothing"
+        navigation.navigate("GenPathClothing", {
+          idPerso: idPerso,
+          idRole: response.data.id_role, // Assurez-vous que id_role est transmis
+        });
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
@@ -123,6 +127,15 @@ const GenPathPersonality = ({ navigation }) => {
       console.error("Erreur lors de la mise à jour du caractère:", error);
       alert("Erreur lors de la mise à jour du caractère.");
     }
+  };
+
+  const onQuit = () => {
+    setModalVisible(true);
+  };
+
+  const confirmQuit = () => {
+    setModalVisible(false);
+    navigation.navigate("Home");
   };
 
   if (loading) {
@@ -169,13 +182,42 @@ const GenPathPersonality = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.continueButton}
-          onPress={onSaveCharacter}
-        >
-          <Text style={styles.buttonText}>Confirmer</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.quitButton} onPress={onQuit}>
+            <Text style={styles.buttonText}>QUITTER</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.continueButton} onPress={onSaveCharacter}>
+            <Text style={styles.buttonText}>Continuer</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={["#484848", "#868686"]}
+            style={styles.modalContent}
+          >
+            <Text style={styles.modalTitle}>TERMINER PLUS TARD :</Text>
+            <Text style={styles.modalDescription}>
+              Vous allez retourner au menu sans sauvegarder les informations de cette page. Les informations des pages précédentes ont déjà été sauvegardées, confirmer ?
+            </Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonYes]} onPress={confirmQuit}>
+                <Text style={styles.buttonText}>OUI</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonNo]} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>ANNULER</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };

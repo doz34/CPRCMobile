@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground, ScrollView, Modal } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
 import axios from "axios";
@@ -15,6 +15,7 @@ const CulturalOrigin = ({ navigation, route }) => {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [initialOriginId, setInitialOriginId] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false); // État pour gérer la visibilité de la modale
 
   const fetchLanguages = async (originId) => {
     setLoading(true);
@@ -22,11 +23,12 @@ const CulturalOrigin = ({ navigation, route }) => {
       const response = await axios.get(`http://192.168.1.17:3000/api/languages/${originId}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
-      setLanguages(response.data);
-  
-      if (route.params?.idLangue) {
-        const initialLanguage = response.data.find(l => l.id_langue === route.params.idLangue);
-        setSelectedLanguage(initialLanguage ? initialLanguage.nom_langue : response.data[0]?.nom_langue);
+      const languagesData = response.data;
+      setLanguages(languagesData);
+
+      // Select the first language by default if available
+      if (languagesData.length > 0) {
+        setSelectedLanguage(languagesData[0].nom_langue);
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des langues:", error);
@@ -35,7 +37,7 @@ const CulturalOrigin = ({ navigation, route }) => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     const fetchOrigins = async () => {
       setLoading(true);
@@ -44,21 +46,16 @@ const CulturalOrigin = ({ navigation, route }) => {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
 
-        setOrigins(originsResponse.data);
+        const originsData = originsResponse.data;
+        setOrigins(originsData);
 
-        // Présélection de l'origine si elle existe
-        let initialId = originsResponse.data[0].id_origine;
-        if (route.params?.idOrigine) {
-          initialId = route.params.idOrigine;
-        }
-
-        const initialOrigin = originsResponse.data.find((o) => o.id_origine === initialId);
-        if (initialOrigin) {
+        // Select the first origin by default if available
+        if (originsData.length > 0) {
+          const initialOrigin = originsData[0];
           setSelectedOrigin(initialOrigin.nom_origine);
-          setInitialOriginId(initialId);
-          await fetchLanguages(initialId);
+          setInitialOriginId(initialOrigin.id_origine);
+          await fetchLanguages(initialOrigin.id_origine);
         }
-
       } catch (error) {
         console.error("Erreur lors de la récupération des origines:", error);
       } finally {
@@ -116,7 +113,16 @@ const CulturalOrigin = ({ navigation, route }) => {
       alert('Erreur lors de la mise à jour du personnage.');
     }
   };
-  
+
+  const onQuit = () => {
+    setModalVisible(true);
+  };
+
+  const confirmQuit = () => {
+    setModalVisible(false);
+    navigation.navigate("Home");
+  };
+
   return (
     <ImageBackground
       source={require("../../../assets/Inscription.png")}
@@ -130,11 +136,11 @@ const CulturalOrigin = ({ navigation, route }) => {
           ORIGINES CULTURELLES :
         </Text>
         <ScrollView style={styles.scrollableContentContainer}>
-      <MyTextSimple
-        text="L'univers de Cyberpunk est multiculturel et international. Vous devez apprendre à vivre aux côtés de gens issus des quatre coins d'un monde fracturé et anarchique ou mourir à la première fois que vous regarderez de travers la mauvaise personne. Vos origines déterminent votre langue maternelle. Dans Cyberpunk RED, on part du principe que tout le monde connaît l'argot des Rues, le pidgin qui, au fil des évolutions, est devenu le langage universel du futur ténébreux, mais vous maîtrisez aussi une autre langue apprise sur les genoux de votre mère. Après avoir lancé un dé pour déterminer votre culture d'origine, choisissez une des langues proposées dans la case adjacente. Vous commencez avec 4 points dans cette compétence de Langue. Il existe des centaines de langues autour du monde, mais pour cet ouvrage, nous avons établi la liste des langues les plus courantes de l'Ere du Rouge pour chaque région. Si vous souhaitez que votre personnage parle une langue qui n'est pas mentionnée, notez votre choix à la place des suggestions de la liste ci-dessous."
-        style={styles.descriptionText} 
-      />
-    </ScrollView>
+          <MyTextSimple
+            text="L'univers de Cyberpunk est multiculturel et international. Vous devez apprendre à vivre aux côtés de gens issus des quatre coins d'un monde fracturé et anarchique ou mourir à la première fois que vous regarderez de travers la mauvaise personne. Vos origines déterminent votre langue maternelle. Dans Cyberpunk RED, on part du principe que tout le monde connaît l'argot des Rues, le pidgin qui, au fil des évolutions, est devenu le langage universel du futur ténébreux, mais vous maîtrisez aussi une autre langue apprise sur les genoux de votre mère. Après avoir lancé un dé pour déterminer votre culture d'origine, choisissez une des langues proposées dans la case adjacente. Vous commencez avec 4 points dans cette compétence de Langue. Il existe des centaines de langues autour du monde, mais pour cet ouvrage, nous avons établi la liste des langues les plus courantes de l'Ere du Rouge pour chaque région. Si vous souhaitez que votre personnage parle une langue qui n'est pas mentionnée, notez votre choix à la place des suggestions de la liste ci-dessous."
+            style={styles.descriptionText} 
+          />
+        </ScrollView>
       </LinearGradient>
   
       <View style={styles.fullContainer}>
@@ -178,12 +184,44 @@ const CulturalOrigin = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
   
-        <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
-          <Text style={styles.buttonText}>Confirmer</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.quitButton} onPress={onQuit}>
+            <Text style={styles.buttonText}>QUITTER</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
+            <Text style={styles.buttonText}>Continuer</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={["#484848", "#868686"]}
+            style={styles.modalContent}
+          >
+            <Text style={styles.modalTitle}>TERMINER PLUS TARD :</Text>
+            <Text style={styles.modalDescription}>
+              Vous allez retourner au menu sans sauvegarder les informations de cette page. Les informations des pages précédentes ont déjà été sauvegardées, confirmer ?
+            </Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonYes]} onPress={confirmQuit}>
+                <Text style={styles.buttonText}>OUI</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonNo]} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>ANNULER</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </View>
+      </Modal>
     </ImageBackground>
   );
-};   
+};
 
 export default CulturalOrigin;

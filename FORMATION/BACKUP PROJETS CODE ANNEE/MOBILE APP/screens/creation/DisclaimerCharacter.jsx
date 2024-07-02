@@ -193,7 +193,10 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       if (response.data && response.data.length > 0) {
-        setCharacters(response.data);
+        const charactersWithRoleIds = response.data.map((character) => {
+          return { ...character, id_role: character.id_role };
+        });
+        setCharacters(charactersWithRoleIds);
         sortCharacters(sortBy, sortDirection);
       } else {
         setCharacters([]);
@@ -342,17 +345,48 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         return;
       }
     
-      console.log("Navigating to CulturalOrigin with:", {
-        idPerso: selectedCharacter.id_perso,
-        idOrigine: selectedCharacter.id_origine,
-        idLangue: selectedCharacter.id_langue,
+      console.log("Selected Character:", {
+        id_perso: selectedCharacter.id_perso,
+        id_role: selectedCharacter.id_role,
+        id_origine: selectedCharacter.id_origine,
+        id_langue: selectedCharacter.id_langue,
+        nom_perso: selectedCharacter.nom_perso,
+        role: selectedCharacter.role // Assurez-vous que ce champ est bien `id_role` et non `nom_role`
       });
     
-      navigation.navigate("CulturalOrigin", {
-        idPerso: selectedCharacter.id_perso,
-        idOrigine: selectedCharacter.id_origine || null, // Fallback to null if undefined
-        idLangue: selectedCharacter.id_langue || null, // Fallback to null if undefined
-      });
+      // Vérifiez si id_role est défini
+      if (!selectedCharacter.id_role) {
+        alert('Le rôle du personnage sélectionné est introuvable.');
+        return;
+      }
+    
+      // Condition pour déterminer la page de destination
+      if (selectedCharacter.id_origine && selectedCharacter.id_langue) {
+        console.log("Navigating to GenPathClothing with:", {
+          idPerso: selectedCharacter.id_perso,
+          idRole: selectedCharacter.id_role,
+        });
+    
+        navigation.navigate("GenPathClothing", {
+          idPerso: selectedCharacter.id_perso,
+          idRole: selectedCharacter.id_role,
+        });
+      } else {
+        console.log("Navigating to CulturalOrigin with:", {
+          idPerso: selectedCharacter.id_perso,
+          idOrigine: selectedCharacter.id_origine,
+          idLangue: selectedCharacter.id_langue,
+          idRole: selectedCharacter.id_role,
+        });
+    
+        navigation.navigate("CulturalOrigin", {
+          idPerso: selectedCharacter.id_perso,
+          idOrigine: selectedCharacter.id_origine || null, // Fallback to null if undefined
+          idLangue: selectedCharacter.id_langue || null, // Fallback to null if undefined
+          idRole: selectedCharacter.id_role,
+        });
+      }
+    
       setConfirmModalVisible(false);
     };
   

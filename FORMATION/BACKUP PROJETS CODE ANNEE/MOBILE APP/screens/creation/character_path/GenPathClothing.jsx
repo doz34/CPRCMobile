@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ImageBackground,
   ScrollView,
+  Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
@@ -14,7 +15,7 @@ import styles from "./character_styles/GenPathClothing.styles";
 import { LinearGradient } from "expo-linear-gradient";
 import MyTextSimple from "../MyTextSimple";
 
-const GenPathClothing = ({ navigation }) => {
+const GenPathClothing = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [stylesList, setStylesList] = useState([]);
   const [haircuts, setHaircuts] = useState([]);
@@ -25,51 +26,81 @@ const GenPathClothing = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [idPerso, setIdPerso] = useState(null);
   const [styleDescription, setStyleDescription] = useState("");
+  const [modalVisible, setModalVisible] = useState(false); // État pour gérer la visibilité de la modale
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch the last character created by the user
-        const lastCharacterResponse = await axios.get(
-          "http://192.168.1.17:3000/api/character/last",
+        const characterId = route.params?.idPerso;
+        const roleId = route.params?.idRole;
+        if (!characterId || !roleId) {
+          throw new Error("Character ID or Role ID not provided");
+        }
+        setIdPerso(characterId);
+
+        // Fetch character details
+        const characterResponse = await axios.get(
+          `http://192.168.1.17:3000/api/character/${characterId}`,
           {
             headers: { Authorization: `Bearer ${user?.token}` },
           }
         );
-        const lastCharacterData = lastCharacterResponse.data;
-        if (!lastCharacterData?.id_perso) {
-          throw new Error("Character ID not found");
-        }
-        setIdPerso(lastCharacterData.id_perso);
+        const characterData = characterResponse.data;
+        console.log("Character data:", characterData); // Log pour débogage
 
         // Fetch styles based on role
-        const roleId = lastCharacterData.id_role;
         const stylesResponse = await axios.get(
-          `http://192.168.1.17:3000/api/styles/${roleId}`,
+          `http://192.168.1.17:3000/api/character/styles/${roleId}`,
           {
             headers: { Authorization: `Bearer ${user?.token}` },
           }
         );
-        setStylesList(stylesResponse.data);
+        const stylesData = stylesResponse.data;
+        setStylesList(stylesData);
 
         // Fetch haircuts
         const haircutsResponse = await axios.get(
-          "http://192.168.1.17:3000/api/haircuts",
+          "http://192.168.1.17:3000/api/character/haircuts",
           {
             headers: { Authorization: `Bearer ${user?.token}` },
           }
         );
-        setHaircuts(haircutsResponse.data);
+        const haircutsData = haircutsResponse.data;
+        setHaircuts(haircutsData);
 
         // Fetch favorite accessories
         const accessoriesResponse = await axios.get(
-          "http://192.168.1.17:3000/api/accessories",
+          "http://192.168.1.17:3000/api/character/accessories",
           {
             headers: { Authorization: `Bearer ${user?.token}` },
           }
         );
-        setFavoriteAccessories(accessoriesResponse.data);
+        const accessoriesData = accessoriesResponse.data;
+        setFavoriteAccessories(accessoriesData);
+
+        // Set the initial style description if a style is already selected
+        if (characterData.id_style) {
+          const selectedStyle = stylesData.find(style => style.id_style === characterData.id_style);
+          if (selectedStyle) {
+            setSelectedStyle(selectedStyle);
+            setStyleDescription(selectedStyle.description);
+          }
+        } else {
+          // Select the first item by default if no style is selected
+          if (stylesData.length > 0) {
+            setSelectedStyle(stylesData[0]);
+            setStyleDescription(stylesData[0].description);
+          }
+        }
+
+        // Select the first haircut and accessory by default
+        if (haircutsData.length > 0) {
+          setSelectedHaircut(haircutsData[0]);
+        }
+        if (accessoriesData.length > 0) {
+          setSelectedAccessory(accessoriesData[0]);
+        }
       } catch (error) {
         console.error("Erreur lors de la récupération des données:", error);
         alert("Erreur lors de la récupération des données.");
@@ -83,7 +114,7 @@ const GenPathClothing = ({ navigation }) => {
     } else {
       alert("Utilisateur non authentifié");
     }
-  }, [user?.token]);
+  }, [user?.token, route.params?.idPerso, route.params?.idRole]);
 
   const handleStyleChange = (itemValue) => {
     setSelectedStyle(itemValue);
@@ -126,6 +157,15 @@ const GenPathClothing = ({ navigation }) => {
       console.error("Erreur lors de la mise à jour de la tenue:", error);
       alert("Erreur lors de la mise à jour de la tenue.");
     }
+  };
+
+  const onQuit = () => {
+    setModalVisible(true);
+  };
+
+  const confirmQuit = () => {
+    setModalVisible(false);
+    navigation.navigate("Home");
   };
 
   if (loading) {
@@ -221,13 +261,42 @@ const GenPathClothing = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.continueButton}
-          onPress={onSaveClothing}
-        >
-          <Text style={styles.buttonText}>Continuer</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.quitButton} onPress={onQuit}>
+            <Text style={styles.buttonText}>QUITTER</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.continueButton} onPress={onSaveClothing}>
+            <Text style={styles.buttonText}>Continuer</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={["#484848", "#868686"]}
+            style={styles.modalContent}
+          >
+            <Text style={styles.modalTitle}>TERMINER PLUS TARD :</Text>
+            <Text style={styles.modalDescription}>
+              Vous allez retourner au menu sans sauvegarder les informations de cette page. Les informations des pages précédentes ont déjà été sauvegardées, confirmer ?
+            </Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonYes]} onPress={confirmQuit}>
+                <Text style={styles.buttonText}>OUI</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.modalButtonNo]} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>ANNULER</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
