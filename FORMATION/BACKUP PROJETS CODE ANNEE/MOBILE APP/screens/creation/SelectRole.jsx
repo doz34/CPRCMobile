@@ -89,22 +89,26 @@ const SelectRoleScreen = ({ navigation }) => {
     }
   }, [user?.token]);
 
-  const onRoleSelect = async (selectedRole) => {
+  const onRoleSelect = async () => {
     try {
+      const selectedRole = roles[currentRoleIndex];
+      const requestBody = {
+        idRole: selectedRole.id_role,
+        // Include idParcours if it's required by your application logic
+        // idParcours: selectedRole.id_parcours, // Uncomment and set the correct value if needed
+      };
+  
       const response = await axios.post(
-        "http://192.168.1.17:3000/api/user/creer-personnage",
-        {
-          idRole: selectedRole.id_role,
-          idParcours: selectedRole.id_parcours_role,
-        },
+        "http://192.168.1.17:3000/api/character/creer-personnage",
+        requestBody,
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-
+  
       if (response.status === 201) {
         console.log("Personnage créé avec succès:", response.data);
-        navigation.navigate("PgenOrig");
+        navigation.navigate("CulturalOrigin", { idPerso: response.data.id_perso });
       }
     } catch (error) {
       console.error("Erreur lors de la création du personnage :", error);
@@ -185,11 +189,11 @@ const SelectRoleScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>En savoir plus</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => onRoleSelect(roles[currentRoleIndex])}
-          style={styles.selectButton}
-        >
-          <Text style={styles.buttonText}>Sélectionner</Text>
-        </TouchableOpacity>
+      onPress={onRoleSelect}
+      style={styles.selectButton}
+    >
+      <Text style={styles.buttonText}>Sélectionner</Text>
+    </TouchableOpacity>
       </View>
   
       {isAdvantagesModalVisible && (

@@ -11,7 +11,11 @@ import MyInfo from './screens/account/MyInfo';
 import DisclaimerCharacter from './screens/creation/DisclaimerCharacter';
 import SelectRoleScreen from './screens/creation/SelectRole';
 import RoleDescriptionScreen from './screens/creation/RoleDescription';
+import CulturalOrigin from './screens/creation/character_path/CulturalOrigin';
 import { UserProvider } from './context/UserContext';
+import GenPathDescScreen from './screens/creation/character_path/GenPathDesc';
+import GenPathPersonalityScreen from './screens/creation/character_path/GenPathPersonality';
+import GenPathClothingScreen from './screens/creation/character_path/GenPathClothing';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -45,6 +49,10 @@ const App = () => {
           <Stack.Screen name="DisclaimerCharacter" component={DisclaimerCharacter} options={{ title: 'Disclaimer Character' }} />
           <Stack.Screen name="SelectRole" component={SelectRoleScreen} />
           <Stack.Screen name="RoleDescription" component={RoleDescriptionScreen} />
+          <Stack.Screen name="GenPathDesc" component={GenPathDescScreen} />
+          <Stack.Screen name="CulturalOrigin" component={CulturalOrigin} />
+          <Stack.Screen name="GenPathPersonality" component={GenPathPersonalityScreen} />
+          <Stack.Screen name="GenPathClothing" component={GenPathClothingScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
