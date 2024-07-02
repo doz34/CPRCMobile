@@ -24,11 +24,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   modalGradient: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -(screenWidth * 0.4) }, { translateY: -(screenHeight * 0.25) }],
     width: screenWidth * 0.8,
+    maxWidth: '90%',
+    maxHeight: screenHeight * 0.8,
+    margin: 20,
     padding: 20,
     borderRadius: 10,
     borderColor: 'black',
@@ -127,6 +126,53 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     marginBottom: 16,
+  },
+  characterContainer: {
+    flexDirection: 'row',
+    padding: 10,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: 'white',
+    marginBottom: 5,
+  },
+  characterIcon: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  characterInfo: {
+    flex: 1,
+  },
+  characterName: {
+    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  characterDetails: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  sortContainer: {
+    flexDirection: 'row',
+    padding: 10,
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  picker: {
+    flex: 1,
+    color: 'white',
+  },
+  selectedCharacterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    marginBottom: 20,
+  },
+  characterList: {
+    width: '100%',
+    flexGrow: 1,
   },
 });
 
