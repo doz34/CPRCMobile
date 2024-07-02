@@ -1,118 +1,71 @@
-import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ImageBackground,
-} from "react-native";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
-import { UserContext } from "../context/UserContext";
+import React, { useState } from 'react';
+import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import axios from 'axios';
+
+const ConnexionScreen = ({ navigation }) => {
+  const [nomUtilisateur, setNomUtilisateur] = useState('');
+  const [motDePasse, setMotDePasse] = useState('');
+
+  const handleConnexion = async () => {
+    try {
+      const response = await axios.post('http://192.168.1.17:3000/api/login', {
+        nom_utilisateur: nomUtilisateur,
+        mot_de_passe: motDePasse,
+      });
+      
+      // Supposons que la réponse réussie du serveur renvoie l'utilisateur et un message de succès
+      if (response.data.user && response.data.message === "Connexion réussie") {
+        // Ici, vous pouvez gérer la navigation ou le stockage du token d'authentification si nécessaire
+        // Par exemple : AsyncStorage.setItem('userToken', response.data.token);
+        // Remplacez 'NomDeLaRouteDeLApplicationPrincipale' par le nom de votre route principale
+        Alert.alert('Connexion réussie', 'Vous êtes maintenant connecté.', [
+          { text: 'OK', onPress: () => navigation.navigate('Home') },
+        ]);
+        
+        navigation.navigate('Home');
+      } else {
+        // Si la connexion échoue mais que le serveur répond quand même (par exemple, mauvais identifiants)
+        Alert.alert('Erreur de connexion', response.data.message || 'Nom d’utilisateur ou mot de passe incorrect.');
+      }
+    } catch (error) {
+      // Si la requête échoue (problème réseau, serveur indisponible, etc.)
+      Alert.alert('Erreur de connexion', 'Une erreur s’est produite lors de la connexion.');
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Nom d'utilisateur"
+        value={nomUtilisateur}
+        onChangeText={setNomUtilisateur}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Mot de passe"
+        secureTextEntry
+        value={motDePasse}
+        onChangeText={setMotDePasse}
+      />
+      <Button title="Se connecter" onPress={handleConnexion} />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
-  },
-  welcomeText: {
-    fontSize: 35,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "white",
-    fontFamily: "Roboto",
-    textShadowColor: "black",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 1,
+    justifyContent: 'center',
   },
   input: {
-    width: "100%",
     height: 40,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#fff",
     padding: 10,
-    color: "#fff",
-    borderRadius: 5,
-  },
-  button: {
-    backgroundColor: "#fd0d1b",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
   },
 });
-
-const ConnexionScreen = () => {
-  const [nomUtilisateur, setNomUtilisateur] = useState("");
-  const [motDePasse, setMotDePasse] = useState("");
-  const { signIn } = useContext(UserContext);
-  const navigation = useNavigation();
-
-  const handleConnexion = async () => {
-    // Vérification des champs vides
-    if (!nomUtilisateur.trim() || !motDePasse.trim()) {
-      Alert.alert(
-        "Champs requis",
-        "Veuillez saisir votre nom d'utilisateur et votre mot de passe."
-      );
-      return; // Arrêt de la fonction si l'un des champs est vide
-    }
-  
-    const result = await signIn(nomUtilisateur, motDePasse); // Attendre le résultat de la tentative de connexion
-    if (result.success) {
-      navigation.navigate("Home"); // Rediriger vers la page d'accueil en cas de succès
-    } else {
-      Alert.alert("Erreur de connexion", result.message); // Afficher l'erreur en cas d'échec
-    }
-  };
-  
-
-  return (
-    <ImageBackground
-      source={require("../assets/Connexion.png")}
-      style={styles.backgroundImage}
-    >
-      <View style={styles.container}>
-        <Text style={styles.welcomeText}>Connexion</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nom d'utilisateur ou Adresse e-mail"
-          placeholderTextColor="#fff"
-          value={nomUtilisateur}
-          onChangeText={setNomUtilisateur}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Mot de passe"
-          placeholderTextColor="#fff"
-          secureTextEntry
-          value={motDePasse}
-          onChangeText={setMotDePasse}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleConnexion}>
-          <Text style={styles.buttonText}>Se connecter</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
-  );
-};
 
 export default ConnexionScreen;
