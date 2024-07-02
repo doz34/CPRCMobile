@@ -17,8 +17,8 @@ const MyCharacters = () => {
   const [characters, setCharacters] = useState([]);
   const [sortedCharacters, setSortedCharacters] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: 'nom_perso', direction: 'ascending' });
-  const [sortBy, setSortBy] = useState('nom_perso');
-  const [sortDirection, setSortDirection] = useState('ascending');
+  const [sortBy, setSortBy] = useState('date_creation');
+  const [sortDirection, setSortDirection] = useState('descending');
 
   useEffect(() => {
     fetchCharacters();
