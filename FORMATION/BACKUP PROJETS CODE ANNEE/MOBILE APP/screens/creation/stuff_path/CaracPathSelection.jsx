@@ -7,6 +7,7 @@ import {
   ImageBackground,
   ScrollView,
   Modal,
+  Alert, // Importer Alert
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
@@ -95,11 +96,14 @@ const CaracPathSelection = ({ navigation, route }) => {
 
   const onSaveSet = async () => {
     try {
-      await axios.post(
+      console.log("Saving set...");
+      const response = await axios.post(
         `http://192.168.1.17:3000/api/character/save-carac-set`,
         { idPerso, caracSet: selectedSet },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
+      console.log("Save response:", response.data);
+      Alert.alert("Succès", "Le set de caractéristiques a été enregistré avec succès.");
       navigation.navigate("CaracPathDerivatedCarac", { idPerso });
     } catch (error) {
       console.error("Erreur lors de la sauvegarde du set de caractéristiques:", error);
