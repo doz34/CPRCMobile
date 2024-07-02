@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
 import styles from "./styles";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 import Swiper from "react-native-swiper";
 
 const SelectRoleScreen = ({ navigation }) => {
@@ -24,15 +24,17 @@ const SelectRoleScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axios.get("http://192.168.1.17:3000/api/user/roles", {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
+        const response = await axios.get(
+          "http://192.168.1.17:3000/api/user/roles",
+          {
+            headers: { Authorization: `Bearer ${user?.token}` },
+          }
+        );
         const rolesWithImages = response.data.map((role) => ({
           ...role,
           role_img: `http://192.168.1.17:3000/${role.role_img}`,
         }));
         setRoles(rolesWithImages);
-        console.log("Données des rôles avec images :", rolesWithImages);
       } catch (error) {
         console.error("Erreur lors de la récupération des rôles :", error);
       } finally {
@@ -76,59 +78,73 @@ const SelectRoleScreen = ({ navigation }) => {
       source={require("../../assets/Inscription.png")}
       style={styles.backgroundImage}
     >
-    <Swiper 
-  style={styles.wrapper} 
-  onIndexChanged={setCurrentRoleIndex}
-  loop={false}
->
-  {roles.map((role) => (
-    <View key={role.id_role} style={styles.slide}>
-      <Text style={styles.title}>{role.nom_role}</Text>
-      <View style={styles.roleImageWrapper}>
-        <Image source={{ uri: role.role_img }} style={styles.roleImage} />
-      </View>
-      <View style={styles.advantagesDisadvantagesContainer}>
-        <LinearGradient
-          colors={['#7ED56F', '#28B485']}
-          style={styles.advantagesContainer}
-        >
-          <Text style={styles.advantagesTitle}>AVANTAGES :</Text>
-          <Text style={styles.advantagesText}>{role.avantages}</Text>
-        </LinearGradient>
-
-        <LinearGradient
-          colors={['#FF416C', '#FF4B2B']}
-          style={styles.disadvantagesContainer}
-        >
-          <Text style={styles.disadvantagesTitle}>INCONVENIENTS :</Text>
-          <Text style={styles.disadvantagesText}>{role.inconvenients}</Text>
-        </LinearGradient>
-      </View>
-
-      <LinearGradient
-        colors={['#C0C0C0', '#484848']}
-        start={{x: 0.9, y: 0}}
-        end={{x: 0.5, y: 1}}
-        style={styles.descriptionContainer}
+      <Swiper
+        style={styles.wrapper}
+        onIndexChanged={setCurrentRoleIndex}
+        loop={false}
       >
-        <Text style={styles.disadvantagesTitle}>EN BREF :</Text>
-        <Text style={styles.descriptionText}>{role.desc_role_short}</Text>
-      </LinearGradient>
-    </View>
-  ))}
-</Swiper>
-<View style={styles.buttonsContainer}>
-<TouchableOpacity
-  onPress={() => navigation.navigate("RoleDescription", { role: roles[currentRoleIndex] })}
-  style={styles.learnMoreButton}
->
-  <Text style={styles.buttonText}>En savoir plus</Text>
-</TouchableOpacity>
-        <TouchableOpacity onPress={() => onRoleSelect(role)} style={styles.selectButton}>
-          <Text style={styles.buttonText}>Sélectionner</Text>
-        </TouchableOpacity>
-      </View>
-</ImageBackground>
+        {roles.map((role) => (
+          <View key={role.id_role} style={styles.roleContainer}>
+            <Image source={{ uri: role.role_img }} style={styles.roleImageWrapper} />
+            {/* Titre du rôle */}
+            <Text style={styles.title}>{role.nom_role}</Text>
+
+            {/* Description en bref */}
+            <LinearGradient
+              colors={["#C0C0C0", "#484848"]}
+              style={styles.descriptionContainer}
+            >
+              <Text style={styles.briefTitle}>EN BREF :</Text>
+              <Text style={styles.descriptionText}>
+                {role.desc_role_short}
+              </Text>
+            </LinearGradient>
+
+            {/* Avantages et Inconvénients */}
+            <View style={styles.advantagesDisadvantagesContainer}>
+              <LinearGradient
+                colors={["#7ED56F", "#28B485"]}
+                style={styles.advantagesContainer}
+              >
+                <Text style={styles.advantagesTitle}>AVANTAGES :</Text>
+                <Text style={styles.advantagesText}>{role.avantages}</Text>
+              </LinearGradient>
+
+              <LinearGradient
+                colors={["#FF416C", "#FF4B2B"]}
+                style={styles.disadvantagesContainer}
+              >
+                <Text style={styles.disadvantagesTitle}>INCONVENIENTS :</Text>
+                <Text style={styles.disadvantagesText}>
+                  {role.inconvenients}
+                </Text>
+              </LinearGradient>
+            </View>
+
+            {/* Boutons */}
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("RoleDescription", {
+                    role: roles[currentRoleIndex],
+                  })
+                }
+                style={styles.learnMoreButton}
+              >
+                <Text style={styles.buttonText}>En savoir plus</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onRoleSelect(role)}
+                style={styles.selectButton}
+              >
+                <Text style={styles.buttonText}>Sélectionner</Text>
+              </TouchableOpacity>
+            </View>
+            
+          </View>
+        ))}
+      </Swiper>
+    </ImageBackground>
   );
 };
 
