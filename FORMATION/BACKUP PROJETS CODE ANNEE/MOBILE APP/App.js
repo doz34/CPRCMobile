@@ -23,6 +23,7 @@ import GenPathEnvironment from './screens/creation/character_path/GenPathEnviron
 import GenPathFamily from './screens/creation/character_path/GenPathFamily';
 import GenPathFriends from './screens/creation/character_path/GenPathFriends';
 import GenPathEnemies from './screens/creation/character_path/GenPathEnemies';
+import GenPathLove from './screens/creation/character_path/GenPathLove';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -67,6 +68,7 @@ const App = () => {
           <Stack.Screen name="GenPathFamily" component={GenPathFamily} />
           <Stack.Screen name="GenPathFriends" component={GenPathFriends} />
           <Stack.Screen name="GenPathEnemies" component={GenPathEnemies} />
+          <Stack.Screen name="GenPathLove" component={GenPathLove} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
