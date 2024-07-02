@@ -32,6 +32,7 @@ import RolePathRockerboyPlace from './screens/creation/role_path/RolePathRockerb
 import RolePathRockerboyEnemies from './screens/creation/role_path/RolePathRockerboyEnemies';
 import RolePathRockerboyEnding from './screens/creation/role_path/RolePathRockerboyEnding';
 import CaracPathDisclaimer from './screens/creation/stuff_path/CaracPathDisclaimer';
+import CaracPathSelection from './screens/creation/stuff_path/CaracPathSelection';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -85,6 +86,7 @@ const App = () => {
           <Stack.Screen name="RolePathRockerboyEnemies" component={RolePathRockerboyEnemies} />
           <Stack.Screen name="RolePathRockerboyEnding" component={RolePathRockerboyEnding} />
           <Stack.Screen name="CaracPathDisclaimer" component={CaracPathDisclaimer} />
+          <Stack.Screen name="CaracPathSelection" component={CaracPathSelection} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
