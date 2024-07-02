@@ -1,34 +1,64 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Constants from 'expo-constants';
 import HomeScreen from './screens/Home';
 import ConnexionScreen from './screens/Connexion';
 import InscriptionScreen from './screens/Inscription';
-
-const Stack = createNativeStackNavigator();
-const serverUrl = Constants.expoConfig.extra.serverUrl;
-console.log(serverUrl);
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {/* Utiliser les composants importés comme écrans */}
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Connexion" component={ConnexionScreen} />
-        <Stack.Screen name="Inscription" component={InscriptionScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
+import MyAccount from './screens/account/MyAccount';
+import MyAvatar from './screens/account/MyAvatar';
+import MyInfo from './screens/account/MyInfo';
+import DisclaimerCharacter from './screens/creation/DisclaimerCharacter';
+import SelectRoleScreen from './screens/creation/SelectRole';
+import RoleDescriptionScreen from './screens/creation/RoleDescription';
+import CulturalOrigin from './screens/creation/character_path/CulturalOrigin';
+import { UserProvider } from './context/UserContext';
+import GenPathDescScreen from './screens/creation/character_path/GenPathDesc';
+import GenPathPersonalityScreen from './screens/creation/character_path/GenPathPersonality';
+import GenPathClothingScreen from './screens/creation/character_path/GenPathClothing';
+import MyCharacters from './screens/account/MyCharacters';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerStyle: {
+    backgroundColor: "#fd0d1b",
+  },
+  headerTintColor: "#fff",
+  headerTitleStyle: {
+    fontWeight: "bold",
   },
 });
+
+const Stack = createNativeStackNavigator();
+
+const App = () => {
+  return (
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: styles.headerStyle,
+            headerTintColor: styles.headerTintColor,
+            headerTitleStyle: styles.headerTitleStyle,
+          }}
+        >
+          <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Accueil' }} />
+          <Stack.Screen name="Connexion" component={ConnexionScreen} options={{ title: 'Connexion' }} />
+          <Stack.Screen name="Inscription" component={InscriptionScreen} options={{ title: 'Inscription' }} />
+          <Stack.Screen name="MyAccount" component={MyAccount} options={{ title: 'Mon Compte' }} />
+          <Stack.Screen name="MyAvatar" component={MyAvatar} options={{ title: 'Mon Avatar' }} />
+          <Stack.Screen name="MyInfo" component={MyInfo} options={{ title: 'Mes Informations' }} />
+          <Stack.Screen name="DisclaimerCharacter" component={DisclaimerCharacter} options={{ title: 'Disclaimer Character' }} />
+          <Stack.Screen name="SelectRole" component={SelectRoleScreen} />
+          <Stack.Screen name="RoleDescription" component={RoleDescriptionScreen} />
+          <Stack.Screen name="GenPathDesc" component={GenPathDescScreen} />
+          <Stack.Screen name="CulturalOrigin" component={CulturalOrigin} />
+          <Stack.Screen name="GenPathPersonality" component={GenPathPersonalityScreen} />
+          <Stack.Screen name="GenPathClothing" component={GenPathClothingScreen} />
+          <Stack.Screen name="MyCharacters" component={MyCharacters} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
+  );
+};
+
+export default App;

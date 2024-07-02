@@ -16,6 +16,7 @@ import { Picker } from "@react-native-picker/picker";
 import styles from "./creation_styles/DisclaimerCharacter.styles";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
+import MyTextSimple from "./MyTextSimple";
 
 const DisclaimerCharacterScreen = ({ navigation }) => {
   const { user } = useContext(UserContext);
@@ -363,32 +364,31 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.container}>
           <LinearGradient
             colors={["#868686", "#484848"]}
-            style={[styles.placeholderContainer, styles.capacityContainer]}
+            style={styles.placeholderContainer}
           >
             <View style={styles.headerContainer}>
               <Text style={styles.roleDescriptionTitleText}>
                 DÉROULÉ DE LA CRÉATION :
               </Text>
             </View>
-            <View style={styles.contentContainer}>
-              <Text style={styles.roleDescriptionText}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...
-              </Text>
-            </View>
+            <ScrollView style={styles.contentContainer}>
+              <MyTextSimple text='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...' style={styles.roleDescriptionText} />
+            </ScrollView>
           </LinearGradient>
-          {loading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
-          ) : (
-            <TouchableOpacity
-              style={[styles.continueButton]}
+        </ScrollView>
+        <TouchableOpacity
+              style={styles.continueButton}
               onPress={() => setInitialModalVisible(true)}
             >
               <Text style={styles.buttonText}>Continuer</Text>
             </TouchableOpacity>
-          )}
-        </ScrollView>
-  
         <Modal
           animationType="slide"
           transparent={true}
@@ -438,7 +438,7 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
           </View>
         </Modal>
       </ImageBackground>
-    );
+    );     
   };
   
   export default DisclaimerCharacterScreen;

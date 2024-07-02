@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, ImageBackground, ScrollView } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
 import axios from "axios";
 import styles from './character_styles/CulturalOrigin.styles';
+import { LinearGradient } from "expo-linear-gradient";
+import MyTextSimple from "../MyTextSimple";
 
 const CulturalOrigin = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
@@ -107,7 +109,7 @@ const CulturalOrigin = ({ navigation, route }) => {
       );
       if (response.status === 200) {
         console.log("Personnage mis à jour avec succès:", response.data);
-        navigation.navigate("NextScreen");
+        navigation.navigate("GenPathPersonality");
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du personnage :", error);
@@ -120,7 +122,22 @@ const CulturalOrigin = ({ navigation, route }) => {
       source={require("../../../assets/Inscription.png")}
       style={styles.backgroundImage}
     >
-      <View style={styles.container}>
+      <LinearGradient
+        colors={["#868686", "#484848"]}
+        style={styles.descriptionContainer}
+      >
+        <Text style={styles.descriptionTitle}>
+          ORIGINES CULTURELLES :
+        </Text>
+        <ScrollView style={styles.scrollableContentContainer}>
+      <MyTextSimple
+        text="L'univers de Cyberpunk est multiculturel et international. Vous devez apprendre à vivre aux côtés de gens issus des quatre coins d'un monde fracturé et anarchique ou mourir à la première fois que vous regarderez de travers la mauvaise personne. Vos origines déterminent votre langue maternelle. Dans Cyberpunk RED, on part du principe que tout le monde connaît l'argot des Rues, le pidgin qui, au fil des évolutions, est devenu le langage universel du futur ténébreux, mais vous maîtrisez aussi une autre langue apprise sur les genoux de votre mère. Après avoir lancé un dé pour déterminer votre culture d'origine, choisissez une des langues proposées dans la case adjacente. Vous commencez avec 4 points dans cette compétence de Langue. Il existe des centaines de langues autour du monde, mais pour cet ouvrage, nous avons établi la liste des langues les plus courantes de l'Ere du Rouge pour chaque région. Si vous souhaitez que votre personnage parle une langue qui n'est pas mentionnée, notez votre choix à la place des suggestions de la liste ci-dessous."
+        style={styles.descriptionText} 
+      />
+    </ScrollView>
+      </LinearGradient>
+  
+      <View style={styles.fullContainer}>
         <View style={styles.sectionContainer}>
           <Text style={styles.title}>Votre origine culturelle :</Text>
           <Picker
@@ -140,7 +157,7 @@ const CulturalOrigin = ({ navigation, route }) => {
             <Text style={styles.buttonText}>Origine aléatoire</Text>
           </TouchableOpacity>
         </View>
-
+  
         <View style={styles.sectionContainer}>
           <Text style={styles.title}>La langue que vous connaissez :</Text>
           <Picker
@@ -160,13 +177,13 @@ const CulturalOrigin = ({ navigation, route }) => {
             <Text style={styles.buttonText}>Langue aléatoire</Text>
           </TouchableOpacity>
         </View>
-
+  
         <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
           <Text style={styles.buttonText}>Confirmer</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
   );
-};
+};   
 
 export default CulturalOrigin;
