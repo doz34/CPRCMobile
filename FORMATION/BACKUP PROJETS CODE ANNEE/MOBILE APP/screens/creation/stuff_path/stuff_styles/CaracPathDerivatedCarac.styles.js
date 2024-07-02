@@ -52,7 +52,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     justifyContent: 'space-between',
-    width: '88%',
+    width: '90%',
   },
   caracTitle: {
     flex: 1,
@@ -66,13 +66,12 @@ export default StyleSheet.create({
     textShadowRadius: 2,
   },
   caracValueContainer: {
-    flex: 3,
+    width: '85%', // Limite la largeur des barres de progression à 40% de l'écran
     height: 45,
     borderRadius: 100,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-end', // Aligne les barres de progression à droite
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    width: '100%',
     overflow: 'hidden',
   },
   caracValueText: {
@@ -84,13 +83,13 @@ export default StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '90%',
+    justifyContent: 'space-around',
+    width: '80%',
     marginBottom: 20,
   },
   quitButton: {
     backgroundColor: 'red',
-    width: '48%',
+    width: '40%',
     paddingVertical: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -98,7 +97,7 @@ export default StyleSheet.create({
   },
   continueButton: {
     backgroundColor: 'green',
-    width: '48%',
+    width: '40%',
     paddingVertical: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -138,7 +137,7 @@ export default StyleSheet.create({
     width: '100%',
   },
   modalButton: {
-    backgroundColor: "grey",
+    backgroundColor: "white",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -149,5 +148,17 @@ export default StyleSheet.create({
   },
   modalButtonNo: {
     backgroundColor: 'red',
+  },
+  buttonText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  quitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  continueButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

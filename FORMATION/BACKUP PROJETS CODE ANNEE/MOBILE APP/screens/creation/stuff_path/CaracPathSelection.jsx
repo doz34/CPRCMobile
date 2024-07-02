@@ -7,7 +7,7 @@ import {
   ImageBackground,
   ScrollView,
   Modal,
-  Alert, // Importer Alert
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
@@ -28,7 +28,7 @@ const CaracPathSelection = ({ navigation, route }) => {
   const [infoModalVisible, setInfoModalVisible] = useState(false);
   const [selectedCarac, setSelectedCarac] = useState(null);
   const [caracNames, setCaracNames] = useState([]);
-  const [fullnomCarac, setFullnomCarac] = useState(""); // Nouvel état pour stocker fullnom_caractypo
+  const [fullnomCarac, setFullnomCarac] = useState("");
 
   useEffect(() => {
     const fetchRoleAndCaracSets = async () => {
@@ -40,7 +40,7 @@ const CaracPathSelection = ({ navigation, route }) => {
         );
         const roleData = roleResponse.data;
         setIdRole(roleData.id_role);
-  
+
         const sets = generateCaracSets(roleData.id_role);
         setCaracSets(sets);
         if (sets.length > 0) {
@@ -54,7 +54,7 @@ const CaracPathSelection = ({ navigation, route }) => {
         setLoading(false);
       }
     };
-  
+
     if (user?.token) {
       fetchRoleAndCaracSets();
     } else {
@@ -103,8 +103,7 @@ const CaracPathSelection = ({ navigation, route }) => {
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       console.log("Save response:", response.data);
-  
-      // Appeler la route pour mettre à jour les stats
+
       console.log("Updating stats...");
       const statsResponse = await axios.post(
         `http://192.168.1.17:3000/api/character/update-stats`,
@@ -112,7 +111,7 @@ const CaracPathSelection = ({ navigation, route }) => {
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       console.log("Stats update response:", statsResponse.data);
-  
+
       Alert.alert("Succès", "Le set de caractéristiques et les stats ont été enregistrés avec succès.");
       navigation.navigate("CaracPathDerivatedCarac", { idPerso });
     } catch (error) {
@@ -135,8 +134,8 @@ const CaracPathSelection = ({ navigation, route }) => {
     setSelectedCarac(caracName);
     try {
       const response = await axios.get(`http://192.168.1.17:3000/api/character/carac-fullname/${carac.id_caractyp}`, {
-        headers: { Authorization: `Bearer ${user?.token}` }
-      });
+        headers: { Authorization: `Bearer ${user?.token}` } }
+      );
       setFullnomCarac(response.data.fullnom_caractypo);
     } catch (error) {
       console.error("Erreur lors de la récupération du fullnom_caractypo:", error);
@@ -196,11 +195,11 @@ const CaracPathSelection = ({ navigation, route }) => {
           {caracDetails.map((carac, index) => {
             const caracName = caracNames.find(name => name.id_caractyp === carac.id_caractyp);
             return (
-              <View key={index} style={[styles.caracContainer, { alignItems: 'flex-start' }]}>
+              <View key={index} style={styles.caracContainer}>
                 <TouchableOpacity onPress={() => openInfoModal(carac)}>
                   <Text style={styles.caracTitle}>{caracName ? caracName.nom_caractypo : `Caractéristique ${carac.id_caractyp}`}</Text>
                 </TouchableOpacity>
-                <View style={[styles.caracValueContainer, { alignItems: 'flex-start' }]}>
+                <View style={styles.caracValueContainer}>
                   <View
                     style={[
                       styles.caracValue,
@@ -217,10 +216,10 @@ const CaracPathSelection = ({ navigation, route }) => {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.quitButton} onPress={onQuit}>
-            <Text style={styles.buttonText}>QUITTER</Text>
+            <Text style={styles.quitButtonText}>QUITTER</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.continueButton} onPress={onSaveSet}>
-            <Text style={styles.buttonText}>CONTINUER</Text>
+            <Text style={styles.continueButtonText}>CONTINUER</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -262,11 +261,11 @@ const CaracPathSelection = ({ navigation, route }) => {
             style={styles.modalContent}
           >
             <Text style={styles.modalTitle}>
-              {fullnomCarac} {/* Affichage uniquement de fullnom_caractypo */}
+              {fullnomCarac} :
             </Text>
             <MyTextSimple text={selectedCarac?.desc_caractypo} style={styles.modalDescription} />
             <TouchableOpacity style={styles.modalButton} onPress={() => setInfoModalVisible(false)}>
-              <Text style={styles.buttonText}>FERMER</Text>
+              <Text style={styles.closeButtonText}>FERMER</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>

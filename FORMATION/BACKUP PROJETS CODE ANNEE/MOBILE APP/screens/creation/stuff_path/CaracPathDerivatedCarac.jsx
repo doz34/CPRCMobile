@@ -132,10 +132,10 @@ const CaracPathDerivatedCarac = ({ navigation, route }) => {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.quitButton} onPress={onQuit}>
-            <Text style={styles.buttonText}>QUITTER</Text>
+            <Text style={styles.quitButtonText}>QUITTER</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
-            <Text style={styles.buttonText}>CONTINUER</Text>
+            <Text style={styles.continueButtonText}>CONTINUER</Text>
           </TouchableOpacity>
         </View>
       </View>
