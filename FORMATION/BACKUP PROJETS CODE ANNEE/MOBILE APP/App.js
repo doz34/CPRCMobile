@@ -29,6 +29,8 @@ import GenPathEnding from './screens/creation/character_path/GenPathEnding';
 import RolePathRockerboyDisclaimer from './screens/creation/role_path/RolePathRockerboyDisclaimer';
 import RolePathRockerboyJob from './screens/creation/role_path/RolePathRockerboyJob';
 import RolePathRockerboyPlace from './screens/creation/role_path/RolePathRockerboyPlace';
+import RolePathRockerboyEnemies from './screens/creation/role_path/RolePathRockerboyEnemies';
+import RolePathRockerboyEnding from './screens/creation/role_path/RolePathRockerboyEnding';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -79,6 +81,8 @@ const App = () => {
           <Stack.Screen name="RolePathRockerboyDisclaimer" component={RolePathRockerboyDisclaimer} />
           <Stack.Screen name="RolePathRockerboyJob" component={RolePathRockerboyJob} />
           <Stack.Screen name="RolePathRockerboyPlace" component={RolePathRockerboyPlace} />
+          <Stack.Screen name="RolePathRockerboyEnemies" component={RolePathRockerboyEnemies} />
+          <Stack.Screen name="RolePathRockerboyEnding" component={RolePathRockerboyEnding} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
