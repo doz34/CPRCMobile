@@ -10,6 +10,7 @@ import MyAvatar from './screens/account/MyAvatar';
 import MyInfo from './screens/account/MyInfo';
 import DisclaimerCharacter from './screens/creation/DisclaimerCharacter';
 import SelectRoleScreen from './screens/creation/SelectRole';
+import RoleDescriptionScreen from './screens/creation/RoleDescription';
 import { UserProvider } from './context/UserContext';
 
 const styles = StyleSheet.create({
@@ -43,6 +44,7 @@ const App = () => {
           <Stack.Screen name="MyInfo" component={MyInfo} options={{ title: 'Mes Informations' }} />
           <Stack.Screen name="DisclaimerCharacter" component={DisclaimerCharacter} options={{ title: 'Disclaimer Character' }} />
           <Stack.Screen name="SelectRole" component={SelectRoleScreen} />
+          <Stack.Screen name="RoleDescription" component={RoleDescriptionScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
