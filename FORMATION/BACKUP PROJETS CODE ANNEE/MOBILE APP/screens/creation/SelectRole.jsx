@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
+  TouchableWithoutFeedback,
+  TouchableOpacity, // Importation de TouchableWithoutFeedback
   StyleSheet,
   Image,
   ImageBackground,
@@ -14,12 +15,53 @@ import { UserContext } from "../../context/UserContext";
 import styles from "./styles";
 import { LinearGradient } from "expo-linear-gradient";
 import Swiper from "react-native-swiper";
+import MyTextComponent from "./MyText";
 
 const SelectRoleScreen = ({ navigation }) => {
   const { user } = useContext(UserContext);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0); // Ajoutez cet état
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  const [isAdvantagesModalVisible, setIsAdvantagesModalVisible] = useState(false);
+  const [isDisadvantagesModalVisible, setIsDisadvantagesModalVisible] = useState(false);
+
+  const AdvantagesModal = ({ role, onClose }) => {
+    return (
+      <View style={styles.modalMainContainer}>
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={['#7ED56F', '#28B485']}
+            style={styles.modalContentContainer}
+          >
+            <Text style={styles.modalTitle}>AVANTAGES :</Text>
+            <MyTextComponent text={role.avantages} style={styles.modalText} />
+            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+              <Text style={styles.modalCloseButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </View>
+    );
+  };
+
+  const DisadvantagesModal = ({ role, onClose }) => {
+    return (
+      <View style={styles.modalMainContainer}>
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={['#FF416C', '#FF4B2B']}
+            style={styles.modalContentContainer}
+          >
+            <Text style={styles.modalTitle}>INCONVÉNIENTS :</Text>
+            <MyTextComponent text={role.inconvenients} style={styles.modalText} />
+            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+              <Text style={styles.modalCloseButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </View>
+    );
+  };
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -88,62 +130,81 @@ const SelectRoleScreen = ({ navigation }) => {
             <Image source={{ uri: role.role_img }} style={styles.roleImageWrapper} />
             {/* Titre du rôle */}
             <Text style={styles.title}>{role.nom_role}</Text>
-
+  
             {/* Description en bref */}
             <LinearGradient
               colors={["#C0C0C0", "#484848"]}
               style={styles.descriptionContainer}
             >
               <Text style={styles.briefTitle}>EN BREF :</Text>
-              <Text style={styles.descriptionText}>
-                {role.desc_role_short}
-              </Text>
+              <MyTextComponent text={role.desc_role_short} style={styles.descriptionText} />
             </LinearGradient>
-
+  
             {/* Avantages et Inconvénients */}
             <View style={styles.advantagesDisadvantagesContainer}>
-              <LinearGradient
-                colors={["#7ED56F", "#28B485"]}
-                style={styles.advantagesContainer}
-              >
-                <Text style={styles.advantagesTitle}>AVANTAGES :</Text>
-                <Text style={styles.advantagesText}>{role.avantages}</Text>
-              </LinearGradient>
-
-              <LinearGradient
-                colors={["#FF416C", "#FF4B2B"]}
-                style={styles.disadvantagesContainer}
-              >
-                <Text style={styles.disadvantagesTitle}>INCONVENIENTS :</Text>
-                <Text style={styles.disadvantagesText}>
-                  {role.inconvenients}
-                </Text>
-              </LinearGradient>
-            </View>
-
-            {/* Boutons */}
-            <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("RoleDescription", {
-                    role: roles[currentRoleIndex],
-                  })
-                }
-                style={styles.learnMoreButton}
+                onPress={() => setIsAdvantagesModalVisible(true)}
+                style={styles.thirdContainer}
               >
-                <Text style={styles.buttonText}>En savoir plus</Text>
+                <LinearGradient
+                  colors={['#7ED56F', '#28B485']}
+                  style={[styles.advantagesContainer, { borderRadius: 30 }]}
+                >
+                  <Text style={styles.advantagesTitle}>AVANTAGES :</Text>
+                  <MyTextComponent text={role.avantages} style={styles.advantagesText} />
+                </LinearGradient>
               </TouchableOpacity>
+  
               <TouchableOpacity
-                onPress={() => onRoleSelect(role)}
-                style={styles.selectButton}
+                onPress={() => setIsDisadvantagesModalVisible(true)}
+                style={styles.thirdContainer}
               >
-                <Text style={styles.buttonText}>Sélectionner</Text>
+                <LinearGradient
+                  colors={['#FF416C', '#FF4B2B']}
+                  style={[styles.disadvantagesContainer, { borderRadius: 30 }]}
+                >
+                  <Text style={styles.disadvantagesTitle}>INCONVÉNIENTS :</Text>
+                  <MyTextComponent text={role.inconvenients} style={styles.disadvantagesText} />
+                </LinearGradient>
               </TouchableOpacity>
             </View>
-            
           </View>
         ))}
       </Swiper>
+  
+      {/* Boutons */}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("RoleDescription", {
+              role: roles[currentRoleIndex],
+            })
+          }
+          style={styles.learnMoreButton}
+        >
+          <Text style={styles.buttonText}>En savoir plus</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onRoleSelect(roles[currentRoleIndex])}
+          style={styles.selectButton}
+        >
+          <Text style={styles.buttonText}>Sélectionner</Text>
+        </TouchableOpacity>
+      </View>
+  
+      {isAdvantagesModalVisible && (
+        <AdvantagesModal
+          role={roles[currentRoleIndex]}
+          onClose={() => setIsAdvantagesModalVisible(false)}
+        />
+      )}
+  
+      {isDisadvantagesModalVisible && (
+        <DisadvantagesModal
+          role={roles[currentRoleIndex]}
+          onClose={() => setIsDisadvantagesModalVisible(false)}
+        />
+      )}
     </ImageBackground>
   );
 };

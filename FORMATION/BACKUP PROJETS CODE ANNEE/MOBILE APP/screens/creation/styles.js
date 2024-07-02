@@ -34,11 +34,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
   },
-  titleContainer: {
-    gridArea: 'titleContainer',
-  },
   title: {
-    fontSize: 35,
+    fontSize: screenWidth * 0.08, // 8% de la largeur de l'écran
     textAlign: 'center',
     color: 'white',
     fontFamily: 'Roboto',
@@ -47,24 +44,28 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -3, height: 3 },
     textShadowRadius: 1,
     zIndex: 2,
+    transform: [{ translateY: -screenHeight * 0.012 }],
   },
   briefTitle: {
     color: 'white',
     fontWeight: 'bold',
     // ... Autres styles ...
   },
+  thirdContainer: {
+    width: screenWidth < 411 ? '33.33%' : '45%', // Un tiers de la largeur de l'écran
+    padding: screenWidth * 0.025, // 2.5% de la largeur de l'écran
+  },
   advantagesDisadvantagesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    padding: 10,
+    bottom: screenHeight < 768 ? screenHeight * 0.2 : screenHeight * 0.42,
+    padding: screenWidth < 411 ? screenWidth * 0.05 : screenWidth * 0.0001,
   },
   advantagesContainer: {
-    flex: 1,
-    marginHorizontal: 8,
-    width: '48%',
-    padding: 10,
-    borderRadius: 25,
+    width: '100%',
+    padding: screenWidth * 0.025,
+    borderRadius: 0, // Ajoutez cette ligne
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
@@ -82,17 +83,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   advantagesText: {
-    padding: 10,
+    padding: screenWidth * 0.025, // 2.5% de la largeur de l'écran
     color: 'white',
     textAlign: 'center',
     flexWrap: 'wrap',
   },
   disadvantagesContainer: {
-    flex: 1,
-    marginHorizontal: 8,
-    width: '48%',
-    padding: 10,
-    borderRadius: 25,
+    width: '100%',
+    padding: screenWidth * 0.025,
+    borderRadius: 0, // Ajoutez cette ligne
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
@@ -110,15 +109,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   disadvantagesText: {
-    padding: 10,
+    padding: screenWidth * 0.025, // 2.5% de la largeur de l'écran
     color: 'white',
     textAlign: 'center',
     flexWrap: 'wrap',
   },
   descriptionContainer: {
-    gridArea: 'description',
-    padding: 10,
-    borderRadius: 25,
+    position: 'absolute',
+    top: screenHeight * 0.06,
+    left: screenWidth * 0.025, // 2.5% de la largeur de l'écran
+    right: screenWidth * 0.025, // 2.5% de la largeur de l'écran
+    padding: screenWidth * 0.025, // 2.5% de la largeur de l'écran
+    borderRadius: screenWidth * 0.0625, // 6.25% de la largeur de l'écran
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -133,39 +135,50 @@ const styles = StyleSheet.create({
     elevation: 5,
     opacity: 0.8,
     zIndex: 2,
+    transform: [
+      {
+        translateY: screenHeight < 1080 ? screenHeight * 0.03 : screenHeight * 0.04,
+      },
+    ],
   },
   descriptionText: {
     color: 'white',
     textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
+    padding: screenWidth * 0.025, // 2.5% de la largeur de l'écran
+    borderRadius: screenWidth * 0.0125, // 1.25% de la largeur de l'écran
     flexWrap: 'wrap',
   },
   buttonsContainer: {
+    position: 'absolute',
+    bottom: screenHeight * 0.05, // 5% de la hauteur de l'écran depuis le bas
+    alignSelf: 'center', // Centrer horizontalement le conteneur
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '80%', // 80% de la largeur de l'écran
+    height: '10%',
   },
   learnMoreButton: {
     backgroundColor: 'teal',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    paddingVertical: screenHeight * 0.025, // 2.5% de la hauteur de l'écran
+    paddingHorizontal: screenWidth * 0.05, // 5% de la largeur de l'écran
+    borderRadius: screenWidth * 0.03, // 1.25% de la largeur de l'écran
     width: '45%',
     alignItems: 'center',
+    zIndex: 2,
   },
   selectButton: {
     backgroundColor: 'green',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    paddingVertical: screenHeight * 0.025, // 2.5% de la hauteur de l'écran
+    paddingHorizontal: screenWidth * 0.05, // 5% de la largeur de l'écran
+    borderRadius: screenWidth * 0.03, // 1.25% de la largeur de l'écran
     width: '45%',
     alignItems: 'center',
-    marginLeft: 10,
+    zIndex: 2,
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: screenWidth * 0.035, // 4.5% de la largeur de l'écran
     fontWeight: 'bold',
   },
   roleImage: {
@@ -174,23 +187,108 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   roleImageWrapper: {
-    position: 'absolute', // Positionne l'image absolument à l'intérieur de 'roleContainer'
-    top: 0, // Alignement en haut
-    bottom: 0, // Alignement en bas
-    left: 0, // Alignement à gauche
-    right: 0, // Alignement à droite
-    width: screenWidth, // Largeur de l'écran
-    height: screenHeight, // Hauteur de l'écran
-    resizeMode: 'cover', // Assurez-vous que l'image couvre tout l'espace sans déformation
-    zIndex: -1, // Assurez-vous que l'image est derrière tous les autres éléments
+    position: 'absolute',
+    alignSelf: 'center',
+    width: screenWidth * 0.5,
+    height: screenHeight * 0.5,
+    resizeMode: 'contain',
+    transform: [{ translateY: screenHeight * 0.23 }],
+    zIndex: 2,
   },
   roleContainer: {
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    position: 'relative', // Assurez-vous que le conteneur est positionné relativement
+    padding: screenWidth * 0.04, // 4% de la largeur de l'écran
+    position: 'relative',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent', // Supprimez l'arrière-plan semi-transparent
+  },
+  modalMainContainer: {
+    position: 'absolute',
+    top: screenHeight * 0.3,
+    left: 0,
+    right: 0,
+    zIndex: 9999, // Un z-index élevé pour s'afficher par-dessus le reste du contenu
+  },
+modalContent: {
+  backgroundColor: 'white',
+  padding: 20,
+  borderRadius: 10,
+  alignItems: 'center',
+},
+modalContentContainer: {
+  position: 'relative',
+  backgroundColor: 'white',
+  padding: 20,
+  borderRadius: 10,
+  alignItems: 'center',
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  marginBottom: 10,
+},
+modalText: {
+  fontSize: 16,
+  textAlign: 'center',
+  marginBottom: 20,
+},
+modalCloseButton: {
+  backgroundColor: 'teal',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 5,
+},
+modalCloseButtonText: {
+  color: 'white',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+roleDescriptionTitleText: {
+  fontSize: 24,
+  fontWeight: 'bold',
+  color: 'black',
+  textAlign: 'center',
+  marginBottom: 16,
+},
+roleDescriptionText: {
+  fontSize: 20,
+  color: 'white',
+  textAlign: 'justify',
+  padding: screenWidth * 0.05,
+  lineHeight: 24,
+  marginVertical: -25,
+},
+
+placeholderContainer: {
+  backgroundColor: 'darkgray',
+  borderRadius: 10,
+  padding: 20,
+  marginHorizontal: 20,
+  marginVertical: 30,
+  opacity: 0.6,
+},
+
+capacityContainer: {
+  marginTop: 20,
+},
+
+continueButton: {
+  backgroundColor: "green",
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 5,
+  marginBottom: 10,
+  width: "80%",
+  alignItems: "center",
+  alignSelf: "center",
+},
+
 });
 
 export default styles;
