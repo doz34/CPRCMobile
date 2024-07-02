@@ -34,6 +34,7 @@ import RolePathRockerboyEnding from './screens/creation/role_path/RolePathRocker
 import CaracPathDisclaimer from './screens/creation/stuff_path/CaracPathDisclaimer';
 import CaracPathSelection from './screens/creation/stuff_path/CaracPathSelection';
 import CaracPathDerivatedCarac from './screens/creation/stuff_path/CaracPathDerivatedCarac';
+import CaracPathEnding from './screens/creation/stuff_path/CaracPathEnding';
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -89,6 +90,7 @@ const App = () => {
           <Stack.Screen name="CaracPathDisclaimer" component={CaracPathDisclaimer} />
           <Stack.Screen name="CaracPathSelection" component={CaracPathSelection} />
           <Stack.Screen name="CaracPathDerivatedCarac" component={CaracPathDerivatedCarac} />
+          <Stack.Screen name="CaracPathEnding" component={CaracPathEnding} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
