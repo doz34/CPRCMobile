@@ -113,7 +113,16 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
         },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
-      navigation.navigate("RolePathRockerboyPlace");
+      Alert.alert(
+        "Confirmation",
+        "Les informations ont été enregistrées avec succès.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate('RolePathRockerboyPlace', { idPerso: idPerso }),
+          },
+        ]
+      );
     } catch (error) {
       console.error("Erreur lors de l'enregistrement des données:", error);
       alert("Erreur lors de l'enregistrement des données.");

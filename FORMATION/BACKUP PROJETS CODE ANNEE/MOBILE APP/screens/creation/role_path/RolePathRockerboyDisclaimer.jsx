@@ -23,13 +23,14 @@ const RolePathRockerboyDisclaimer = ({ navigation, route }) => {
   useEffect(() => {
     const fetchImageUrl = async () => {
       try {
+        const url = "http://192.168.1.17:3000/api/roles/1";
+        const headers = { Authorization: `Bearer ${user?.token}` };
+
         console.log("Fetching image URL for role 1...");
-        const response = await axios.get(
-          "http://192.168.1.17:3000/api/roles/1",
-          {
-            headers: { Authorization: `Bearer ${user?.token}` },
-          }
-        );
+        console.log("Request URL:", url);
+        console.log("Request Headers:", headers);
+
+        const response = await axios.get(url, { headers });
 
         console.log("Response status:", response.status);
         console.log("Response data:", response.data);
@@ -74,6 +75,7 @@ const RolePathRockerboyDisclaimer = ({ navigation, route }) => {
             <ScrollView style={styles.contentContainer}>
               <MyTextSimple
                 text='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. ...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
