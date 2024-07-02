@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   backgroundImage: {
@@ -16,6 +16,7 @@ export default StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
     borderRadius: 10,
+    opacity: 0.8,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   descriptionTitle: {
@@ -97,8 +98,8 @@ export default StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '80%',
+    justifyContent: 'center',
+    width: '100%',
     marginTop: 20,
   },
   modalContainer: {
@@ -141,5 +142,20 @@ export default StyleSheet.create({
   },
   modalButtonNo: {
     backgroundColor: 'red',
+  },
+  imageContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 0, // Mettre l'image derrière tous les éléments sauf le background
+  },
+  rockerImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain", // Utiliser cover pour que l'image prenne tout l'écran sans dépasser
   },
 });

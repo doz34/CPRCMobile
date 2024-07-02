@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   Alert,
+  Image,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../context/UserContext";
@@ -34,6 +35,8 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
   const [specifiques, setSpecifiques] = useState([]);
   const [selectedSpecifique, setSelectedSpecifique] = useState(null);
 
+  const [imageUrl, setImageUrl] = useState(null);
+
   const fetchData = async (endpoint, setState, filterFn) => {
     setLoading(true);
     try {
@@ -50,12 +53,35 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
     }
   };
 
+  const fetchImageUrl = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.17:3000/api/roles/1",
+        {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        }
+      );
+
+      if (response.status === 200 && response.data.role_img) {
+        const fullImageUrl = `http://192.168.1.17:3000/${response.data.role_img}`;
+        setImageUrl(fullImageUrl);
+      } else {
+        console.error("Invalid response data:", response.data);
+        alert("Erreur: Données de réponse invalides.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'image:", error);
+      alert(`Erreur lors de la récupération de l'image: ${error.message}`);
+    }
+  };
+
   useEffect(() => {
     if (user?.token) {
       fetchData('roles/type_role', setTypeRoles, role => role.id_typrol >= 1 && role.id_typrol <= 10);
       fetchData('roles/travail_soloteam', setTravailSoloTeams, team => team.id_travsolteam === 1 || team.id_travsolteam === 2);
       fetchData('roles/travail_soloteam_passe', setTravailSoloTeamsPass, () => true);
       fetchData('roles/specifique', setSpecifiques, spec => spec.id_spec >= 1 && spec.id_spec <= 6);
+      fetchImageUrl();
     }
   }, [user?.token]);
 
@@ -78,6 +104,12 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
           id_travsolteam: selectedTravailSoloTeam?.id_travsolteam,
           id_travsolteampass: selectedTravailSoloTeamPass?.id_travsolteampass,
           id_spec: selectedSpecifique?.id_spec,
+          visibility: {
+            id_typrol: true,
+            id_travsolteam: true,
+            id_travsolteampass: selectedTravailSoloTeam?.id_travsolteam === 2,
+            id_spec: selectedTravailSoloTeam?.desc_travsolteam !== "En groupe" && selectedTravailSoloTeamPass?.id_travsolteampass === 1,
+          },
         },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
@@ -102,6 +134,12 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
       source={require("../../../assets/Inscription.png")}
       style={styles.backgroundImage}
     >
+      {imageUrl && (
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUrl }} style={styles.rockerImage} />
+        </View>
+      )}
+
       <LinearGradient
         colors={["#868686", "#484848"]}
         style={styles.descriptionContainer}
@@ -117,7 +155,7 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.sectionContainer}>
-          <Text style={styles.title}>Afficher desc_typrol avec l'id_typrol 1 de la table quest_typrol</Text>
+          <Text style={styles.title}>Quel genre de Rockeur êtes-vous ?</Text>
           <Picker
             selectedValue={selectedTypeRole}
             style={styles.picker}
@@ -166,7 +204,7 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
           </View>
         )}
 
-        {selectedTravailSoloTeamPass?.id_travsolteampass === 1 && (
+        {selectedTravailSoloTeam?.desc_travsolteam !== "En groupe" && selectedTravailSoloTeamPass?.id_travsolteampass === 1 && (
           <View style={styles.sectionContainer}>
             <Text style={styles.title}>Pourquoi êtes-vous parti ?</Text>
             <Picker
