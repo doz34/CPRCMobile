@@ -92,7 +92,7 @@ const StuffPathDisclaimer = ({ navigation, route }) => {
         nextPage = "Home";
     }
     console.log("Navigating to:", nextPage, "with idPerso:", idPerso, "and idRole:", idRole);
-    navigation.navigate(nextPage, { idPerso, idRole });
+    navigation.navigate("StuffPathSelectionRockerboy", { idPerso, idRole, idUser: user?.id });
   };
 
   if (loading) {

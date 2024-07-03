@@ -116,16 +116,12 @@ export default StyleSheet.create({
     width: '40%',
     paddingVertical: 15,
     borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: "center",
   },
   quitButton: {
     backgroundColor: 'red',
     width: '40%',
     paddingVertical: 15,
     borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: "center",
     marginRight: 10,
   },
   buttonContainer: {
@@ -322,6 +318,14 @@ export default StyleSheet.create({
     height: 60, // Ajuster la hauteur pour correspondre au dropdown
     justifyContent: 'center', // Centrer le texte verticalement
     width: '35%', // Réduire la largeur du bouton
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  footerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   
 });

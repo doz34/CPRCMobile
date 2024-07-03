@@ -6,16 +6,19 @@ import {
   Modal,
   ScrollView,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../../context/UserContext";
 import axios from "axios";
 import styles from "./stuff_path_selection_styles/StuffPathSelectionRockerboy.styles";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [idPerso, setIdPerso] = useState(route.params.idPerso);
+  const [idUtilisateur, setIdUtilisateur] = useState(null);
   const [weapons, setWeapons] = useState([]);
   const [meleeWeapons, setMeleeWeapons] = useState([]);
   const [grenades, setGrenades] = useState([]);
@@ -100,8 +103,101 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [meleeWeaponModalVisible, setMeleeWeaponModalVisible] = useState(false);
   const [meleeWeaponModalContent, setMeleeWeaponModalContent] = useState({});
   const [grenade2DistinctModalVisible, setGrenade2DistinctModalVisible] = useState(false);
+  const [isContinueModalVisible, setContinueModalVisible] = useState(false);
+  const [isQuitModalVisible, setQuitModalVisible] = useState(false);
 
   useEffect(() => {
+    if (user) {
+      console.log("User context in component:", user);
+      setIdUtilisateur(user.id);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const initialize = async () => {
+      console.log('Initializing with idUtilisateur:', idUtilisateur, 'and idPerso:', idPerso);
+      if (idUtilisateur && idPerso) {
+        await storeInitialIds();
+        await fetchUserAndCharacterIds();
+      } else {
+        console.error('ID utilisateur ou ID personnage non défini');
+        Alert.alert('Erreur', 'ID utilisateur ou ID personnage non défini.');
+      }
+    };
+
+    // Fonction pour stocker les IDs utilisateur et personnage dans AsyncStorage
+    const storeInitialIds = async () => {
+      try {
+        console.log('Storing IDs in AsyncStorage');
+        await AsyncStorage.multiSet([
+          ['id_utilisateur', idUtilisateur.toString()],
+          ['id_perso', idPerso.toString()]
+        ]);
+        console.log('IDs stored successfully');
+      } catch (error) {
+        console.error('Erreur lors du stockage des IDs:', error);
+      }
+    };
+
+    // Fonction pour récupérer les IDs stockés et effectuer les opérations nécessaires
+    const fetchUserAndCharacterIds = async () => {
+      try {
+          console.log('Fetching stored IDs from AsyncStorage');
+          const storedIds = await AsyncStorage.multiGet(['id_utilisateur', 'id_perso']);
+          const storedIdUtilisateur = storedIds[0][1];
+          const storedIdPerso = storedIds[1][1];
+          console.log('Stored IDs:', { storedIdUtilisateur, storedIdPerso });
+          if (!storedIdUtilisateur || !storedIdPerso) {
+              Alert.alert('Erreur', 'ID utilisateur ou ID personnage non défini.');
+              return;
+          }
+          await transmitIdPerso(storedIdPerso);
+          const equipmentData = [
+              { id_arme: 10, quantite: 1, id_perso: storedIdPerso },
+              // autres entrées...
+          ];
+          // La boucle for a été supprimée ici
+      } catch (error) {
+          console.error('Error updating equipment:', error);
+          Alert.alert('Erreur', 'Une erreur est survenue lors de la mise à jour de l\'équipement.');
+      }
+  };
+
+    if (idUtilisateur !== null) {
+      initialize();
+    }
+  }, [user?.token, idPerso, idUtilisateur]);
+
+  // Définir la fonction transmitIdPerso
+  const transmitIdPerso = async (idPerso) => {
+    try {
+      console.log('Transmitting idPerso:', idPerso);
+      // Ajoutez ici la logique pour transmettre l'idPerso
+    } catch (error) {
+      console.error('Erreur lors de la transmission de l\'idPerso:', error);
+    }
+  };
+
+  useEffect(() => {
+
+    const fetchInitialData = async () => {
+      try {
+        const cyberfashion1Name = await fetchCyberfashionNames(2);
+        setSelectedCyberfashion1(cyberfashion1Name);
+        const cyberfashion2Name = await fetchCyberfashionNames(7);
+        setSelectedCyberfashion2(cyberfashion2Name);
+        const cyberaudio1Name = await fetchCyberaudioNames(9);
+        setSelectedCyberaudio1(cyberaudio1Name);
+        const cyberaudio2Name = await fetchCyberaudioNames(1);
+        setSelectedCyberaudio2(cyberaudio2Name);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des données initiales:",
+          error
+        );
+      }
+    };
+
     const fetchWeapons = async () => {
       try {
         const response = await axios.get(
@@ -121,16 +217,23 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
 
     const fetchMeleeWeapons = async () => {
       try {
-          const response = await axios.get("http://192.168.1.17:3000/api/roles/melee-weapons", {
-              headers: { Authorization: `Bearer ${user?.token}` }
-          });
-          const filteredWeapons = response.data.filter((weapon) => [6, 7, 8].includes(weapon.id_arme));
-          console.log("Filtered melee weapons:", filteredWeapons);
-          setMeleeWeapons(filteredWeapons);
+        const response = await axios.get(
+          "http://192.168.1.17:3000/api/roles/melee-weapons",
+          {
+            headers: { Authorization: `Bearer ${user?.token}` },
+          }
+        );
+        const filteredWeapons = response.data.filter((weapon) =>
+          [6, 7, 8].includes(weapon.id_arme)
+        );
+        setMeleeWeapons(filteredWeapons);
       } catch (error) {
-          console.error("Erreur lors de la récupération des armes de mêlée:", error);
+        console.error(
+          "Erreur lors de la récupération des armes de mêlée:",
+          error
+        );
       }
-  };
+    };
 
     const fetchGrenades = async () => {
       try {
@@ -140,7 +243,6 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
             headers: { Authorization: `Bearer ${user?.token}` },
           }
         );
-        console.log("Grenades data:", response.data); // Ajoutez ce log
         setGrenades(response.data);
         setSelectedGrenade(response.data.find((grenade) => grenade.id === 28));
       } catch (error) {
@@ -428,20 +530,20 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     const details = await fetchCyberaudio3Details();
     setCyberaudio3ModalContent(details);
     setCyberaudio3ModalVisible(true);
-
   };
 
   const handleCyberaudio3Change = (itemValue) => {
     console.log("Dropdown Cyberaudio 3 value changed:", itemValue); // Log de la nouvelle valeur sélectionnée
     setSelectedCyberaudio3(itemValue);
-  
+
     // Condition pour déclencher la modale si la valeur sélectionnée n'est pas "Veuillez sélectionner"
     if (itemValue !== "") {
       console.log("Triggering modal for Cyberaudio 3 selection:", itemValue); // Log pour vérifier que la condition est remplie
       setGuitarModalVisible(true);
       setGuitarModalContent({
         title: "ATTENTION :",
-        description: "Si vous sélectionnez le Détecteur de Micros (Cybermatériel), vous ne pourrez pas choisir la Guitare Electrique (objet). Confirmer ?",
+        description:
+          "Si vous sélectionnez le Détecteur de Micros (Cybermatériel), vous ne pourrez pas choisir la Guitare Electrique (objet). Confirmer ?",
         confirmButtonText: "OUI",
         cancelButtonText: "NON",
         onConfirm: () => {
@@ -471,7 +573,8 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
       console.log("Triggering modal for Melee Weapon selection:", itemValue);
       setMeleeWeaponModalContent({
         title: "ATTENTION :",
-        description: "Si vous sélectionnez une Arme de Mêlée, vous ne pourrez pas choisir la Grenade Etourdissante en supplément des Grenades Lacrymogène (x2). Confirmer ?",
+        description:
+          "Si vous sélectionnez une Arme de Mêlée, vous ne pourrez pas choisir la Grenade Etourdissante en supplément des Grenades Lacrymogène (x2). Confirmer ?",
         confirmButtonText: "OUI",
         cancelButtonText: "NON",
         onConfirm: () => {
@@ -487,55 +590,77 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
       });
       setMeleeWeaponModalVisible(true);
     } else {
-      console.log("Selected 'Veuillez sélectionner' or non-triggering weapon, no modal triggered.");
+      console.log(
+        "Selected 'Veuillez sélectionner' or non-triggering weapon, no modal triggered."
+      );
       setMeleeWeaponModalVisible(false);
     }
   };
 
-const MeleeWeaponModal = ({ visible, content, onRequestClose }) => {
-  if (!content) return null;
-  return (
+  const MeleeWeaponModal = ({ visible, content, onRequestClose }) => {
+    if (!content) return null;
+    return (
       <Modal visible={visible} onRequestClose={onRequestClose}>
-          <View>
-              <Text>{content.title}</Text>
-              <Text>{content.description}</Text>
-              <TouchableOpacity onPress={content.onConfirm} style={{ backgroundColor: 'green' }}>
-                  <Text style={{ color: 'white', fontWeight: 'bold' }}>{content.confirmButtonText}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={content.onCancel} style={{ backgroundColor: 'red' }}>
-                  <Text style={{ color: 'white', fontWeight: 'bold' }}>{content.cancelButtonText}</Text>
-              </TouchableOpacity>
-          </View>
+        <View>
+          <Text>{content.title}</Text>
+          <Text>{content.description}</Text>
+          <TouchableOpacity
+            onPress={content.onConfirm}
+            style={{ backgroundColor: "green" }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              {content.confirmButtonText}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={content.onCancel}
+            style={{ backgroundColor: "red" }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              {content.cancelButtonText}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </Modal>
-  );
-};
+    );
+  };
 
-const Grenade2Modal = ({ visible, content, onRequestClose }) => {
-  if (!content) return null;
-  return (
+  const Grenade2Modal = ({ visible, content, onRequestClose }) => {
+    if (!content) return null;
+    return (
       <Modal
-          visible={visible}
-          onRequestClose={onRequestClose}
-          transparent={true}
-          animationType="slide"
+        visible={visible}
+        onRequestClose={onRequestClose}
+        transparent={true}
+        animationType="slide"
       >
-          <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                  <Text style={styles.modalTitle}>{content.title}</Text>
-                  <Text style={styles.modalDescription}>{content.description}</Text>
-                  <View style={styles.modalButtons}>
-                      <TouchableOpacity onPress={content.onConfirm} style={styles.confirmButton}>
-                          <Text style={styles.buttonText}>{content.confirmButtonText}</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={content.onCancel} style={styles.cancelButton}>
-                          <Text style={styles.buttonText}>{content.cancelButtonText}</Text>
-                      </TouchableOpacity>
-                  </View>
-              </View>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{content.title}</Text>
+            <Text style={styles.modalDescription}>{content.description}</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={content.onConfirm}
+                style={styles.confirmButton}
+              >
+                <Text style={styles.buttonText}>
+                  {content.confirmButtonText}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={content.onCancel}
+                style={styles.cancelButton}
+              >
+                <Text style={styles.buttonText}>
+                  {content.cancelButtonText}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
+        </View>
       </Modal>
-  );
-};
+    );
+  };
 
   const handleVesteSelect = async () => {
     const details = await fetchVesteDetails();
@@ -583,14 +708,15 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
   const handleObject3Change = (itemValue) => {
     console.log("Dropdown 3 value changed:", itemValue); // Log de la nouvelle valeur sélectionnée
     setSelectedObject3(itemValue);
-  
+
     // Condition pour déclencher la modale si la valeur sélectionnée n'est pas "Veuillez sélectionner"
     if (itemValue !== "") {
       console.log("Triggering modal for Object 3 selection:", itemValue); // Log pour vérifier que la condition est remplie
       setGuitarModalVisible(true);
       setGuitarModalContent({
         title: "ATTENTION :",
-        description: "Si vous sélectionnez cet objet, vous ne pourrez pas choisir le Détecteur de Micros (Cybermatériel). Confirmer ?",
+        description:
+          "Si vous sélectionnez cet objet, vous ne pourrez pas choisir le Détecteur de Micros (Cybermatériel). Confirmer ?",
         confirmButtonText: "OUI",
         cancelButtonText: "NON",
         onConfirm: () => {
@@ -608,35 +734,37 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
       console.log("Selected 'Veuillez sélectionner', no modal triggered."); // Log si la valeur est "Veuillez sélectionner"
     }
   };
-  
+
   const handleGrenade2Change = (itemValue) => {
     console.log("handleGrenade2Change appelé avec :", itemValue);
     setSelectedGrenadeType(itemValue);
     // Condition pour vérifier si l'ID de la grenade est 5
     if (itemValue && itemValue.id === 5) {
-        console.log("ID de la grenade est 5 :", itemValue);
-        setGrenade2ModalContent({
-            title: "ATTENTION :",
-            description: "Si vous sélectionnez la Grenade Etourdissante, vous ne pourrez pas choisir l'Arme de Mêlée. Confirmer ?",
-            confirmButtonText: "OUI",
-            cancelButtonText: "NON",
-            onConfirm: () => {
-                setSelectedGrenadeType(itemValue);
-                setSelectedMeleeWeapon(null);
-                setGrenade2ModalVisible(false);
-            },
-            onCancel: () => {
-                setSelectedGrenadeType(null);
-                setSelectedMeleeWeapon(itemValue);
-                setGrenade2ModalVisible(false);
-            },
-        });
-        setGrenade2ModalVisible(true);
+      console.log("ID de la grenade est 5 :", itemValue);
+      setGrenade2ModalContent({
+        title: "ATTENTION :",
+        description:
+          "Si vous sélectionnez la Grenade Etourdissante, vous ne pourrez pas choisir l'Arme de Mêlée. Confirmer ?",
+        confirmButtonText: "OUI",
+        cancelButtonText: "NON",
+        onConfirm: () => {
+          setSelectedGrenadeType(itemValue);
+          setSelectedMeleeWeapon(null);
+          setGrenade2ModalVisible(false);
+        },
+        onCancel: () => {
+          setSelectedGrenadeType(null);
+          setSelectedMeleeWeapon(itemValue);
+          setGrenade2ModalVisible(false);
+        },
+      });
+      setGrenade2ModalVisible(true);
     } else {
-        console.log("Sélectionné 'Veuillez sélectionner' ou grenade non-déclenchante, pas de modale déclenchée.");
+      console.log(
+        "Sélectionné 'Veuillez sélectionner' ou grenade non-déclenchante, pas de modale déclenchée."
+      );
     }
-};
-  
+  };
 
   const closeObjectModal = () => {
     setObjectModalVisible(false);
@@ -681,7 +809,7 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
   const handleGrenadeTypeSelect = (grenadeType) => {
     setSelectedGrenadeType(grenadeType);
     setGrenade2ModalContent({ ...grenadeType, quantity: 1 });
-  };
+};
 
   const handleAmmunitionSelect = () => {
     fetchAmmunitionDetails();
@@ -981,7 +1109,7 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
       </ScrollView>
     );
   };
-  
+
   const renderGrenade1ModalContent = () => {
     if (!grenade1ModalContent) return null;
     return (
@@ -1038,7 +1166,7 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
         </TouchableOpacity>
       </ScrollView>
     );
-}
+  };
 
   const renderAmmunitionModalContent = () => {
     if (!ammunitionModalContent) return null;
@@ -1406,19 +1534,95 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
     );
   };
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      const cyberfashion1Name = await fetchCyberfashionNames(2);
-      setSelectedCyberfashion1(cyberfashion1Name);
-      const cyberfashion2Name = await fetchCyberfashionNames(7);
-      setSelectedCyberfashion2(cyberfashion2Name);
-      const cyberaudio1Name = await fetchCyberaudioNames(9);
-      setSelectedCyberaudio1(cyberaudio1Name);
-      const cyberaudio2Name = await fetchCyberaudioNames(1);
-      setSelectedCyberaudio2(cyberaudio2Name);
-    };
-    fetchInitialData();
-  }, [user?.token]);
+  const handleContinue = async () => {
+    console.log("Début de handleContinue");
+    if (!selectedMeleeWeapon && !selectedGrenadeType) {
+      Alert.alert(
+        "Erreur",
+        "Veuillez sélectionner au moins une valeur pour Arme de mêlée ou pour Grenades."
+      );
+      console.log(
+        "Erreur: Aucune arme de mêlée ou type de grenade sélectionné"
+      );
+      return;
+    }
+    if (!selectedObject3 && !selectedCyberaudio3) {
+      Alert.alert(
+        "Erreur",
+        "Veuillez sélectionner au moins une valeur pour Objet 3 ou pour Cyberaudio 3."
+      );
+      console.log("Erreur: Aucun objet 3 ou cyberaudio 3 sélectionné");
+      return;
+    }
+    try {
+      const idUtilisateur = await AsyncStorage.getItem("id_utilisateur");
+      const idPerso = await AsyncStorage.getItem("id_perso");
+      console.log("idUtilisateur récupéré:", idUtilisateur);
+      console.log("id_perso récupéré:", idPerso);
+      if (!idUtilisateur) {
+        Alert.alert("Erreur", "ID utilisateur non défini.");
+        console.log("Erreur: ID utilisateur non défini");
+        return;
+      }
+      if (!idPerso) {
+        Alert.alert("Erreur", "ID personnage non défini.");
+        console.log("Erreur: ID personnage non défini");
+        return;
+      }
+      // Transmettre id_perso avant d'exécuter la requête POST
+      await transmitIdPerso(idPerso);
+
+      // Ajouter les nouvelles entrées
+      const equipmentData = [
+        { id_arme: 10, quantite: 1, id_perso: idPerso },
+        { id_equipement: selectedMeleeWeapon, quantite: 1, id_perso: idPerso },
+        { id_equipement: 28, quantite: 1, id_perso: idPerso },
+        { id_equipement: selectedGrenadeType, quantite: 1, id_perso: idPerso },
+        { id_equipement: 1, quantite: 5, id_perso: idPerso },
+        { id_equipement: 5, quantite: 1, id_perso: idPerso },
+        { id_equipement: 6, quantite: 1, id_perso: idPerso },
+        { id_equipement: 1, quantite: 1, id_perso: idPerso },
+        { id_equipement: 36, quantite: 1, id_perso: idPerso },
+        { id_equipement: selectedObject3, quantite: 1, id_perso: idPerso },
+        { id_equipement: 41, quantite: 1, id_perso: idPerso },
+        { id_equipement: 2, quantite: 1, id_perso: idPerso },
+        { id_equipement: 45, quantite: 1, id_perso: idPerso },
+        { id_equipement: 7, quantite: 1, id_perso: idPerso },
+        { id_equipement: 2, quantite: 1, id_attribut: 2, id_perso: idPerso },
+        { id_equipement: 7, quantite: 1, id_attribut: 7, id_perso: idPerso },
+        { id_equipement: 9, quantite: 1, id_attribut: 37, id_perso: idPerso },
+        { id_equipement: 1, quantite: 1, id_attribut: 29, id_perso: idPerso },
+        {
+          id_equipement: selectedCyberaudio3,
+          quantite: 1,
+          id_attribut: 35,
+          id_perso: idPerso,
+        },
+      ];
+
+      console.log("Données d'équipement à envoyer:", equipmentData);
+
+      for (const item of equipmentData) {
+        console.log("Envoi de l'équipement:", item);
+        await axios.post(
+          "http://192.168.1.17:3000/api/roles/personnage_equipement",
+          item,
+          {
+            headers: { Authorization: `Bearer ${user?.token}` },
+          }
+        );
+      }
+
+      console.log("Navigation vers StuffPathEnding");
+      navigation.navigate("StuffPathEnding");
+    } catch (error) {
+      console.error("Error updating equipment:", error);
+      Alert.alert(
+        "Erreur",
+        "Une erreur est survenue lors de la mise à jour de l'équipement."
+      );
+    }
+  };
 
   return (
     <ImageBackground
@@ -1469,24 +1673,28 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
                 <Text style={styles.clickableTitleText}>ARME DE MÊLÉE</Text>
               </TouchableOpacity>
               <View style={styles.pickerContainer}>
-              <Picker
-      selectedValue={selectedMeleeWeapon}
-      style={[
-        styles.picker,
-        selectedMeleeWeapon
-          ? { borderColor: "yellow", borderWidth: 2 }
-          : {},
-      ]}
-      onValueChange={(itemValue) => {
-        console.log("Picker value changed:", itemValue);
-        handleMeleeWeaponChangeAndSelect(itemValue); // Remplacez handleMeleeWeaponSelect par handleMeleeWeaponChange
-      }}
-    >
-      <Picker.Item label="Veuillez sélectionner" value="" />
-      {meleeWeapons.map((weapon) => (
-    <Picker.Item key={weapon.id_arme} label={weapon.nom} value={weapon} />
-))}
-    </Picker>
+                <Picker
+                  selectedValue={selectedMeleeWeapon}
+                  style={[
+                    styles.picker,
+                    selectedMeleeWeapon
+                      ? { borderColor: "yellow", borderWidth: 2 }
+                      : {},
+                  ]}
+                  onValueChange={(itemValue) => {
+                    console.log("Picker value changed:", itemValue);
+                    handleMeleeWeaponChangeAndSelect(itemValue); // Remplacez handleMeleeWeaponSelect par handleMeleeWeaponChange
+                  }}
+                >
+                  <Picker.Item label="Veuillez sélectionner" value="" />
+                  {meleeWeapons.map((weapon) => (
+                    <Picker.Item
+                      key={weapon.id_arme}
+                      label={weapon.nom}
+                      value={weapon}
+                    />
+                  ))}
+                </Picker>
               </View>
             </View>
             <View style={styles.row}>
@@ -1542,37 +1750,34 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
                 <Text style={styles.clickableTitleText}>GRENADES 2</Text>
               </TouchableOpacity>
               <View style={styles.pickerContainer}>
-              <Picker
-        selectedValue={selectedGrenadeType}
-        style={[
-          styles.picker,
-          selectedGrenadeType
-            ? { borderColor: "yellow", borderWidth: 2 }
-            : {},
-        ]}
-        onValueChange={(itemValue) => {
-          console.log("Valeur sélectionnée dans le Picker:", itemValue);
-          handleGrenade2Change(itemValue);
-      }}
-      >
-        <Picker.Item label="Veuillez sélectionner" value={null} />
-        {grenades
-          .filter((grenade) => {
-            const isGrenadeIdFive = grenade.id === 5;
-            console.log('Filtering grenade:', grenade, 'Is ID 5:', isGrenadeIdFive);
-            return isGrenadeIdFive;
-          })
-          .map((grenade) => {
-            console.log('Mapping grenade:', grenade);
-            return (
-              <Picker.Item
-                key={grenade.id}
-                label={grenade.nom}
-                value={grenade}
-              />
-            );
-          })}
-      </Picker>
+                <Picker
+                  selectedValue={selectedGrenadeType}
+                  style={[
+                    styles.picker,
+                    selectedGrenadeType
+                      ? { borderColor: "yellow", borderWidth: 2 }
+                      : {},
+                  ]}
+                  onValueChange={(itemValue) => {
+                    handleGrenade2Change(itemValue);
+                  }}
+                >
+                  <Picker.Item label="Veuillez sélectionner" value={null} />
+                  {grenades
+                    .filter((grenade) => {
+                      const isGrenadeIdFive = grenade.id === 5;
+                      return isGrenadeIdFive;
+                    })
+                    .map((grenade) => {
+                      return (
+                        <Picker.Item
+                          key={grenade.id}
+                          label={grenade.nom}
+                          value={grenade}
+                        />
+                      );
+                    })}
+                </Picker>
               </View>
             </View>
             <View style={styles.row}>
@@ -2123,38 +2328,122 @@ const Grenade2Modal = ({ visible, content, onRequestClose }) => {
           </LinearGradient>
         </View>
         <View style={styles.container}>
-    {/* Autres composants et éléments de l'interface utilisateur */}
-    
-    {/* Modale pour la guitare */}
-    {guitarModalVisible && (
-      <GuitarModal
-        visible={guitarModalVisible}
-        content={guitarModalContent}
-        onRequestClose={() => setGuitarModalVisible(false)}
-      />
-    )}
+          {/* Autres composants et éléments de l'interface utilisateur */}
 
-    {/* Modale pour le microphone */}
-    {microphoneModalVisible && (
-      <MicrophoneModal
-        visible={microphoneModalVisible}
-        content={microphoneModalContent}
-        onRequestClose={() => setMicrophoneModalVisible(false)}
-      />
-    )}
+          {/* Modale pour la guitare */}
+          {guitarModalVisible && (
+            <GuitarModal
+              visible={guitarModalVisible}
+              content={guitarModalContent}
+              onRequestClose={() => setGuitarModalVisible(false)}
+            />
+          )}
 
-    {/* Autres modales et contenus */}
-  </View>
-  <View style={styles.container}><MeleeWeaponModal
-    visible={meleeWeaponModalVisible}
-    content={meleeWeaponModalContent}
-    onRequestClose={() => setMeleeWeaponModalVisible(false)}
-/></View>
-<View><Grenade2Modal
-                visible={grenade2ModalVisible}
-                content={grenade2ModalContent}
-                onRequestClose={() => setGrenade2ModalVisible(false)}
-            /></View>
+          {/* Modale pour le microphone */}
+          {microphoneModalVisible && (
+            <MicrophoneModal
+              visible={microphoneModalVisible}
+              content={microphoneModalContent}
+              onRequestClose={() => setMicrophoneModalVisible(false)}
+            />
+          )}
+
+          {/* Autres modales et contenus */}
+        </View>
+        <View style={styles.container}>
+          <MeleeWeaponModal
+            visible={meleeWeaponModalVisible}
+            content={meleeWeaponModalContent}
+            onRequestClose={() => setMeleeWeaponModalVisible(false)}
+          />
+        </View>
+        <View>
+          <Grenade2Modal
+            visible={grenade2ModalVisible}
+            content={grenade2ModalContent}
+            onRequestClose={() => setGrenade2ModalVisible(false)}
+          />
+        </View>
+        <View style={styles.container}>
+          {/* Votre contenu existant */}
+
+          {/* Boutons CONTINUER et QUITTER */}
+          <View style={styles.footerButtons}>
+            <TouchableOpacity
+              style={styles.quitButton}
+              onPress={() => setQuitModalVisible(true)}
+            >
+              <Text style={styles.buttonText}>QUITTER</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.continueButton}
+              onPress={() => setContinueModalVisible(true)}
+            >
+              <Text style={styles.buttonText}>CONTINUER</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Modale CONTINUER */}
+          <Modal
+            visible={isContinueModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setContinueModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text>Confirmez-vous le choix de l'équipement ?</Text>
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonYes]}
+                    onPress={handleContinue}
+                  >
+                    <Text style={styles.buttonText}>OUI</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonNo]}
+                    onPress={() => setContinueModalVisible(false)}
+                  >
+                    <Text style={styles.buttonText}>NON</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Modale QUITTER */}
+          <Modal
+            visible={isQuitModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setQuitModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>TERMINER PLUS TARD :</Text>
+                <Text>
+                  Vous allez retourner au menu sans sauvegarder les informations
+                  de cette page. Les informations des pages précédentes ont déjà
+                  été sauvegardées, confirmer ?
+                </Text>
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonYes]}
+                    onPress={() => navigation.navigate("Home")}
+                  >
+                    <Text style={styles.buttonText}>OUI</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalButtonNo]}
+                    onPress={() => setQuitModalVisible(false)}
+                  >
+                    <Text style={styles.buttonText}>ANNULER</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </View>
       </ScrollView>
     </ImageBackground>
   );
