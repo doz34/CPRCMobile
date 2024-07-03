@@ -77,10 +77,26 @@ const RolePathRockerboyJob = ({ navigation, route }) => {
 
   useEffect(() => {
     if (user?.token) {
-      fetchData('roles/type_role', setTypeRoles, role => role.id_typrol >= 1 && role.id_typrol <= 10);
-      fetchData('roles/travail_soloteam', setTravailSoloTeams, team => team.id_travsolteam === 1 || team.id_travsolteam === 2);
-      fetchData('roles/travail_soloteam_passe', setTravailSoloTeamsPass, () => true);
-      fetchData('roles/specifique', setSpecifiques, spec => spec.id_spec >= 1 && spec.id_spec <= 6);
+      fetchData('roles/type_role', (data) => {
+        setTypeRoles(data);
+        setSelectedTypeRole(data[0]);
+      }, role => role.id_typrol >= 1 && role.id_typrol <= 10);
+  
+      fetchData('roles/travail_soloteam', (data) => {
+        setTravailSoloTeams(data);
+        setSelectedTravailSoloTeam(data[0]);
+      }, team => team.id_travsolteam === 1 || team.id_travsolteam === 2);
+  
+      fetchData('roles/travail_soloteam_passe', (data) => {
+        setTravailSoloTeamsPass(data);
+        setSelectedTravailSoloTeamPass(data[0]);
+      }, () => true);
+  
+      fetchData('roles/specifique', (data) => {
+        setSpecifiques(data);
+        setSelectedSpecifique(data[0]);
+      }, spec => spec.id_spec >= 1 && spec.id_spec <= 6);
+  
       fetchImageUrl();
     }
   }, [user?.token]);
