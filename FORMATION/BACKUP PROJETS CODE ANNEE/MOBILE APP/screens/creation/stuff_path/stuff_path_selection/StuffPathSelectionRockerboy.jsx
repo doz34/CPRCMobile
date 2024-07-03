@@ -7,6 +7,7 @@ import {
   ScrollView,
   ImageBackground,
   Alert,
+  Button,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../../../context/UserContext";
@@ -33,8 +34,8 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [meleeModalContent, setMeleeModalContent] = useState({});
   const [grenadeModalContent, setGrenadeModalContent] = useState({});
   const [grenade1ModalVisible, setGrenade1ModalVisible] = useState(false);
-  const [grenade2ModalVisible, setGrenade2ModalVisible] = useState(false);
   const [grenade1ModalContent, setGrenade1ModalContent] = useState({});
+  const [grenade2ModalVisible, setGrenade2ModalVisible] = useState(false);
   const [grenade2ModalContent, setGrenade2ModalContent] = useState({});
   const [selectedAmmunition, setSelectedAmmunition] = useState(
     "Munitions Standard de Pistolet TL (x50)"
@@ -52,7 +53,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [headArmorModalContent, setHeadArmorModalContent] = useState({});
   const [bodyArmorModalContent, setBodyArmorModalContent] = useState({});
   const [selectedObject, setSelectedObject] = useState(null);
-  const [selectedObject3, setSelectedObject3] = useState("");
+  const [selectedObject3, setSelectedObject3] = useState(null);
   const [objectModalContent, setObjectModalContent] = useState({});
   const [objectModalVisible, setObjectModalVisible] = useState(false);
   // Ajout des états pour Cyberfashion et Cyberaudio
@@ -60,7 +61,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [selectedCyberfashion2, setSelectedCyberfashion2] = useState(null);
   const [selectedCyberaudio1, setSelectedCyberaudio1] = useState(null);
   const [selectedCyberaudio2, setSelectedCyberaudio2] = useState(null);
-  const [selectedCyberaudio3, setSelectedCyberaudio3] = useState(null);
+  const [selectedCyberaudio3, setSelectedCyberaudio3] = useState("");
 
   // Ajout des états pour les modales
   const [cyberfashion1ModalVisible, setCyberfashion1ModalVisible] =
@@ -102,8 +103,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [microphoneModalContent, setMicrophoneModalContent] = useState({});
   const [meleeWeaponModalVisible, setMeleeWeaponModalVisible] = useState(false);
   const [meleeWeaponModalContent, setMeleeWeaponModalContent] = useState({});
-  const [grenade2DistinctModalVisible, setGrenade2DistinctModalVisible] =
-    useState(false);
+  const [grenade2DistinctModalVisible, setGrenade2DistinctModalVisible] = useState(false);
   const [isContinueModalVisible, setContinueModalVisible] = useState(false);
   const [isQuitModalVisible, setQuitModalVisible] = useState(false);
 
@@ -210,7 +210,6 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-  
     const fetchWeapons = async () => {
       try {
         const response = await axios.get(
@@ -539,6 +538,14 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     setCyberaudio2ModalVisible(true);
   };
 
+  useEffect(() => {
+    console.log("Valeur de selectedCyberaudio3:", selectedCyberaudio3);
+    console.log(
+      "ID de selectedCyberaudio3:",
+      selectedCyberaudio3 ? selectedCyberaudio3.id : "Non défini"
+    );
+  }, [selectedCyberaudio3]);
+
   const handleCyberaudio3Select = async () => {
     const details = await fetchCyberaudio3Details();
     setCyberaudio3ModalContent(details);
@@ -546,13 +553,22 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     setSelectedCyberaudio3({ id: 7, ...details }); // Assurez-vous que l'ID est bien 7
   };
 
-  const handleCyberaudio3Change = (itemValue) => {
-    console.log("Dropdown Cyberaudio 3 value changed:", itemValue); // Log de la nouvelle valeur sélectionnée
-    setSelectedCyberaudio3(itemValue);
+  useEffect(() => {
+    console.log("Valeur de selectedCyberaudio3:", selectedCyberaudio3);
+    console.log(
+      "ID de selectedCyberaudio3:",
+      selectedCyberaudio3 ? selectedCyberaudio3.id : "Non défini"
+    );
+  }, [selectedCyberaudio3]);
 
+  const handleCyberaudio3Change = (itemValue) => {
+    console.log("Dropdown Cyberaudio 3 value changed:", itemValue);
+    // Log de la nouvelle valeur sélectionnée
+    setSelectedCyberaudio3({ id: itemValue }); // Assurez-vous que l'ID est bien défini
     // Condition pour déclencher la modale si la valeur sélectionnée n'est pas "Veuillez sélectionner"
-    if (itemValue !== "") {
-      console.log("Triggering modal for Cyberaudio 3 selection:", itemValue); // Log pour vérifier que la condition est remplie
+    if (itemValue) {
+      console.log("Triggering modal for Cyberaudio 3 selection:", itemValue);
+      // Log pour vérifier que la condition est remplie
       setGuitarModalVisible(true);
       setGuitarModalContent({
         title: "ATTENTION :",
@@ -561,7 +577,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
         confirmButtonText: "OUI",
         cancelButtonText: "NON",
         onConfirm: () => {
-          setSelectedCyberaudio3(itemValue);
+          setSelectedCyberaudio3({ id: itemValue });
           setSelectedObject3(null);
           setGuitarModalVisible(false);
         },
@@ -572,16 +588,15 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
         },
       });
     } else {
-      console.log("Selected 'Veuillez sélectionner', no modal triggered."); // Log si la valeur est "Veuillez sélectionner"
+      console.log("Selected 'Veuillez sélectionner', no modal triggered.");
+      // Log si la valeur est "Veuillez sélectionner"
     }
   };
 
   const handleMeleeWeaponChangeAndSelect = (itemValue) => {
     console.log("Dropdown Melee Weapon value changed:", itemValue);
     setSelectedMeleeWeapon(itemValue);
-    setMeleeModalContent(itemValue); // Ajout de la logique de handleMeleeWeaponSelect
-
-    // Vérifiez si l'arme sélectionnée doit déclencher une modale
+    setMeleeModalContent(itemValue);
     const triggerModalIds = [6, 7, 8];
     if (itemValue && triggerModalIds.includes(itemValue.id_arme)) {
       console.log("Triggering modal for Melee Weapon selection:", itemValue);
@@ -593,12 +608,12 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
         cancelButtonText: "NON",
         onConfirm: () => {
           setSelectedMeleeWeapon(itemValue);
-          setSelectedGrenadeType(null);
+          setSelectedGrenadeType(null); // Réinitialiser la sélection de Grenades 2
           setMeleeWeaponModalVisible(false);
         },
         onCancel: () => {
           setSelectedMeleeWeapon(null);
-          setSelectedGrenadeType(itemValue);
+          setSelectedGrenadeType({ id: 5 }); // Conserver la sélection de la grenade étourdissante
           setMeleeWeaponModalVisible(false);
         },
       });
@@ -611,6 +626,9 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     }
   };
 
+  const isMeleeWeaponSelected =
+    selectedMeleeWeapon && [6, 7, 8].includes(selectedMeleeWeapon.id_arme);
+
   const MeleeWeaponModal = ({ visible, content, onRequestClose }) => {
     if (!content) return null;
     return (
@@ -618,22 +636,11 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
         <View>
           <Text>{content.title}</Text>
           <Text>{content.description}</Text>
-          <TouchableOpacity
+          <Button
+            title={content.confirmButtonText}
             onPress={content.onConfirm}
-            style={{ backgroundColor: "green" }}
-          >
-            <Text style={{ color: "white", fontWeight: "bold" }}>
-              {content.confirmButtonText}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={content.onCancel}
-            style={{ backgroundColor: "red" }}
-          >
-            <Text style={{ color: "white", fontWeight: "bold" }}>
-              {content.cancelButtonText}
-            </Text>
-          </TouchableOpacity>
+          />
+          <Button title={content.cancelButtonText} onPress={content.onCancel} />
         </View>
       </Modal>
     );
@@ -722,7 +729,6 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const handleObject3Change = (itemValue) => {
     console.log("Dropdown 3 value changed:", itemValue); // Log de la nouvelle valeur sélectionnée
     setSelectedObject3(itemValue);
-
     // Condition pour déclencher la modale si la valeur sélectionnée n'est pas "Veuillez sélectionner"
     if (itemValue !== "") {
       console.log("Triggering modal for Object 3 selection:", itemValue); // Log pour vérifier que la condition est remplie
@@ -735,7 +741,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
         cancelButtonText: "NON",
         onConfirm: () => {
           setSelectedObject3(itemValue);
-          setSelectedCyberaudio3(null);
+          setSelectedCyberaudio3("");
           setGuitarModalVisible(false);
         },
         onCancel: () => {
@@ -749,36 +755,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     }
   };
 
-  const handleGrenade2Change = (itemValue) => {
-    console.log("handleGrenade2Change appelé avec :", itemValue);
-    setSelectedGrenadeType(itemValue);
-    // Condition pour vérifier si l'ID de la grenade est 5
-    if (itemValue && itemValue.id === 5) {
-      console.log("ID de la grenade est 5 :", itemValue);
-      setGrenade2ModalContent({
-        title: "ATTENTION :",
-        description:
-          "Si vous sélectionnez la Grenade Etourdissante, vous ne pourrez pas choisir l'Arme de Mêlée. Confirmer ?",
-        confirmButtonText: "OUI",
-        cancelButtonText: "NON",
-        onConfirm: () => {
-          setSelectedGrenadeType(itemValue);
-          setSelectedMeleeWeapon(null);
-          setGrenade2ModalVisible(false);
-        },
-        onCancel: () => {
-          setSelectedGrenadeType(null);
-          setSelectedMeleeWeapon(itemValue);
-          setGrenade2ModalVisible(false);
-        },
-      });
-      setGrenade2ModalVisible(true);
-    } else {
-      console.log(
-        "Sélectionné 'Veuillez sélectionner' ou grenade non-déclenchante, pas de modale déclenchée."
-      );
-    }
-  };
+  
 
   const closeObjectModal = () => {
     setObjectModalVisible(false);
@@ -820,10 +797,23 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     setGrenade1ModalContent({ ...grenade, quantity: 2 });
   };
 
-  const handleGrenadeTypeSelect = (grenadeType) => {
-    setSelectedGrenadeType(grenadeType);
-    setGrenade2ModalContent({ ...grenadeType, quantity: 1 });
-  };
+  /*const openGrenade2InfoModal = async (grenadeType) => {
+    try {
+        await handleGrenadeTypeSelect(grenadeType);
+        setGrenade2DistinctModalVisible(true);
+    } catch (error) {
+        console.error("Erreur lors de l'ouverture de la modale Grenades 2 :", error);
+    }
+};*/
+
+const handleGrenadeTypeSelect = (grenadeType) => {
+  setSelectedGrenadeType(grenadeType);
+  setGrenade2ModalContent({ ...grenadeType, quantity: 1 });
+};
+
+/*const onGrenade2ButtonPress = (grenadeType) => {
+  openGrenade2InfoModal(grenadeType);
+};*/
 
   const handleAmmunitionSelect = () => {
     fetchAmmunitionDetails();
@@ -853,6 +843,39 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const closeGrenadeModal = () => {
     setGrenadeModalVisible(false);
   };
+
+  /*const closeGrenade2Modal = () => {
+    setGrenade2DistinctModalVisible(false);
+};*/
+
+const handleGrenade2Change = (itemValue) => {
+  console.log("handleGrenade2Change appelé avec :", itemValue);
+  setSelectedGrenadeType(itemValue);
+  if (itemValue && itemValue.id === 5) {
+      console.log("ID de la grenade est 5 :", itemValue);
+      setGrenade2ModalContent({
+        id: itemValue.id,
+        quantity: itemValue.quantity || 1,
+          title: "ATTENTION :",
+          description: "Si vous sélectionnez la Grenade Etourdissante, vous ne pourrez pas choisir l'Arme de Mêlée. Confirmer ?",
+          confirmButtonText: "OUI",
+          cancelButtonText: "NON",
+          onConfirm: () => {
+              setSelectedGrenadeType(itemValue);
+              setSelectedMeleeWeapon(null); // Réinitialiser la sélection de l'arme de mêlée
+              setGrenade2ModalVisible(false);
+          },
+          onCancel: () => {
+              setSelectedGrenadeType(null);
+              setSelectedMeleeWeapon({ id: 6 }); // Conserver la sélection de l'arme de mêlée
+              setGrenade2ModalVisible(false);
+          },
+      });
+      setGrenade2ModalVisible(true);
+  } else {
+      console.log("Sélectionné 'Veuillez sélectionner' ou grenade non-déclenchante, pas de modale déclenchée.");
+  }
+};
 
   // Modal components for guitar and microphone warnings
   const GuitarModal = ({ visible, content, onRequestClose }) => {
@@ -1040,6 +1063,21 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     );
   };
 
+  const renderMeleeWeaponPicker = () => {
+    return (
+      <Picker
+        selectedValue={selectedMeleeWeapon}
+        onValueChange={handleMeleeWeaponChangeAndSelect}
+        style={[styles.picker, !selectedMeleeWeapon && { opacity: 0.5 }]}
+        enabled={!!selectedMeleeWeapon}
+      >
+        {meleeWeapons.map((weapon) => (
+          <Picker.Item key={weapon.id_arme} label={weapon.nom} value={weapon} />
+        ))}
+      </Picker>
+    );
+  };
+
   const renderMeleeModalContent = () => {
     if (!meleeModalContent) return null;
     return (
@@ -1162,7 +1200,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
           <View style={styles.modalPair}>
             <Text style={styles.modalKey}>Type de munition:</Text>
             <Text style={styles.modalValue}>
-              {grenade2ModalContent.nom || "Aucun(e)"}
+              {grenade2ModalContent.id === 5 ? "Etourdissante" : grenade2ModalContent.nom || "Aucun(e)"}
             </Text>
           </View>
           <View style={styles.modalPair}>
@@ -1180,7 +1218,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
         </TouchableOpacity>
       </ScrollView>
     );
-  };
+}
 
   const renderAmmunitionModalContent = () => {
     if (!ammunitionModalContent) return null;
@@ -1550,190 +1588,235 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
 
   const getCharacterStyle = async (idPerso) => {
     try {
-        const response = await axios.get(`http://192.168.1.17:3000/api/user/character-style/${idPerso}`);
-        return response.data.id_style;
+      const response = await axios.get(
+        `http://192.168.1.17:3000/api/user/character-style/${idPerso}`
+      );
+      return response.data.id_style;
     } catch (error) {
-        console.error('Error fetching character style:', error);
-        return null;
+      console.error("Error fetching character style:", error);
+      return null;
     }
-};
+  };
 
-const getVêtementId = async (table, idStyle) => {
+  const getVêtementId = async (table, idStyle) => {
     try {
-        const response = await axios.get(`http://192.168.1.17:3000/api/user/vetement-id/${table}/${idStyle}`);
-        return response.data.id_vetement;
+      const response = await axios.get(
+        `http://192.168.1.17:3000/api/user/vetement-id/${table}/${idStyle}`
+      );
+      return response.data.id_vetement;
     } catch (error) {
-        console.error('Error fetching vetement id:', error);
-        return null;
+      console.error("Error fetching vetement id:", error);
+      return null;
     }
-};
+  };
 
-const sendEquipmentData = async (equipmentData, idUtilisateur) => {
-  try {
-    for (const item of equipmentData) {
-      let table;
-      if (item.id_arme) {
-        table = "personnage_armes";
-      } else if (item.id_armure) {
-        table = "personnage_armures";
-      } else if (item.id_obj) {
-        table = "personnage_equipement";
-      } else if (item.id_cyberfashion) {
-        table = "personnage_cyberfashion";
-      } else if (item.id_cyberaudio) {
-        table = "personnage_cyberaudio";
-      } else if (item.id_vetement) {
-        table = "personnage_vetements";
-      } else if (item.id === 28 || item.id === 1) {
-        table = "personnage_munitions";
-      } else if (item.id) {
-        table = "personnage_equipement"; // ou une autre table appropriée
-      } else if (item.id_attribut) {
-        table = "personnage_cyberaudio"; // ou une autre table appropriée
-      } else if (item.id_attribut) {
-        table = "personnage_cyberfashion";
-      }
-      // Ajoutez id_utilisateur à chaque item
-      item.id_utilisateur = idUtilisateur;
-      await axios.post(`http://192.168.1.17:3000/api/roles/${table}`, item, {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      console.log("Envoi de l'équipement:", item);
-    }
-    console.log("Navigation vers StuffPathEnding");
-    navigation.navigate("StuffPathEnding");
-  } catch (error) {
-    console.error("Error updating equipment:", error);
-    Alert.alert("Erreur", "Une erreur est survenue lors de la mise à jour de l'équipement.");
-  }
-};
+  const handleContinue = async () => {
+    console.log("Début de handleContinue");
 
-const handleContinue = async () => {
-  console.log("Début de handleContinue");
-  if (!selectedMeleeWeapon && !selectedGrenadeType) {
+    if (!selectedMeleeWeapon && !selectedGrenadeType) {
       Alert.alert(
-          "Erreur",
-          "Veuillez sélectionner au moins une valeur pour Arme de mêlée ou pour Grenades."
+        "Erreur",
+        "Veuillez sélectionner au moins une valeur pour Arme de mêlée ou pour Grenades."
       );
       console.log(
-          "Erreur: Aucune arme de mêlée ou type de grenade sélectionné"
+        "Erreur: Aucune arme de mêlée ou type de grenade sélectionné"
       );
       return;
-  }
-  if (!selectedObject3 && !selectedCyberaudio3) {
+    }
+
+    if (!selectedObject3 && !selectedCyberaudio3) {
       Alert.alert(
-          "Erreur",
-          "Veuillez sélectionner au moins une valeur pour Objet 3 ou pour Cyberaudio 3."
+        "Erreur",
+        "Veuillez sélectionner au moins une valeur pour Objet 3 ou pour Cyberaudio 3."
       );
-      console.log("Erreur: Aucun objet 3 ou cyberaudio 3 sélectionné");
+      console.log(
+        "Erreur: Aucune valeur sélectionnée pour Objet 3 ou Cyberaudio 3"
+      );
       return;
-  }
-  try {
+    }
+
+    try {
+      console.log("Récupération des IDs utilisateur et personnage");
       const idUtilisateur = await AsyncStorage.getItem("id_utilisateur");
       const idPerso = await AsyncStorage.getItem("id_perso");
       console.log("idUtilisateur récupéré:", idUtilisateur);
       console.log("id_perso récupéré:", idPerso);
+
       if (!idUtilisateur) {
-          Alert.alert("Erreur", "ID utilisateur non défini.");
-          console.log("Erreur: ID utilisateur non défini");
-          return;
+        Alert.alert("Erreur", "ID utilisateur non défini.");
+        console.log("Erreur: ID utilisateur non défini");
+        return;
       }
+
       if (!idPerso) {
-          Alert.alert("Erreur", "ID personnage non défini.");
-          console.log("Erreur: ID personnage non défini");
-          return;
+        Alert.alert("Erreur", "ID personnage non défini.");
+        console.log("Erreur: ID personnage non défini");
+        return;
       }
-      // Transmettre id_perso avant d'exécuter la requête POST
-      await transmitIdPerso(idPerso);
 
-      // Récupérer le id_style du personnage
+      console.log("Récupération du style du personnage");
       const idStyle = await getCharacterStyle(idPerso);
+      console.log("idStyle récupéré:", idStyle);
 
-      // Récupérer les id_vetement des tables héritées
-      const vesteId = await getVêtementId('veste', idStyle);
-      const bijouxId = await getVêtementId('bijoux', idStyle);
-      const hautId = await getVêtementId('haut', idStyle);
+      console.log("Récupération des IDs de vêtements");
+      const vesteId = await getVêtementId("veste", idStyle);
+      const bijouxId = await getVêtementId("bijoux", idStyle);
+      const hautId = await getVêtementId("haut", idStyle);
+      console.log("vesteId récupéré:", vesteId);
+      console.log("bijouxId récupéré:", bijouxId);
+      console.log("hautId récupéré:", hautId);
+
       console.log("Valeur de selectedCyberaudio3:", selectedCyberaudio3);
-      console.log("ID de selectedCyberaudio3:", selectedCyberaudio3 ? selectedCyberaudio3.id : "Non défini");
-      // Ajouter les nouvelles entrées
+      console.log(
+        "ID de selectedCyberaudio3:",
+        selectedCyberaudio3 ? selectedCyberaudio3.id : "Non défini"
+      );
+
+      console.log("Préparation des données d'équipement");
       const equipmentData = [
-          // Arme à distance
-          { id_arme: 10, quantite: 1, id_perso: idPerso },
+        // Arme à distance
+        { id_arme: 10, quantite: 1, id_perso: idPerso },
 
-          // Arme de Mêlée (seulement si un des 3 id cités est sélectionné)
-          ...(selectedMeleeWeapon &&
-          [6, 7, 8].includes(selectedMeleeWeapon.id_arme)
-              ? [
-                  {
-                      id_arme: selectedMeleeWeapon.id_arme,
-                      quantite: 1,
-                      id_perso: idPerso,
-                  },
-              ]
-              : []),
+        // Arme de Mêlée (seulement si un des 3 id cités est sélectionné)
+        ...(selectedMeleeWeapon &&
+        selectedMeleeWeapon.id_arme &&
+        [6, 7, 8].includes(selectedMeleeWeapon.id_arme)
+          ? [
+              {
+                id_arme: selectedMeleeWeapon.id_arme,
+                quantite: 1,
+                id_perso: idPerso,
+              },
+            ]
+          : []),
 
-          // Grenades
-          { id: 28, quantite: 1, id_perso: idPerso },
-          ...(selectedGrenadeType && selectedGrenadeType.id === 24
-              ? [{ id: 24, quantite: 1, id_perso: idPerso }]
-              : []),
+        // Grenades
+        { id: 28, quantite: 1, id_perso: idPerso },
+        ...(selectedGrenadeType && selectedGrenadeType.id === 5
+          ? [{ id: 5, quantite: 1, id_perso: idPerso }]
+          : []),
 
-          // Munitions
-          { id: 1, quantite: 5, id_perso: idPerso },
+        // Munitions
+        { id: 1, quantite: 5, id_perso: idPerso },
 
-          // Armures
-          { id_armure: 5, quantite: 1, id_perso: idPerso },
-          { id_armure: 6, quantite: 1, id_perso: idPerso },
+        // Armures
+        { id_armure: 5, quantite: 1, id_perso: idPerso },
+        { id_armure: 6, quantite: 1, id_perso: idPerso },
 
-          // Objets
-          { id_obj: 1, quantite: 1, id_perso: idPerso },
-          { id_obj: 36, quantite: 1, id_perso: idPerso },
-          ...(selectedObject3 && selectedObject3.id === 18
-              ? [{ id_obj: 18, quantite: 1, id_perso: idPerso }]
-              : []),
-          { id_obj: 41, quantite: 1, id_perso: idPerso },
-          { id_obj: 2, quantite: 1, id_perso: idPerso },
-          { id_obj: 45, quantite: 1, id_perso: idPerso },
-          { id_obj: 7, quantite: 1, id_perso: idPerso },
+        // Objets
+        { id_obj: 1, quantite: 1, id_perso: idPerso },
+        { id_obj: 36, quantite: 1, id_perso: idPerso },
+        ...(selectedObject3 && selectedObject3 === "25"
+          ? [{ id_obj: 25, quantite: 1, id_perso: idPerso }]
+          : []),
+        { id_obj: 41, quantite: 1, id_perso: idPerso },
+        { id_obj: 2, quantite: 1, id_perso: idPerso },
+        { id_obj: 45, quantite: 1, id_perso: idPerso },
+        { id_obj: 7, quantite: 1, id_perso: idPerso },
 
-          // Cyberfashion
-          { id_cyberfashion: 2, id_attribut: 2, quantite: 1, id_perso: idPerso },
-          { id_cyberfashion: 7, id_attribut: 7, quantite: 1, id_perso: idPerso },
+        // Cyberfashion
+        { id_cyberfashion: 2, id_attribut: 2, quantite: 1, id_perso: idPerso },
+        { id_cyberfashion: 7, id_attribut: 7, quantite: 1, id_perso: idPerso },
 
-          // Cyberaudio
-          { id_cyberaudio: 9, id_attribut: 37, quantite: 1, id_perso: idPerso },
-          { id_cyberaudio: 1, id_attribut: 29, quantite: 1, id_perso: idPerso },
-          ...(selectedCyberaudio3 && selectedCyberaudio3.id === 7
-              ? [
-                  {
-                      id_cyberaudio: 7,
-                      id_attribut: 35,
-                      quantite: 1,
-                      id_perso: idPerso,
-                  },
-              ]
-              : []),
+        // Cyberaudio
+        { id_cyberaudio: 9, id_attribut: 37, quantite: 1, id_perso: idPerso },
+        { id_cyberaudio: 1, id_attribut: 29, quantite: 1, id_perso: idPerso },
+        ...(selectedCyberaudio3 && selectedCyberaudio3.id
+          ? [
+              {
+                id_cyberaudio: selectedCyberaudio3.id,
+                id_attribut: 35,
+                quantite: 1,
+                id_perso: idPerso,
+              },
+            ]
+          : []),
 
-          // Vêtements
-          { id_vetement: vesteId, quantite: 1, id_perso: idPerso },
-          { id_vetement: bijouxId, quantite: 1, id_perso: idPerso },
-          { id_vetement: hautId, quantite: 1, id_perso: idPerso },
+        // Vêtements
+        { id_vetement: vesteId, quantite: 1, id_perso: idPerso },
+        { id_vetement: bijouxId, quantite: 1, id_perso: idPerso },
+        { id_vetement: hautId, quantite: 1, id_perso: idPerso },
       ];
 
       console.log("Données d'équipement à envoyer:", equipmentData);
 
-      // Appel de la fonction sendEquipmentData
-      await sendEquipmentData(equipmentData, idUtilisateur);
+      // Log des données d'équipement avec les tables et colonnes
+      console.log("Donnée 1:", equipmentData[0]);
+      console.log("Donnée 2:", equipmentData[1]);
+      console.log("Donnée 3:", equipmentData[2]);
+      console.log("Donnée 4:", equipmentData[3]);
+      console.log("Donnée 5:", equipmentData[4]);
+      console.log("Donnée 6:", equipmentData[5]);
+      console.log("Donnée 7:", equipmentData[6]);
+      console.log("Donnée 8:", equipmentData[7]);
+      console.log("Donnée 9:", equipmentData[8]);
+      console.log("Donnée 10:", equipmentData[9]);
+      console.log("Donnée 11:", equipmentData[10]);
+      console.log("Donnée 12:", equipmentData[11]);
+      console.log("Donnée 13:", equipmentData[12]);
+      console.log("Donnée 14:", equipmentData[13]);
+      console.log("Donnée 15:", equipmentData[14]);
+      console.log("Donnée 16:", equipmentData[15]);
+      console.log("Donnée 17:", equipmentData[16]);
+      console.log("Donnée 18:", equipmentData[17]);
+      console.log("Donnée 19:", equipmentData[18]);
+      console.log("Donnée 20:", equipmentData[19]);
+      console.log("Donnée 21:", equipmentData[20]);
+      console.log("Donnée 22:", equipmentData[21]);
+      console.log("Donnée 23:", equipmentData[22]);
+      console.log("Donnée 24:", equipmentData[23]);
+      console.log("Donnée 25:", equipmentData[24]);
+      console.log("Donnée 26:", equipmentData[25]);
+      console.log("Donnée 27:", equipmentData[26]);
+      console.log("Donnée 28:", equipmentData[27]);
+      console.log("Donnée 29:", equipmentData[28]);
+      console.log("Donnée 30:", equipmentData[29]);
 
-  } catch (error) {
+      console.log("Appel de la fonction sendEquipmentData");
+      await sendEquipmentData(equipmentData, idUtilisateur, idPerso);
+      console.log("Données d'équipement envoyées avec succès");
+    } catch (error) {
       console.error("Error updating equipment:", error);
       Alert.alert(
-          "Erreur",
-          "Une erreur est survenue lors de la mise à jour de l'équipement."
+        "Erreur",
+        "Une erreur est survenue lors de la mise à jour de l'équipement."
       );
-  }
-};
+    }
+  };
 
+  const sendEquipmentData = async (equipmentData, idUtilisateur, idPerso) => {
+    try {
+      console.log("Données envoyées à clear-references:", {
+        idUtilisateur,
+        idPerso,
+      });
+      await axios.post(
+        "http://192.168.1.17:3000/api/roles/clear-references",
+        { idUtilisateur, idPerso },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      console.log("Références supprimées avec succès.");
+      console.log("Données envoyées à insert-references:", {
+        idUtilisateur,
+        idPerso,
+        equipmentData,
+      });
+      await axios.post(
+        "http://192.168.1.17:3000/api/roles/insert-references",
+        { idUtilisateur, idPerso, equipmentData },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      console.log("Références insérées avec succès.");
+      console.log("Navigation vers StuffPathEnding");
+      navigation.navigate("StuffPathEnding");
+    } catch (error) {
+      console.error("Error updating equipment:", error);
+      Alert.alert(
+        "Erreur",
+        "Une erreur est survenue lors de la mise à jour de l'équipement."
+      );
+    }
+  };
 
   return (
     <ImageBackground
@@ -1773,13 +1856,12 @@ const handleContinue = async () => {
             </View>
             <View style={styles.row}>
               <TouchableOpacity
-                onPress={selectedMeleeWeapon ? openMeleeModal : null}
+                onPress={openMeleeModal}
                 style={[
                   styles.clickableTitle,
-                  { borderColor: "yellow" },
-                  !selectedMeleeWeapon && { opacity: 0.5 },
+                  !isMeleeWeaponSelected && { opacity: 0.5 },
                 ]}
-                disabled={!selectedMeleeWeapon}
+                disabled={!isMeleeWeaponSelected}
               >
                 <Text style={styles.clickableTitleText}>ARME DE MÊLÉE</Text>
               </TouchableOpacity>
@@ -2329,23 +2411,22 @@ const handleContinue = async () => {
                 style={[
                   styles.objectButton,
                   { borderColor: "yellow" },
-                  !selectedCyberaudio3 && { opacity: 0.5 },
+                  !selectedCyberaudio3.id && { opacity: 0.5 },
                 ]}
-                disabled={!selectedCyberaudio3}
+                disabled={!selectedCyberaudio3.id}
                 onPress={handleCyberaudio3Select}
               >
                 <Text style={styles.clickableTitleText}>Cyberaudio 3</Text>
               </TouchableOpacity>
               <Picker
-                selectedValue={selectedCyberaudio3}
+                selectedValue={
+                  selectedCyberaudio3 ? selectedCyberaudio3.id : ""
+                }
                 onValueChange={handleCyberaudio3Change}
                 style={styles.objectPicker}
               >
                 <Picker.Item label="Veuillez sélectionner" value="" />
-                <Picker.Item
-                  label="Détecteur de Micros"
-                  value="detecteur_de_micros"
-                />
+                <Picker.Item label="Détecteur de Micros" value="7" />
               </Picker>
             </View>
             {renderCyberaudio3ModalContent()}
