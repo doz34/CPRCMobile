@@ -560,6 +560,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
       selectedCyberaudio3 ? selectedCyberaudio3.id : "Non défini"
     );
   }, [selectedCyberaudio3]);
+  
 
   const handleCyberaudio3Change = (itemValue) => {
     console.log("Dropdown Cyberaudio 3 value changed:", itemValue);
@@ -1675,7 +1676,7 @@ const handleGrenade2Change = (itemValue) => {
       console.log("Préparation des données d'équipement");
       const equipmentData = [
         // Arme à distance
-        { id_arme: 10, quantite: 1, id_perso: idPerso },
+        { id_arme: 20, quantite: 1, id_perso: idPerso },
 
         // Arme de Mêlée (seulement si un des 3 id cités est sélectionné)
         ...(selectedMeleeWeapon &&
@@ -1693,7 +1694,7 @@ const handleGrenade2Change = (itemValue) => {
         // Grenades
         { id: 28, quantite: 1, id_perso: idPerso },
         ...(selectedGrenadeType && selectedGrenadeType.id === 5
-          ? [{ id: 5, quantite: 1, id_perso: idPerso }]
+          ? [{ id: 24, quantite: 1, id_perso: idPerso }]
           : []),
 
         // Munitions
