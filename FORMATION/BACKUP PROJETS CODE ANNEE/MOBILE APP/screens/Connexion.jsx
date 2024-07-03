@@ -67,17 +67,23 @@ const ConnexionScreen = () => {
   const navigation = useNavigation();
 
   const handleConnexion = async () => {
-    try {
-      await signIn(nomUtilisateur, motDePasse);
-      navigation.navigate("Home");
-    } catch (error) {
+    // Vérification des champs vides
+    if (!nomUtilisateur.trim() || !motDePasse.trim()) {
       Alert.alert(
-        "Erreur de connexion",
-        "Une erreur réseau s'est produite. Veuillez réessayer."
+        "Champs requis",
+        "Veuillez saisir votre nom d'utilisateur et votre mot de passe."
       );
-      console.error(error);
+      return; // Arrêt de la fonction si l'un des champs est vide
+    }
+  
+    const result = await signIn(nomUtilisateur, motDePasse); // Attendre le résultat de la tentative de connexion
+    if (result.success) {
+      navigation.navigate("Home"); // Rediriger vers la page d'accueil en cas de succès
+    } else {
+      Alert.alert("Erreur de connexion", result.message); // Afficher l'erreur en cas d'échec
     }
   };
+  
 
   return (
     <ImageBackground
@@ -88,7 +94,7 @@ const ConnexionScreen = () => {
         <Text style={styles.welcomeText}>Connexion</Text>
         <TextInput
           style={styles.input}
-          placeholder="Nom d'utilisateur"
+          placeholder="Nom d'utilisateur ou Adresse e-mail"
           placeholderTextColor="#fff"
           value={nomUtilisateur}
           onChangeText={setNomUtilisateur}

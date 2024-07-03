@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
 import axios from "axios";
 
@@ -28,9 +29,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "white",
     fontFamily: "Roboto",
-    textShadowColor: 'black',
+    textShadowColor: "black",
     textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 1
+    textShadowRadius: 1,
   },
   boldText: {
     fontWeight: "bold",
@@ -62,29 +63,33 @@ const styles = StyleSheet.create({
 const HomeScreen = ({ navigation }) => {
   const { user, signOut } = useContext(UserContext);
   const [userInfo, setUserInfo] = useState(null);
+  const [imageKey, setImageKey] = useState(Date.now()); // Ajoutez un état pour gérer la clé de l'image
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (user) {
-        try {
-          const response = await axios.get(
-            "http://192.168.1.17:3000/api/user/me",
-            {
-              headers: { Authorization: `Bearer ${user.token}` },
-            }
-          );
-          setUserInfo(response.data);
-        } catch (error) {
-          console.error(
-            "Erreur lors de la récupération des informations de l'utilisateur :",
-            error
-          );
-        }
+  const fetchUserInfo = useCallback(async () => {
+    if (user) {
+      try {
+        const response = await axios.get(
+          "http://192.168.1.17:3000/api/user/me",
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        setUserInfo(response.data);
+        setImageKey(Date.now()); // Mettez à jour la clé de l'image à chaque fois que vous récupérez les informations de l'utilisateur
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des informations de l'utilisateur :",
+          error
+        );
       }
-    };
-
-    fetchUserInfo();
+    }
   }, [user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserInfo(); // Appellez fetchUserInfo à chaque fois que l'écran est focalisé
+    }, [fetchUserInfo])
+  );
 
   return (
     <ImageBackground
@@ -95,13 +100,15 @@ const HomeScreen = ({ navigation }) => {
         {user ? (
           <>
             <Text style={styles.welcomeText}>
-              Bienvenue, <Text style={styles.boldText}>{user.nomUtilisateur}</Text> !
+              Bienvenue,{" "}
+              <Text style={styles.boldText}>{user.nomUtilisateur}</Text> !
             </Text>
             {userInfo && userInfo.avatarUrl && (
               <Image
-                source={{ uri: userInfo.avatarUrl }}
-                style={styles.avatarImage}
-              />
+              key={imageKey} // Utilisez la clé unique pour l'élément <Image>
+              source={{ uri: userInfo.avatarUrl }}
+              style={styles.avatarImage}
+            />
             )}
             <View style={styles.buttonContainer}>
               <TouchableOpacity

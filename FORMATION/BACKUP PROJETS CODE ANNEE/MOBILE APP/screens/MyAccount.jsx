@@ -121,6 +121,11 @@ const MyAccount = () => {
   const [ancienMotDePasse, setAncienMotDePasse] = useState("");
   const [avatar, setAvatar] = useState(user?.avatarUrl || "");
 
+  const [confirmMotDePasse, setConfirmMotDePasse] = useState(""); // Nouvel état pour la confirmation du mot de passe
+
+  // Ajoutez un état pour gérer une clé unique pour l'élément <Image>
+  const [imageKey, setImageKey] = useState(Date.now());
+
   // Fonction pour vérifier si les champs sont valides
   const isValidForm = () => {
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/; // Modifier selon les besoins
@@ -128,6 +133,7 @@ const MyAccount = () => {
     return (
       emailRegex.test(email) &&
       passwordRegex.test(motDePasse) &&
+      motDePasse === confirmMotDePasse && // Assurez-vous que le mot de passe et sa confirmation sont identiques
       motDePasse !== ancienMotDePasse
     );
   };
@@ -196,6 +202,15 @@ const MyAccount = () => {
         );
         return false;
       }
+
+      // Ajout de la vérification pour s'assurer que le mot de passe et sa confirmation sont identiques
+      if (motDePasse !== confirmMotDePasse) {
+        Alert.alert(
+          "Erreur",
+          "Le nouveau mot de passe et la confirmation du mot de passe ne correspondent pas."
+        );
+        return false;
+      }
     }
 
     return true;
@@ -244,9 +259,14 @@ const MyAccount = () => {
           "Vos informations ont été mises à jour."
         );
 
+        // Mise à jour des valeurs initiales après une mise à jour réussie
+        setInitialEmail(email);
+        setInitialAvatar(avatar);
+
         // Nettoyez les champs de mot de passe après une mise à jour réussie
         setMotDePasse("");
         setAncienMotDePasse("");
+        setConfirmMotDePasse(""); // Effacez également le champ de confirmation du mot de passe
       } else {
         throw new Error(updateResult.message);
       }
@@ -310,10 +330,24 @@ const MyAccount = () => {
           "Document uploaded successfully, response data:",
           response.data
         );
-        setAvatar(
-          `http://192.168.1.17:3000/images/avatars/${response.data.filePath}`
-        );
-        Alert.alert("Upload Successful");
+
+        // Remplacez les barres obliques inverses par des barres obliques et ne répétez pas le chemin 'images/avatars/'
+        const filePath = response.data.filePath.replace(/\\/g, "/");
+        const newAvatarUrl = `http://192.168.1.17:3000/${filePath}?${new Date().getTime()}`;
+        console.log("New avatar URL:", newAvatarUrl);
+        // Affichez la popup de succès avec un callback pour mettre à jour l'avatar
+        Alert.alert("Upload Successful", "Votre avatar a été mis à jour.", [
+          {
+            text: "OK",
+            onPress: () => {
+              // Mise à jour de l'URL de l'avatar et de la clé de l'image pour forcer le rafraîchissement
+              const newAvatarUrl = `http://192.168.1.17:3000/${response.data.filePath.replace(/\\/g, "/")}?${new Date().getTime()}`;
+              console.log("New avatar URL:", newAvatarUrl);
+              setAvatar(newAvatarUrl);
+              setImageKey(Date.now()); // Mettez à jour la clé de l'image pour forcer le re-render
+            },
+          },
+        ]);
       } catch (error) {
         console.error(
           "Axios request failed:",
@@ -344,7 +378,11 @@ const MyAccount = () => {
         <View style={{ alignItems: "center", padding: 20 }}>
           <Text style={styles.welcomeText}>Mon Avatar :</Text>
           {avatar && (
-            <Image source={{ uri: avatar }} style={styles.avatarImage} />
+            <Image
+            key={imageKey} // Utilisez la clé unique pour l'élément <Image>
+            source={{ uri: avatar }}
+            style={styles.avatarImage}
+          />
           )}
           <TouchableOpacity
             style={[styles.button, styles.buttonWithSpacing]} // Utilisation de deux styles ici
@@ -379,11 +417,14 @@ const MyAccount = () => {
               value={motDePasse}
               onChangeText={setMotDePasse}
             />
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleUpdate}
-              disabled={!isValidForm()} // Désactiver le bouton si le formulaire n'est pas valide
-            ></TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirmer nouveau mot de passe"
+              placeholderTextColor="#fff"
+              secureTextEntry
+              value={confirmMotDePasse}
+              onChangeText={setConfirmMotDePasse}
+            />
           </View>
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>Mettre à jour</Text>
