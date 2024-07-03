@@ -33,6 +33,15 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [grenade2ModalVisible, setGrenade2ModalVisible] = useState(false);
   const [grenade1ModalContent, setGrenade1ModalContent] = useState({});
   const [grenade2ModalContent, setGrenade2ModalContent] = useState({});
+  const [selectedAmmunition, setSelectedAmmunition] = useState("Munitions Standard de Pistolet TL (x50)");
+  const [ammunitionModalVisible, setAmmunitionModalVisible] = useState(false);
+  const [ammunitionModalContent, setAmmunitionModalContent] = useState({});
+  const [selectedHeadArmor, setSelectedHeadArmor] = useState("Protection de Tête (PA 11)");
+  const [selectedBodyArmor, setSelectedBodyArmor] = useState("Protection de Corps (PA 11)");
+  const [headArmorModalVisible, setHeadArmorModalVisible] = useState(false);
+  const [bodyArmorModalVisible, setBodyArmorModalVisible] = useState(false);
+  const [headArmorModalContent, setHeadArmorModalContent] = useState({});
+  const [bodyArmorModalContent, setBodyArmorModalContent] = useState({});
 
   useEffect(() => {
     const fetchWeapons = async () => {
@@ -110,6 +119,56 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     }
   };
 
+  const fetchAmmunitionDetails = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.17:3000/api/roles/ammunition-details",
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      const { typeMunitions, qualiteMunitions, typeMunitionsArme, quantite } = response.data;
+      setAmmunitionModalContent({
+        typeMunitions: typeMunitions.map(item => item.nom).join(", "),
+        qualiteMunitions: qualiteMunitions.map(item => item.nom).join(", "),
+        typeMunitionsArme: typeMunitionsArme.categorie_arme,
+        quantite: quantite * 5,
+      });
+    } catch (error) {
+      console.error("Erreur lors de la récupération des détails des munitions:", error);
+    }
+  };
+
+  const fetchArmorDetails = async (armorId) => {
+    try {
+      const response = await axios.get(`http://192.168.1.17:3000/api/roles/armor-details/${armorId}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des détails de l'armure:", error);
+      return {};
+    }
+  };
+
+  const handleHeadArmorSelect = async () => {
+    const armorDetails = await fetchArmorDetails(5); // Assurez-vous que l'ID de l'armure de tête est correct
+    setHeadArmorModalContent(armorDetails);
+    setHeadArmorModalVisible(true);
+};
+
+  const handleBodyArmorSelect = async () => {
+    const armorDetails = await fetchArmorDetails(6);
+    setBodyArmorModalContent(armorDetails);
+    setBodyArmorModalVisible(true);
+  };
+  
+  const closeHeadArmorModal = () => {
+    setHeadArmorModalVisible(false);
+  };
+  
+  const closeBodyArmorModal = () => {
+    setBodyArmorModalVisible(false);
+  };
+
   const handleWeaponSelect = async (weapon) => {
     setSelectedWeapon(weapon);
     const munitions = await fetchCompatibleMunitions(weapon.id_arme);
@@ -129,6 +188,11 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const handleGrenadeTypeSelect = (grenadeType) => {
     setSelectedGrenadeType(grenadeType);
     setGrenade2ModalContent({ ...grenadeType, quantity: 1 });
+  };
+
+  const handleAmmunitionSelect = () => {
+    fetchAmmunitionDetails();
+    setAmmunitionModalVisible(true);
   };
 
   const openModal = () => {
@@ -374,26 +438,19 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     if (!grenade1ModalContent) return null;
     return (
       <ScrollView contentContainerStyle={styles.modalScrollContent}>
-        <Text style={styles.modalTitle}>GRENADES 1 :</Text>
+        <Text style={styles.modalTitle}>GRENADES 1</Text>
         <View style={styles.modalContentContainer}>
           <View style={styles.modalPair}>
             <Text style={styles.modalKey}>Type de munition:</Text>
-            <Text style={styles.modalValue}>
-              {grenade1ModalContent.nom || "Aucun(e)"}
-            </Text>
+            <Text style={styles.modalValue}>{grenade1ModalContent.nom || "Aucun(e)"}</Text>
           </View>
           <View style={styles.modalPair}>
             <Text style={styles.modalKey}>Quantité:</Text>
-            <Text style={styles.modalValue}>
-              {grenade1ModalContent.quantity}
-            </Text>
+            <Text style={styles.modalValue}>{grenade1ModalContent.quantity}</Text>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => setGrenade1ModalVisible(false)}
-          style={styles.grenadeCloseButton}  // Utiliser le nouveau style
-        >
-          <Text style={styles.grenadeCloseButtonText}>FERMER</Text>
+        <TouchableOpacity onPress={() => setGrenade1ModalVisible(false)} style={styles.closeButton}>
+          <Text style={styles.buttonText}>FERMER</Text>
         </TouchableOpacity>
       </ScrollView>
     );
@@ -403,26 +460,117 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     if (!grenade2ModalContent) return null;
     return (
       <ScrollView contentContainerStyle={styles.modalScrollContent}>
-        <Text style={styles.modalTitle}>GRENADES 2 :</Text>
+        <Text style={styles.modalTitle}>GRENADES 2</Text>
         <View style={styles.modalContentContainer}>
           <View style={styles.modalPair}>
             <Text style={styles.modalKey}>Type de munition:</Text>
-            <Text style={styles.modalValue}>
-              {grenade2ModalContent.nom || "Aucun(e)"}
-            </Text>
+            <Text style={styles.modalValue}>{grenade2ModalContent.nom || "Aucun(e)"}</Text>
           </View>
           <View style={styles.modalPair}>
             <Text style={styles.modalKey}>Quantité:</Text>
-            <Text style={styles.modalValue}>
-              {grenade2ModalContent.quantity}
-            </Text>
+            <Text style={styles.modalValue}>{grenade2ModalContent.quantity}</Text>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => setGrenade2ModalVisible(false)}
-          style={styles.grenadeCloseButton}  // Utiliser le nouveau style
-        >
-          <Text style={styles.grenadeCloseButtonText}>FERMER</Text>
+        <TouchableOpacity onPress={() => setGrenade2ModalVisible(false)} style={styles.closeButton}>
+          <Text style={styles.buttonText}>FERMER</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
+  const renderAmmunitionModalContent = () => {
+    if (!ammunitionModalContent) return null;
+    return (
+      <ScrollView contentContainerStyle={styles.modalScrollContent}>
+        <Text style={styles.modalTitle}>MUNITIONS</Text>
+        <View style={styles.modalContentContainer}>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Forme de la munition:</Text>
+            <Text style={styles.modalValue}>{ammunitionModalContent.typeMunitions || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Type de munition:</Text>
+            <Text style={styles.modalValue}>{ammunitionModalContent.qualiteMunitions || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Type d'arme des munitions:</Text>
+            <Text style={styles.modalValue}>{ammunitionModalContent.typeMunitionsArme || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Quantité:</Text>
+            <Text style={styles.modalValue}>{ammunitionModalContent.quantite || "Aucun(e)"}</Text>
+          </View>
+        </View>
+        <TouchableOpacity onPress={() => setAmmunitionModalVisible(false)} style={styles.closeButton}>
+          <Text style={styles.buttonText}>FERMER</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
+  const renderHeadArmorModalContent = () => {
+    if (!headArmorModalContent) return null;
+    return (
+      <ScrollView contentContainerStyle={styles.modalScrollContent}>
+        <Text style={styles.modalTitle}>Armure Tête</Text>
+        <View style={styles.modalContentContainer}>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Nom:</Text>
+            <Text style={styles.modalValue}>{headArmorModalContent.nom || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Type:</Text>
+            <Text style={styles.modalValue}>{headArmorModalContent.type || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Description:</Text>
+            <Text style={styles.modalValue}>{headArmorModalContent.description || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Pouvoir d'Arrêt:</Text>
+            <Text style={styles.modalValue}>{headArmorModalContent.pouvoir_arret || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Pénalité:</Text>
+            <Text style={styles.modalValue}>{headArmorModalContent.penalite || "Aucun(e)"}</Text>
+          </View>
+        </View>
+        <TouchableOpacity onPress={() => setHeadArmorModalVisible(false)} style={styles.closeButton}>
+          <Text style={styles.buttonText}>FERMER</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+  
+  const renderBodyArmorModalContent = () => {
+    if (!bodyArmorModalContent) return null;
+    return (
+      <ScrollView contentContainerStyle={styles.modalScrollContent}>
+        <Text style={styles.modalTitle}>Armure Corps</Text>
+        <View style={styles.modalContentContainer}>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Nom:</Text>
+            <Text style={styles.modalValue}>{bodyArmorModalContent.nom || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Type:</Text>
+            <Text style={styles.modalValue}>{bodyArmorModalContent.type || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Description:</Text>
+            <Text style={styles.modalValue}>{bodyArmorModalContent.description || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Pouvoir d'Arrêt:</Text>
+            <Text style={styles.modalValue}>{bodyArmorModalContent.pouvoir_arret || "Aucun(e)"}</Text>
+          </View>
+          <View style={styles.modalPair}>
+            <Text style={styles.modalKey}>Pénalité:</Text>
+            <Text style={styles.modalValue}>{bodyArmorModalContent.penalite || "Aucun(e)"}</Text>
+          </View>
+        </View>
+        <TouchableOpacity onPress={() => setBodyArmorModalVisible(false)} style={styles.closeButton}>
+          <Text style={styles.buttonText}>FERMER</Text>
         </TouchableOpacity>
       </ScrollView>
     );
@@ -465,7 +613,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-
+  
           <View style={styles.sectionContainer}>
             <View style={styles.row}>
               <TouchableOpacity
@@ -504,7 +652,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-
+  
           <View style={styles.sectionContainer}>
             <View style={styles.row}>
               <TouchableOpacity
@@ -519,7 +667,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               >
                 <Text style={styles.clickableTitleText}>GRENADES 1</Text>
               </TouchableOpacity>
-              <View style={styles.grenadeDropdownContainer}>
+              <View style={styles.pickerContainer}>
                 <Picker
                   selectedValue={selectedGrenade}
                   style={[
@@ -558,7 +706,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               >
                 <Text style={styles.clickableTitleText}>GRENADES 2</Text>
               </TouchableOpacity>
-              <View style={styles.grenadeDropdownContainer}>
+              <View style={styles.pickerContainer}>
                 <Picker
                   selectedValue={selectedGrenadeType}
                   style={[
@@ -585,7 +733,35 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-
+  
+          <View style={styles.sectionContainer}>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={() => {
+                  fetchAmmunitionDetails();
+                  setAmmunitionModalVisible(true);
+                }}
+                style={[styles.clickableTitle, { borderColor: "white" }]}
+              >
+                <Text style={styles.clickableTitleText}>MUNITIONS</Text>
+              </TouchableOpacity>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedAmmunition}
+                  style={styles.picker}
+                  onValueChange={(itemValue) =>
+                    setSelectedAmmunition(itemValue)
+                  }
+                >
+                  <Picker.Item
+                    label="Munitions Standard de Pistolet TL (x50)"
+                    value="Munitions Standard de Pistolet TL (x50)"
+                  />
+                </Picker>
+              </View>
+            </View>
+          </View>
+  
           <Modal
             animationType="slide"
             transparent={true}
@@ -601,7 +777,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               </LinearGradient>
             </View>
           </Modal>
-
+  
           <Modal
             animationType="slide"
             transparent={true}
@@ -617,7 +793,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               </LinearGradient>
             </View>
           </Modal>
-
+  
           <Modal
   animationType="slide"
   transparent={true}
@@ -627,7 +803,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   <View style={styles.modalContainer}>
     <LinearGradient
       colors={["#484848", "#868686"]}
-      style={styles.grenadeModalContent}  // Utiliser le nouveau style
+      style={styles.modalContent}
     >
       {renderGrenade1ModalContent()}
     </LinearGradient>
@@ -643,12 +819,90 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   <View style={styles.modalContainer}>
     <LinearGradient
       colors={["#484848", "#868686"]}
-      style={styles.grenadeModalContent}  // Utiliser le nouveau style
+      style={styles.modalContent}
     >
       {renderGrenade2ModalContent()}
     </LinearGradient>
   </View>
 </Modal>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={ammunitionModalVisible}
+            onRequestClose={() => setAmmunitionModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderAmmunitionModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={[styles.clickableTitle, { borderColor: "white" }]}
+              onPress={handleHeadArmorSelect}
+            >
+              <Text style={styles.clickableTitleText}>Armure Tête</Text>
+            </TouchableOpacity>
+            <Picker
+  selectedValue={selectedHeadArmor}
+  style={[styles.picker, styles.headArmorPicker]} // Ajoutez styles.smallPicker ici
+  onValueChange={(itemValue) => setSelectedHeadArmor(itemValue)}
+>
+  <Picker.Item label="Protection de Tête (PA 11)" value="Protection de Tête (PA 11)" />
+</Picker>
+          </View>
+  
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={[styles.clickableTitle, { borderColor: "white" }]}
+              onPress={handleBodyArmorSelect}
+            >
+              <Text style={styles.clickableTitleText}>Armure Corps</Text>
+            </TouchableOpacity>
+            <Picker
+  selectedValue={selectedBodyArmor}
+  style={[styles.picker, styles.bodyArmorPicker]} // Ajoutez styles.smallPicker ici
+  onValueChange={(itemValue) => setSelectedBodyArmor(itemValue)}
+>
+  <Picker.Item label="Protection de Corps (PA 11)" value="Protection de Corps (PA 11)" />
+</Picker>
+          </View>
+  
+          <Modal
+            visible={headArmorModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closeHeadArmorModal}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderHeadArmorModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+  
+          <Modal
+            visible={bodyArmorModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closeBodyArmorModal}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderBodyArmorModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
         </LinearGradient>
       </ScrollView>
     </ImageBackground>
