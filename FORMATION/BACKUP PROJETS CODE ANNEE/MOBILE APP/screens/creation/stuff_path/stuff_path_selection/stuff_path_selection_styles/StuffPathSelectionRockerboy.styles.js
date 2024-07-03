@@ -38,6 +38,7 @@ export default StyleSheet.create({
     marginBottom: 50, // Maintain spacing between sections
     alignItems: 'center',
     width: '100%',
+    justifyContent: 'center', // Ajouté pour centrer horizontalement
   },
   fullContainer: {
     flexGrow: 1,
@@ -145,7 +146,7 @@ export default StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Assurez-vous que le fond est semi-transparent pour une meilleure visibilité
+    backgroundColor: 'rgba(128, 128, 128, 0.8)', // Changer la couleur de fond à gris
     flexShrink: 1,  // Allow the modal to shrink if needed
     flexGrow: 1,  // Allow the modal to grow if needed
   },
@@ -245,6 +246,7 @@ export default StyleSheet.create({
     alignItems: 'center',  // Center vertically
     paddingVertical: 10,
     paddingHorizontal: 20,
+    justifyContent: 'center', // Ajouté pour centrer horizontalement
   },
   rowItem: {
     flex: 1,
@@ -268,5 +270,19 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     color: 'black',
     borderRadius: 10,
+  },
+  clickableTitle: {
+    borderWidth: 2,
+    borderColor: 'white',
+    padding: 5,
+    marginBottom: 10,
+    marginRight: 10,
+    height: 60,  // Adjust the height to match the dropdown
+    justifyContent: 'center',  // Center the text vertically
+  },
+  clickableTitleText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

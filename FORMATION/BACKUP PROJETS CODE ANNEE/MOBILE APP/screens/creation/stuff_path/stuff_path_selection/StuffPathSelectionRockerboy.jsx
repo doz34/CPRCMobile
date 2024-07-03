@@ -42,6 +42,10 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [bodyArmorModalVisible, setBodyArmorModalVisible] = useState(false);
   const [headArmorModalContent, setHeadArmorModalContent] = useState({});
   const [bodyArmorModalContent, setBodyArmorModalContent] = useState({});
+  const [selectedObject, setSelectedObject] = useState(null);
+  const [selectedObject3, setSelectedObject3] = useState("");
+  const [objectModalContent, setObjectModalContent] = useState({});
+  const [objectModalVisible, setObjectModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchWeapons = async () => {
@@ -147,6 +151,28 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
       console.error("Erreur lors de la récupération des détails de l'armure:", error);
       return {};
     }
+  };
+
+  const fetchObjectDetails = async (objectId) => {
+    try {
+      const response = await axios.get(`http://192.168.1.17:3000/api/roles/object-details/${objectId}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails de l\'objet:', error);
+      return {};
+    }
+  };
+
+  const handleObjectSelect = async (objectId) => {
+    const objectDetails = await fetchObjectDetails(objectId);
+    setObjectModalContent(objectDetails);
+    setObjectModalVisible(true);
+  };
+  
+  const closeObjectModal = () => {
+    setObjectModalVisible(false);
   };
 
   const handleHeadArmorSelect = async () => {
@@ -903,6 +929,150 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
               </LinearGradient>
             </View>
           </Modal>
+          <View style={styles.container}>
+    {/* Placeholder pour les objets */}
+    <View style={[styles.sectionContainer, { marginTop: 90 }]}>
+      <Text style={styles.title}>Objets</Text>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.clickableTitle, { borderColor: 'white' }]}
+          onPress={() => handleObjectSelect(1)}
+        >
+          <Text style={styles.clickableTitleText}>Objet 1</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={selectedObject}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedObject(itemValue)}
+        >
+          <Picker.Item label="Agent" value="1" />
+        </Picker>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.clickableTitle, { borderColor: 'white' }]}
+          onPress={() => handleObjectSelect(36)}
+        >
+          <Text style={styles.clickableTitleText}>Objet 2</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={selectedObject}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedObject(itemValue)}
+        >
+          <Picker.Item label="Ordinateur" value="36" />
+        </Picker>
+      </View>
+      <View style={styles.row}>
+  <TouchableOpacity
+    style={[
+      styles.clickableTitle,
+      { borderColor: 'yellow' },
+      !selectedObject3 && { opacity: 0.5 }, // Griser le bouton si aucune sélection
+    ]}
+    onPress={() => handleObjectSelect(25)}
+    disabled={!selectedObject3} // Désactiver le bouton si aucune sélection
+  >
+    <Text style={styles.clickableTitleText}>Objet 3</Text>
+  </TouchableOpacity>
+  <Picker
+    selectedValue={selectedObject3}
+    style={styles.picker}
+    onValueChange={(itemValue) => setSelectedObject3(itemValue)}
+  >
+    <Picker.Item label="Veuillez sélectionner" value="" />
+    <Picker.Item label="Guitare Électrique" value="25" />
+  </Picker>
+</View>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.clickableTitle, { borderColor: 'white' }]}
+          onPress={() => handleObjectSelect(41)}
+        >
+          <Text style={styles.clickableTitleText}>Objet 4</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={selectedObject}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedObject(itemValue)}
+        >
+          <Picker.Item label="Peinture Phosphorescente" value="41" />
+        </Picker>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.clickableTitle, { borderColor: 'white' }]}
+          onPress={() => handleObjectSelect(2)}
+        >
+          <Text style={styles.clickableTitleText}>Objet 5</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={selectedObject}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedObject(itemValue)}
+        >
+          <Picker.Item label="Amplificateur Portable" value="2" />
+        </Picker>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.clickableTitle, { borderColor: 'white' }]}
+          onPress={() => handleObjectSelect(45)}
+        >
+          <Text style={styles.clickableTitleText}>Objet 6</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={selectedObject}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedObject(itemValue)}
+        >
+          <Picker.Item label="Récepteur Radio / Lecteur de Musique" value="45" />
+        </Picker>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.clickableTitle, { borderColor: 'white' }]}
+          onPress={() => handleObjectSelect(7)}
+        >
+          <Text style={styles.clickableTitleText}>Objet 7</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={selectedObject}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedObject(itemValue)}
+        >
+          <Picker.Item label="Caméra" value="7" />
+        </Picker>
+      </View>
+    </View>
+
+    {/* Modale pour afficher les détails de l'objet */}
+    <Modal
+      visible={objectModalVisible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={closeObjectModal}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Détails de l'objet</Text>
+          <View style={styles.modalContentContainer}>
+            <Text style={styles.modalKey}>Nom :</Text>
+            <Text style={styles.modalValue}>{objectModalContent.nom_obj || 'Aucun(e)'}</Text>
+            <Text style={styles.modalKey}>Description :</Text>
+            <Text style={styles.modalValue}>{objectModalContent.desc_obj || 'Aucun(e)'}</Text>
+            <Text style={styles.modalKey}>Particularité :</Text>
+            <Text style={styles.modalValue}>{objectModalContent.particularite || 'Aucun(e)'}</Text>
+            <Text style={styles.modalKey}>Quantité :</Text>
+            <Text style={styles.modalValue}>1</Text>
+          </View>
+          <TouchableOpacity style={styles.closeButton} onPress={closeObjectModal}>
+            <Text style={styles.closeButtonText}>FERMER</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  </View>
         </LinearGradient>
       </ScrollView>
     </ImageBackground>
