@@ -1,5 +1,5 @@
 // screens/account/styles.js
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Animated } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -288,7 +288,27 @@ continueButton: {
   alignItems: "center",
   alignSelf: "center",
 },
-
+arrowContainer: {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: [{ translateX: '-50' }, { translateY: '-50' }],
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  paddingHorizontal: 20,
+},
+arrow: {
+  fontSize: 30,
+  color: 'white',
+  opacity: 0.5,
+  animation: 'blink 1s infinite',
+},
+'@keyframes blink': {
+  '0%': { opacity: 0.5 },
+  '50%': { opacity: 1 },
+  '100%': { opacity: 0.5 },
+},
 });
 
 export default styles;
