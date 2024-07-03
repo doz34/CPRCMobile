@@ -53,6 +53,12 @@ const GenPathSocialOrigin = ({ navigation, route }) => {
     }
   }, [user?.token]);
 
+  useEffect(() => {
+    if (origins.length > 0) {
+      setSelectedOrigin(origins[0]);
+    }
+  }, [origins]);
+
   const randomizeSelection = () => {
     const randomIndex = Math.floor(Math.random() * origins.length);
     setSelectedOrigin(origins[randomIndex]);

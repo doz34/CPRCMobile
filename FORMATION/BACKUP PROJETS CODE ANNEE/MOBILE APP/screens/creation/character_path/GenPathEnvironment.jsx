@@ -53,6 +53,12 @@ const GenPathEnvironment = ({ navigation, route }) => {
     }
   }, [user?.token]);
 
+  useEffect(() => {
+    if (environments.length > 0) {
+      setSelectedEnvironment(environments[0]);
+    }
+  }, [environments]);
+
   const randomizeSelection = () => {
     const randomIndex = Math.floor(Math.random() * environments.length);
     setSelectedEnvironment(environments[randomIndex]);

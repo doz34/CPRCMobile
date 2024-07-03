@@ -40,6 +40,7 @@ import CompPathSelection from './screens/creation/stuff_path/CompPathSelection';
 import CompPathEnding from './screens/creation/stuff_path/CompPathEnding';
 import StuffPathDisclaimer from './screens/creation/stuff_path/StuffPathDisclaimer';
 import StuffPathSelectionRockerboy from './screens/creation/stuff_path/stuff_path_selection/StuffPathSelectionRockerboy';
+import StuffPathEnding from './screens/creation/stuff_path/StuffPathEnding';
 
 
 const styles = StyleSheet.create({
@@ -102,6 +103,7 @@ const App = () => {
           <Stack.Screen name="CompPathEnding" component={CompPathEnding} />
           <Stack.Screen name="StuffPathDisclaimer" component={StuffPathDisclaimer} />
           <Stack.Screen name="StuffPathSelectionRockerboy" component={StuffPathSelectionRockerboy} />
+          <Stack.Screen name="StuffPathEnding" component={StuffPathEnding} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

@@ -63,6 +63,15 @@ const GenPathMotRel = ({ navigation, route }) => {
     }
   }, [user?.token]);
 
+  useEffect(() => {
+    if (!loading && values.length > 0 && opinions.length > 0 && importanceWho.length > 0 && importanceWhat.length > 0) {
+      randomizeSelection(values, setSelectedValue);
+      randomizeSelection(opinions, setSelectedOpinion);
+      randomizeSelection(importanceWho, setSelectedImportanceWho);
+      randomizeSelection(importanceWhat, setSelectedImportanceWhat);
+    }
+  }, [loading, values, opinions, importanceWho, importanceWhat]);
+
   const randomizeSelection = (data, setSelected) => {
     const randomIndex = Math.floor(Math.random() * data.length);
     setSelected(data[randomIndex]);

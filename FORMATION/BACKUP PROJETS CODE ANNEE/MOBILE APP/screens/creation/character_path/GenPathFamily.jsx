@@ -53,6 +53,13 @@ const GenPathFamily = ({ navigation, route }) => {
     }
   }, [user?.token]);
 
+  // useEffect pour initialiser les valeurs par défaut une fois que les données sont chargées
+  useEffect(() => {
+    if (histories.length > 0) {
+      setSelectedHistory(histories[0]); // Initialiser avec la première histoire de la liste
+    }
+  }, [histories]);
+
   const randomizeSelection = () => {
     const randomIndex = Math.floor(Math.random() * histories.length);
     setSelectedHistory(histories[randomIndex]);
