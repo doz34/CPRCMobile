@@ -7,11 +7,74 @@ import {
   StyleSheet,
   Alert,
   Image,
+  ImageBackground,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { UserContext } from "../context/UserContext";
 import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
 import * as FileSystem from "expo-file-system";
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  container: {
+    //flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  formContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  welcomeText: {
+    fontSize: 35,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "white",
+    fontFamily: "Roboto",
+    textShadowColor: "black", // Définit la couleur de l'ombre à noir
+    textShadowOffset: { width: -1, height: 1 }, // Définit le décalage de l'ombre
+    textShadowRadius: 1, // Définit le flou de l'ombre
+  },
+  input: {
+    height: 40,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#fff",
+    padding: 10,
+    color: "#fff",
+    borderRadius: 5,
+  },
+  avatarImage: {
+    width: 328,
+    height: 328,
+    borderRadius: 164,
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: "#fd0d1b",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 10, // Valeur de base pour la marge du bas
+    width: "80%",
+    alignItems: "center",
+  },
+  buttonWithSpacing: {
+    marginBottom: 50,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
 
 axios.interceptors.response.use(
   (response) => response,
@@ -35,7 +98,9 @@ axios.interceptors.response.use(
 
 const MyAccount = () => {
   const { user, signOut, updateUser } = useContext(UserContext);
-  const [nomUtilisateur, setNomUtilisateur] = useState(user?.nomUtilisateur || "");
+  const [nomUtilisateur, setNomUtilisateur] = useState(
+    user?.nomUtilisateur || ""
+  );
   const [email, setEmail] = useState(user?.email || "");
   const [motDePasse, setMotDePasse] = useState("");
   const [avatar, setAvatar] = useState(user?.avatarUrl || "");
@@ -45,15 +110,21 @@ const MyAccount = () => {
     const fetchUserInfo = async () => {
       if (user && user.token) {
         try {
-          const response = await axios.get('http://192.168.1.17:3000/api/user/me', {
-            headers: { Authorization: `Bearer ${user.token}` },
-          });
+          const response = await axios.get(
+            "http://192.168.1.17:3000/api/user/me",
+            {
+              headers: { Authorization: `Bearer ${user.token}` },
+            }
+          );
           setAvatar(response.data.avatarUrl); // Mettez à jour l'avatar ici
           setNomUtilisateur(response.data.nomUtilisateur);
           setEmail(response.data.email);
           // Mettez à jour d'autres informations si nécessaire
         } catch (error) {
-          console.error('Erreur lors de la récupération des informations de l\'utilisateur :', error);
+          console.error(
+            "Erreur lors de la récupération des informations de l'utilisateur :",
+            error
+          );
           Alert.alert(
             "Erreur",
             "Impossible de récupérer les informations de l'utilisateur."
@@ -162,61 +233,58 @@ const MyAccount = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mon Compte</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nom d'utilisateur"
-        value={nomUtilisateur}
-        onChangeText={setNomUtilisateur}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Nouveau mot de passe"
-        secureTextEntry
-        value={motDePasse}
-        onChangeText={setMotDePasse}
-      />
-      {avatar ? (
-        <Image source={{ uri: avatar }} style={styles.avatarImage} />
-      ) : (
-        <Text>Pas d'avatar à afficher</Text>
-      )}
-      <Button title="Uploader un Avatar" onPress={onDocumentPress} />
-      <Button title="Mettre à jour" onPress={handleUpdate} />
-    </View>
+    <ImageBackground
+      source={require("../assets/Inscription.png")}
+      style={styles.backgroundImage}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+      >
+        <View style={{ alignItems: "center", padding: 20 }}>
+          <Text style={styles.welcomeText}>Mon Avatar :</Text>
+          {avatar && (
+            <Image source={{ uri: avatar }} style={styles.avatarImage} />
+          )}
+          <TouchableOpacity
+            style={[styles.button, styles.buttonWithSpacing]} // Utilisation de deux styles ici
+            onPress={onDocumentPress}
+          >
+            <Text style={styles.buttonText}>Uploader un Avatar</Text>
+          </TouchableOpacity>
+          <View style={styles.formContainer}>
+            <Text style={styles.welcomeText}>
+              Mes informations utilisateur :
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nom d'utilisateur"
+              placeholderTextColor="#fff"
+              value={nomUtilisateur}
+              onChangeText={setNomUtilisateur}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#fff"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Nouveau mot de passe"
+              placeholderTextColor="#fff"
+              secureTextEntry
+              value={motDePasse}
+              onChangeText={setMotDePasse}
+            />
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+            <Text style={styles.buttonText}>Mettre à jour</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
-  
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    marginBottom: 12,
-    borderWidth: 1,
-    padding: 10,
-  },
-  avatarImage: {
-    width: 100, // La largeur que vous souhaitez pour l'image
-    height: 100, // La hauteur que vous souhaitez pour l'image
-    borderRadius: 50, // Si vous voulez des coins arrondis
-    // Ajoutez d'autres styles si nécessaire
-  },
-});
 
 export default MyAccount;

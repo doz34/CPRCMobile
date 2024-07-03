@@ -1,47 +1,14 @@
 import React from 'react';
-import { StyleSheet } from "react-native";
+import {
+  StyleSheet,
+} from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/Home';
 import ConnexionScreen from './screens/Connexion';
 import InscriptionScreen from './screens/Inscription';
-import MyAccount from './screens/account/MyAccount';
-import MyAvatar from './screens/account/MyAvatar';
-import MyInfo from './screens/account/MyInfo';
-import MyCharacters from './screens/account/MyCharacters';
-import DisclaimerCharacter from './screens/creation/DisclaimerCharacter';
-import SelectRoleScreen from './screens/creation/SelectRole';
-import RoleDescriptionScreen from './screens/creation/RoleDescription';
-import CulturalOrigin from './screens/creation/character_path/CulturalOrigin';
+import MyAccount from './screens/MyAccount';
 import { UserProvider } from './context/UserContext';
-import GenPathDescScreen from './screens/creation/character_path/GenPathDesc';
-import GenPathPersonalityScreen from './screens/creation/character_path/GenPathPersonality';
-import GenPathClothingScreen from './screens/creation/character_path/GenPathClothing';
-import GenPathMotRel from './screens/creation/character_path/GenPathMotRel';
-import GenPathSocialOrigin from './screens/creation/character_path/GenPathSocialOrigin';
-import GenPathEnvironment from './screens/creation/character_path/GenPathEnvironment';
-import GenPathFamily from './screens/creation/character_path/GenPathFamily';
-import GenPathFriends from './screens/creation/character_path/GenPathFriends';
-import GenPathEnemies from './screens/creation/character_path/GenPathEnemies';
-import GenPathLove from './screens/creation/character_path/GenPathLove';
-import GenPathObjective from './screens/creation/character_path/GenPathObjective';
-import GenPathEnding from './screens/creation/character_path/GenPathEnding';
-import RolePathRockerboyDisclaimer from './screens/creation/role_path/RolePathRockerboyDisclaimer';
-import RolePathRockerboyJob from './screens/creation/role_path/RolePathRockerboyJob';
-import RolePathRockerboyPlace from './screens/creation/role_path/RolePathRockerboyPlace';
-import RolePathRockerboyEnemies from './screens/creation/role_path/RolePathRockerboyEnemies';
-import RolePathRockerboyEnding from './screens/creation/role_path/RolePathRockerboyEnding';
-import CaracPathDisclaimer from './screens/creation/stuff_path/CaracPathDisclaimer';
-import CaracPathSelection from './screens/creation/stuff_path/CaracPathSelection';
-import CaracPathDerivatedCarac from './screens/creation/stuff_path/CaracPathDerivatedCarac';
-import CaracPathEnding from './screens/creation/stuff_path/CaracPathEnding';
-import CompPathDisclaimer from './screens/creation/stuff_path/CompPathDisclaimer';
-import CompPathSelection from './screens/creation/stuff_path/CompPathSelection';
-import CompPathEnding from './screens/creation/stuff_path/CompPathEnding';
-import StuffPathDisclaimer from './screens/creation/stuff_path/StuffPathDisclaimer';
-import StuffPathSelectionRockerboy from './screens/creation/stuff_path/stuff_path_selection/StuffPathSelectionRockerboy';
-import StuffPathEnding from './screens/creation/stuff_path/StuffPathEnding';
-
 
 const styles = StyleSheet.create({
   headerStyle: {
@@ -70,40 +37,6 @@ const App = () => {
           <Stack.Screen name="Connexion" component={ConnexionScreen} options={{ title: 'Connexion' }} />
           <Stack.Screen name="Inscription" component={InscriptionScreen} options={{ title: 'Inscription' }} />
           <Stack.Screen name="MyAccount" component={MyAccount} options={{ title: 'Mon Compte' }} />
-          <Stack.Screen name="MyAvatar" component={MyAvatar} options={{ title: 'Mon Avatar' }} />
-          <Stack.Screen name="MyInfo" component={MyInfo} options={{ title: 'Mes Informations' }} />
-          <Stack.Screen name="MyCharacters" component={MyCharacters} />
-          <Stack.Screen name="DisclaimerCharacter" component={DisclaimerCharacter} options={{ title: 'Disclaimer Character' }} />
-          <Stack.Screen name="SelectRole" component={SelectRoleScreen} />
-          <Stack.Screen name="RoleDescription" component={RoleDescriptionScreen} />
-          <Stack.Screen name="GenPathDesc" component={GenPathDescScreen} />
-          <Stack.Screen name="CulturalOrigin" component={CulturalOrigin} />
-          <Stack.Screen name="GenPathPersonality" component={GenPathPersonalityScreen} />
-          <Stack.Screen name="GenPathClothing" component={GenPathClothingScreen} />
-          <Stack.Screen name="GenPathMotRel" component={GenPathMotRel} />
-          <Stack.Screen name="GenPathSocialOrigin" component={GenPathSocialOrigin} />
-          <Stack.Screen name="GenPathEnvironment" component={GenPathEnvironment} />
-          <Stack.Screen name="GenPathFamily" component={GenPathFamily} />
-          <Stack.Screen name="GenPathFriends" component={GenPathFriends} />
-          <Stack.Screen name="GenPathEnemies" component={GenPathEnemies} />
-          <Stack.Screen name="GenPathLove" component={GenPathLove} />
-          <Stack.Screen name="GenPathObjective" component={GenPathObjective} />
-          <Stack.Screen name="GenPathEnding" component={GenPathEnding} />
-          <Stack.Screen name="RolePathRockerboyDisclaimer" component={RolePathRockerboyDisclaimer} />
-          <Stack.Screen name="RolePathRockerboyJob" component={RolePathRockerboyJob} />
-          <Stack.Screen name="RolePathRockerboyPlace" component={RolePathRockerboyPlace} />
-          <Stack.Screen name="RolePathRockerboyEnemies" component={RolePathRockerboyEnemies} />
-          <Stack.Screen name="RolePathRockerboyEnding" component={RolePathRockerboyEnding} />
-          <Stack.Screen name="CaracPathDisclaimer" component={CaracPathDisclaimer} />
-          <Stack.Screen name="CaracPathSelection" component={CaracPathSelection} />
-          <Stack.Screen name="CaracPathDerivatedCarac" component={CaracPathDerivatedCarac} />
-          <Stack.Screen name="CaracPathEnding" component={CaracPathEnding} />
-          <Stack.Screen name="CompPathDisclaimer" component={CompPathDisclaimer} />
-          <Stack.Screen name="CompPathSelection" component={CompPathSelection} />
-          <Stack.Screen name="CompPathEnding" component={CompPathEnding} />
-          <Stack.Screen name="StuffPathDisclaimer" component={StuffPathDisclaimer} />
-          <Stack.Screen name="StuffPathSelectionRockerboy" component={StuffPathSelectionRockerboy} />
-          <Stack.Screen name="StuffPathEnding" component={StuffPathEnding} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
