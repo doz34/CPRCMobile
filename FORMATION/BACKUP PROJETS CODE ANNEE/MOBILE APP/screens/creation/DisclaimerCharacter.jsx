@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import styles from "./creation_styles/DisclaimerCharacter.styles";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
 import MyTextSimple from "./MyTextSimple";
+import { useFocusEffect } from '@react-navigation/native';
 
 const DisclaimerCharacterScreen = ({ navigation }) => {
   const { user } = useContext(UserContext);
@@ -56,6 +57,27 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
     sortCharacters(sortBy, sortDirection);
   }, [characters, sortBy, sortDirection]);
 
+  useFocusEffect(
+    useCallback(() => {
+      // Reset state when screen is focused
+      setInitialModalVisible(false);
+      setCreateNewModalVisible(false);
+      setConfirmModalVisible(false);
+      setConfirmNameModalVisible(false);
+      setCharacterName("");
+      setTempCharacterName("");
+      setCharacterStatus(null);
+      setLoading(true);
+      setLastCharacterId(null);
+      setSelectCharacterModalVisible(false);
+      setSelectedCharacter(null);
+      setCharacters([]);
+      setSortedCharacters([]);
+      setSortBy("date_creation");
+      setSortDirection("descending");
+    }, [])
+  );
+
   const getCharacterStatus = async () => {
     try {
       const response = await axios.get(
@@ -85,11 +107,30 @@ const DisclaimerCharacterScreen = ({ navigation }) => {
     }
   };
 
-  const handleSubmitName = () => {
-    setCharacterName(tempCharacterName);
-    setCreateNewModalVisible(false);
-    setConfirmNameModalVisible(true);
-  };
+  const handleSubmitName = async () => {
+    setLoading(true);
+    try {
+        const response = await axios.post(
+            "http://192.168.1.17:3000/api/character/creer-nom-personnage",
+            { nom_perso: tempCharacterName, no_ami: true },
+            { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        if (response.status === 201) {
+            console.log("Nom du personnage créé avec succès:", response.data);
+            navigation.navigate("SelectRole", { idPerso: response.data.id_perso });
+        }
+    } catch (error) {
+        if (error.response && error.response.status === 409) {
+            alert("Le nom du personnage existe déjà pour cet utilisateur.");
+        } else {
+            console.error("Erreur lors de la création du personnage:", error);
+            alert("Erreur lors de la création du nom du personnage.");
+        }
+    } finally {
+        setLoading(false);
+        setConfirmNameModalVisible(false);
+    }
+};
 
   const handleConfirmName = async () => {
     try {

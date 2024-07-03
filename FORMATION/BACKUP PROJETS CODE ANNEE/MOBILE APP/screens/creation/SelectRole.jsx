@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef, memo } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Image,
   ImageBackground,
+  Modal,
   Animated
 } from 'react-native';
 import axios from 'axios';
@@ -19,61 +20,44 @@ const SelectRoleScreen = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isAdvantagesModalVisible, setIsAdvantagesModalVisible] = useState(false);
-  const [isDisadvantagesModalVisible, setIsDisadvantagesModalVisible] = useState(false);
   const idPerso = route.params.idPerso;
+  const currentRoleIndex = useRef(0);
 
-  const order = [1, 2, 8, 4, 5, 6, 7, 3, 9, 10];
-  const swiperRef = useRef(null);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  console.log('Component Rendered');
+
+  const fetchRoles = useCallback(async () => {
+    console.log('Fetching roles...');
+    try {
+      const response = await axios.get(
+        'http://192.168.1.17:3000/api/user/roles',
+        {
+          headers: { Authorization: `Bearer ${user?.token}` }
+        }
+      );
+      const rolesWithImages = response.data.map((role) => ({
+        ...role,
+        role_img: `http://192.168.1.17:3000/${role.role_img}`
+      }));
+      setRoles(rolesWithImages);
+      console.log('Roles fetched:', rolesWithImages);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des rôles :', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.token]);
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get(
-          'http://192.168.1.17:3000/api/user/roles',
-          {
-            headers: { Authorization: `Bearer ${user?.token}` }
-          }
-        );
-        const rolesWithImages = response.data.map((role) => ({
-          ...role,
-          role_img: `http://192.168.1.17:3000/${role.role_img}`
-        }));
-        const orderedRoles = order.map(id => rolesWithImages.find(role => role.id_role === id));
-        setRoles(orderedRoles);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des rôles :', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    console.log('useEffect triggered');
     if (user?.token) {
       fetchRoles();
     }
-  }, [user?.token, order]);
+  }, [user?.token, fetchRoles]);
 
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [fadeAnim]);
-
-  const onRoleSelect = async () => {
+  const onRoleSelect = useCallback(async () => {
+    console.log('Selecting role...');
     try {
-      const selectedRole = roles[swiperRef.current.state.index];
+      const selectedRole = roles[currentRoleIndex.current];
       const requestBody = {
         idRole: selectedRole.id_role
       };
@@ -93,18 +77,10 @@ const SelectRoleScreen = ({ navigation, route }) => {
     } catch (error) {
       console.error('Erreur lors de la mise à jour du rôle du personnage :', error);
     }
-  };
-
-  const renderArrow = (direction) => {
-    const arrowStyle = direction === 'left' ? styles.leftArrow : styles.rightArrow;
-    return (
-      <Animated.View style={[styles.arrow, arrowStyle, { opacity: fadeAnim }]}>
-        <Text style={styles.arrowText}>{direction === 'left' ? '←' : '→'}</Text>
-      </Animated.View>
-    );
-  };
+  }, [roles, idPerso, user.token, navigation]);
 
   if (loading) {
+    console.log('Loading...');
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
@@ -114,68 +90,26 @@ const SelectRoleScreen = ({ navigation, route }) => {
       style={styles.backgroundImage}
     >
       <Swiper
-        ref={swiperRef}
         style={styles.wrapper}
-        loop={true} // Permettre le swipe infini
-        index={0} // Afficher par défaut l'id_role=1
+        onIndexChanged={(index) => {
+          console.log('Swiper index changed:', index);
+          currentRoleIndex.current = index;
+        }}
+        loop={true} // Enable looping
+        removeClippedSubviews={false} // Prevents re-rendering of off-screen components
       >
         {roles.map((role) => (
-          <View key={role.id_role} style={styles.roleContainer}>
-            <Image source={{ uri: role.role_img }} style={styles.roleImageWrapper} />
-            {/* Titre du rôle */}
-            <Text style={styles.title}>{role.nom_role}</Text>
-
-            {/* Description en bref */}
-            <LinearGradient
-              colors={['#C0C0C0', '#484848']}
-              style={styles.descriptionContainer}
-            >
-              <Text style={styles.briefTitle}>EN BREF :</Text>
-              <MyTextComponent text={role.desc_role_short} style={styles.descriptionText} />
-            </LinearGradient>
-
-            {/* Avantages et Inconvénients */}
-            <View style={styles.advantagesDisadvantagesContainer}>
-              <TouchableOpacity
-                onPress={() => setIsAdvantagesModalVisible(true)}
-                style={styles.thirdContainer}
-              >
-                <LinearGradient
-                  colors={['#7ED56F', '#28B485']}
-                  style={[styles.advantagesContainer, { borderRadius: 30 }]}
-                >
-                  <Text style={styles.advantagesTitle}>AVANTAGES :</Text>
-                  <MyTextComponent text={role.avantages} style={styles.advantagesText} />
-                </LinearGradient>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => setIsDisadvantagesModalVisible(true)}
-                style={styles.thirdContainer}
-              >
-                <LinearGradient
-                  colors={['#FF416C', '#FF4B2B']}
-                  style={[styles.disadvantagesContainer, { borderRadius: 30 }]}
-                >
-                  <Text style={styles.disadvantagesTitle}>INCONVÉNIENTS :</Text>
-                  <MyTextComponent text={role.inconvenients} style={styles.disadvantagesText} />
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <RoleCard
+            key={role.id_role}
+            role={role}
+          />
         ))}
       </Swiper>
-
-      {/* Flèches clignotantes */}
-      {renderArrow('left')}
-      {renderArrow('right')}
-
-      {/* Boutons */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           onPress={() =>
             navigation.navigate('RoleDescription', {
-              role: roles[swiperRef.current.state.index]
+              role: roles[currentRoleIndex.current]
             })
           }
           style={styles.learnMoreButton}
@@ -186,21 +120,131 @@ const SelectRoleScreen = ({ navigation, route }) => {
           <Text style={styles.buttonText}>Sélectionner</Text>
         </TouchableOpacity>
       </View>
-
-      {isAdvantagesModalVisible && (
-        <AdvantagesModal
-          role={roles[swiperRef.current.state.index]}
-          onClose={() => setIsAdvantagesModalVisible(false)}
-        />
-      )}
-
-      {isDisadvantagesModalVisible && (
-        <DisadvantagesModal
-          role={roles[swiperRef.current.state.index]}
-          onClose={() => setIsDisadvantagesModalVisible(false)}
-        />
-      )}
+      <Arrow direction="left" />
+      <Arrow direction="right" />
+      <ModalManager />
     </ImageBackground>
+  );
+};
+
+const RoleCard = memo(({ role }) => {
+  const openModal = useCallback((content) => {
+    ModalManager.open(content);
+  }, []);
+
+  console.log('Rendering RoleCard:', role.id_role);
+  return (
+    <View style={styles.roleContainer}>
+      <Image source={{ uri: role.role_img }} style={styles.roleImageWrapper} />
+      <Text style={styles.title}>{role.nom_role}</Text>
+      <LinearGradient
+        colors={['#C0C0C0', '#484848']}
+        style={styles.descriptionContainer}
+      >
+        <Text style={styles.briefTitle}>EN BREF :</Text>
+        <MyTextComponent text={role.desc_role_short} style={styles.descriptionText} />
+      </LinearGradient>
+      <View style={styles.advantagesDisadvantagesContainer}>
+        <TouchableOpacity
+          onPress={() => openModal({ type: 'advantages', content: role.avantages })}
+          style={styles.thirdContainer}
+        >
+          <LinearGradient
+            colors={['#7ED56F', '#28B485']}
+            style={[styles.advantagesContainer, { borderRadius: 30 }]}
+          >
+            <Text style={styles.advantagesTitle}>AVANTAGES :</Text>
+            <MyTextComponent text={role.avantages} style={styles.advantagesText} />
+          </LinearGradient>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => openModal({ type: 'disadvantages', content: role.inconvenients })}
+          style={styles.thirdContainer}
+        >
+          <LinearGradient
+            colors={['#FF416C', '#FF4B2B']}
+            style={[styles.disadvantagesContainer, { borderRadius: 30 }]}
+          >
+            <Text style={styles.disadvantagesTitle}>INCONVÉNIENTS :</Text>
+            <MyTextComponent text={role.inconvenients} style={styles.disadvantagesText} />
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+});
+
+const ModalManager = () => {
+  const [modalContent, setModalContent] = useState(null);
+
+  const open = useCallback((content) => {
+    setModalContent(content);
+  }, []);
+
+  const close = useCallback(() => {
+    setModalContent(null);
+  }, []);
+
+  ModalManager.open = open;
+  ModalManager.close = close;
+
+  return (
+    <Modal
+      visible={modalContent !== null}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={close}
+    >
+      <View style={styles.modalMainContainer}>
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={modalContent?.type === 'advantages' ? ['#7ED56F', '#28B485'] : ['#FF416C', '#FF4B2B']}
+            style={styles.modalContentContainer}
+          >
+            <Text style={styles.modalTitle}>
+              {modalContent?.type === 'advantages' ? 'AVANTAGES :' : 'INCONVÉNIENTS :'}
+            </Text>
+            <MyTextComponent text={modalContent?.content} style={styles.modalText} />
+            <TouchableOpacity style={styles.modalCloseButton} onPress={close}>
+              <Text style={styles.modalCloseButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const Arrow = ({ direction }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [fadeAnim]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.arrow,
+        direction === 'left' ? styles.arrowLeft : styles.arrowRight,
+        { opacity: fadeAnim },
+      ]}
+    >
+      <View style={direction === 'left' ? styles.arrowLeftShape : styles.arrowRightShape} />
+    </Animated.View>
   );
 };
 

@@ -209,11 +209,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent', // Supprimez l'arrière-plan semi-transparent
   },
   modalMainContainer: {
-    position: 'absolute',
-    top: screenHeight * 0.3,
-    left: 0,
-    right: 0,
-    zIndex: 9999, // Un z-index élevé pour s'afficher par-dessus le reste du contenu
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Ajoutez un fond semi-transparent pour l'effet de modale
   },
 modalContent: {
   backgroundColor: 'white',
@@ -288,26 +287,41 @@ continueButton: {
   alignItems: "center",
   alignSelf: "center",
 },
-arrowContainer: {
+arrow: {
   position: 'absolute',
   top: '50%',
-  left: '50%',
-  transform: [{ translateX: '-50' }, { translateY: '-50' }],
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  width: '100%',
-  paddingHorizontal: 20,
+  transform: [{ translateY: -screenHeight * 0.05 }],
+  zIndex: 10,
 },
-arrow: {
-  fontSize: 30,
-  color: 'white',
-  opacity: 0.5,
-  animation: 'blink 1s infinite',
+arrowLeft: {
+  left: 10,
 },
-'@keyframes blink': {
-  '0%': { opacity: 0.5 },
-  '50%': { opacity: 1 },
-  '100%': { opacity: 0.5 },
+arrowRight: {
+  right: 10,
+},
+arrowLeftShape: {
+  width: 0,
+  height: 0,
+  borderTopWidth: 20,
+  borderBottomWidth: 20,
+  borderRightWidth: 20,
+  borderStyle: 'solid',
+  backgroundColor: 'transparent',
+  borderTopColor: 'transparent',
+  borderBottomColor: 'transparent',
+  borderRightColor: 'white',
+},
+arrowRightShape: {
+  width: 0,
+  height: 0,
+  borderTopWidth: 20,
+  borderBottomWidth: 20,
+  borderLeftWidth: 20,
+  borderStyle: 'solid',
+  backgroundColor: 'transparent',
+  borderTopColor: 'transparent',
+  borderBottomColor: 'transparent',
+  borderLeftColor: 'white',
 },
 });
 
