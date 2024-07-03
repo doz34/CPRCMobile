@@ -14,6 +14,7 @@ import {
 import { UserContext } from "../context/UserContext";
 import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import * as FileSystem from "expo-file-system";
 
 const styles = StyleSheet.create({
@@ -76,6 +77,18 @@ const styles = StyleSheet.create({
   },
 });
 
+// Configuration d'axios-retry
+axiosRetry(axios, {
+  retries: 3, // Nombre de tentatives en cas d'échec
+  retryDelay: (retryCount) => {
+    return retryCount * 1000; // Délai entre chaque tentative (en ms)
+  },
+  retryCondition: (error) => {
+    // Renvoie true si une nouvelle tentative doit être effectuée
+    return error.code === "ERR_NETWORK";
+  },
+});
+
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -98,12 +111,34 @@ axios.interceptors.response.use(
 
 const MyAccount = () => {
   const { user, signOut, updateUser } = useContext(UserContext);
-  const [nomUtilisateur, setNomUtilisateur] = useState(
-    user?.nomUtilisateur || ""
-  );
+
+  // États initiaux pour stocker les valeurs actuelles de l'utilisateur
+  const [initialEmail, setInitialEmail] = useState(user?.email || "");
+  const [initialAvatar, setInitialAvatar] = useState(user?.avatarUrl || "");
+
   const [email, setEmail] = useState(user?.email || "");
   const [motDePasse, setMotDePasse] = useState("");
+  const [ancienMotDePasse, setAncienMotDePasse] = useState("");
   const [avatar, setAvatar] = useState(user?.avatarUrl || "");
+
+  // Fonction pour vérifier si les champs sont valides
+  const isValidForm = () => {
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/; // Modifier selon les besoins
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basique; ajuster si nécessaire
+    return (
+      emailRegex.test(email) &&
+      passwordRegex.test(motDePasse) &&
+      motDePasse !== ancienMotDePasse
+    );
+  };
+
+  useEffect(() => {
+    // Mise à jour des états initiaux lors du chargement des informations de l'utilisateur
+    setInitialEmail(user?.email || "");
+    setInitialAvatar(user?.avatarUrl || "");
+    setEmail(user?.email || "");
+    setAvatar(user?.avatarUrl || "");
+  }, [user]);
 
   useEffect(() => {
     // Fonction pour récupérer les informations de l'utilisateur
@@ -117,8 +152,9 @@ const MyAccount = () => {
             }
           );
           setAvatar(response.data.avatarUrl); // Mettez à jour l'avatar ici
-          setNomUtilisateur(response.data.nomUtilisateur);
           setEmail(response.data.email);
+          setInitialEmail(response.data.email); // Mettez à jour initialEmail ici
+          setInitialAvatar(response.data.avatarUrl); // Mettez à jour initialAvatar ici
           // Mettez à jour d'autres informations si nécessaire
         } catch (error) {
           console.error(
@@ -136,26 +172,91 @@ const MyAccount = () => {
     fetchUserInfo();
   }, [user]);
 
+  const validerMiseAJour = () => {
+    // Vérification des formats de champs
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert("Erreur", "L'adresse email n'est pas valide.");
+      return false;
+    }
+
+    if (motDePasse || ancienMotDePasse) {
+      if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/.test(motDePasse)) {
+        Alert.alert(
+          "Erreur",
+          "Le nouveau mot de passe doit contenir au moins 1 majuscule, 1 minuscule, 1 caractère spécial, 1 chiffre et doit contenir au minimum 8 caractères."
+        );
+        return false;
+      }
+
+      // Assurez-vous que l'ancien mot de passe et le nouveau ne sont pas identiques
+      if (ancienMotDePasse === motDePasse) {
+        Alert.alert(
+          "Erreur",
+          "L'ancien mot de passe et le nouveau mot de passe ne doivent pas être identiques."
+        );
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const getAvatarPathForDatabase = (avatarUrl) => {
+    const matches = avatarUrl.match(/\/images\/avatars\/(.+)$/);
+    return matches ? `images\\avatars\\${matches[1]}` : null;
+  };
+
   const handleUpdate = async () => {
     console.log("Starting user info update...");
-    try {
-      const updatedUser = {
-        nom_utilisateur: nomUtilisateur,
-        email,
-        mot_de_passe: motDePasse,
-        avatar,
-      };
-      await updateUser(updatedUser);
-      console.log("User info updated successfully.");
+
+    // Vérifiez si des modifications ont été apportées
+    const hasEmailChanged = email !== initialEmail;
+    const hasPasswordChanged = motDePasse && motDePasse !== ancienMotDePasse;
+    const hasAvatarChanged = avatar !== initialAvatar;
+
+    if (!hasEmailChanged && !hasPasswordChanged && !hasAvatarChanged) {
       Alert.alert(
-        "Mise à jour réussie",
-        "Vos informations ont été mises à jour."
+        "Aucune modification détectée",
+        "Veuillez modifier au moins une information avant de mettre à jour."
       );
+      return;
+    }
+
+    if (!validerMiseAJour()) return;
+
+    const updatedFields = {};
+    if (hasEmailChanged) updatedFields.email = email;
+    if (hasPasswordChanged) {
+      updatedFields.ancienMotDePasse = ancienMotDePasse;
+      updatedFields.motDePasse = motDePasse;
+    }
+    if (hasAvatarChanged) {
+      updatedFields.avatar = getAvatarPathForDatabase(avatar);
+    }
+
+    try {
+      const updateResult = await updateUser(updatedFields);
+
+      if (updateResult.success) {
+        console.log("User info updated successfully.");
+        Alert.alert(
+          "Mise à jour réussie",
+          "Vos informations ont été mises à jour."
+        );
+
+        // Nettoyez les champs de mot de passe après une mise à jour réussie
+        setMotDePasse("");
+        setAncienMotDePasse("");
+      } else {
+        throw new Error(updateResult.message);
+      }
     } catch (error) {
       console.error("Error updating user info:", error);
       Alert.alert(
         "Erreur lors de la mise à jour",
-        "Une erreur s'est produite. Veuillez réessayer."
+        error.response?.data?.message ||
+          error.message ||
+          "Une erreur s'est produite. Veuillez réessayer."
       );
     }
   };
@@ -201,7 +302,7 @@ const MyAccount = () => {
               "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${user.token}`,
             },
-            timeout: 30000, // Augmentez le délai d'attente à 30 secondes (ajustez selon vos besoins)
+            timeout: 60000, // Augmentez le délai d'attente à 30 secondes (ajustez selon vos besoins)
           }
         );
 
@@ -257,17 +358,18 @@ const MyAccount = () => {
             </Text>
             <TextInput
               style={styles.input}
-              placeholder="Nom d'utilisateur"
-              placeholderTextColor="#fff"
-              value={nomUtilisateur}
-              onChangeText={setNomUtilisateur}
-            />
-            <TextInput
-              style={styles.input}
               placeholder="Email"
               placeholderTextColor="#fff"
               value={email}
               onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Ancien mot de passe"
+              placeholderTextColor="#fff"
+              secureTextEntry
+              value={ancienMotDePasse}
+              onChangeText={setAncienMotDePasse}
             />
             <TextInput
               style={styles.input}
@@ -277,6 +379,11 @@ const MyAccount = () => {
               value={motDePasse}
               onChangeText={setMotDePasse}
             />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleUpdate}
+              disabled={!isValidForm()} // Désactiver le bouton si le formulaire n'est pas valide
+            ></TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>Mettre à jour</Text>
