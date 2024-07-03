@@ -57,7 +57,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [selectedCyberfashion2, setSelectedCyberfashion2] = useState(null);
   const [selectedCyberaudio1, setSelectedCyberaudio1] = useState(null);
   const [selectedCyberaudio2, setSelectedCyberaudio2] = useState(null);
-  const [selectedCyberaudio3, setSelectedCyberaudio3] = useState("");
+  const [selectedCyberaudio3, setSelectedCyberaudio3] = useState(null);
 
   // Ajout des états pour les modales
   const [cyberfashion1ModalVisible, setCyberfashion1ModalVisible] =
@@ -213,11 +213,75 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     }
   };
 
-  // Fonctions pour récupérer les détails du cybermatériel
-  const fetchCyberDetails = async (id, type) => {
+  // Fonctions de fetch pour les détails
+  const fetchCyberfashion1Details = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.1.17:3000/api/roles/cyber-details/${id}`,
+        "http://192.168.1.17:3000/api/roles/cyberfashion-details/1",
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des détails de Cyberfashion 1:",
+        error
+      );
+      return {};
+    }
+  };
+
+  const fetchCyberfashion2Details = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.17:3000/api/roles/cyberfashion-details/2",
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des détails de Cyberfashion 2:",
+        error
+      );
+      return {};
+    }
+  };
+
+  const fetchCyberaudio1Details = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.17:3000/api/roles/cyberaudio-details/1",
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des détails de Cyberaudio 1:",
+        error
+      );
+      return {};
+    }
+  };
+
+  const fetchCyberaudio2Details = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.17:3000/api/roles/cyberaudio-details/2",
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des détails de Cyberaudio 2:",
+        error
+      );
+      return {};
+    }
+  };
+
+  const fetchCyberaudio3Details = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.17:3000/api/roles/cyberaudio-details/3",
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
@@ -225,45 +289,78 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
       return response.data;
     } catch (error) {
       console.error(
-        `Erreur lors de la récupération des détails du ${type}:`,
+        "Erreur lors de la récupération des détails de Cyberaudio 3:",
         error
       );
       return {};
     }
   };
 
-  // Fonctions pour gérer les sélections et ouvrir les modales
+  // Fonctions de fetch pour les noms
+  const fetchCyberfashionNames = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://192.168.1.17:3000/api/roles/cyberfashion-names/${id}`,
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      return response.data.nom;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des noms de Cyberfashion:",
+        error
+      );
+      return "";
+    }
+  };
+
+  const fetchCyberaudioNames = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://192.168.1.17:3000/api/roles/cyberaudio-names/${id}`,
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+      return response.data.nom;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des noms de Cyberaudio:",
+        error
+      );
+      return "";
+    }
+  };
+
+  // Fonctions de sélection
   const handleCyberfashion1Select = async () => {
-    const details = await fetchCyberDetails(2, "cyberfashion");
+    const details = await fetchCyberfashion1Details();
     setCyberfashion1ModalContent(details);
     setCyberfashion1ModalVisible(true);
   };
 
   const handleCyberfashion2Select = async () => {
-    const details = await fetchCyberDetails(7, "cyberfashion");
+    const details = await fetchCyberfashion2Details();
     setCyberfashion2ModalContent(details);
     setCyberfashion2ModalVisible(true);
   };
 
   const handleCyberaudio1Select = async () => {
-    const details = await fetchCyberDetails(37, "cyberaudio");
+    const details = await fetchCyberaudio1Details();
     setCyberaudio1ModalContent(details);
     setCyberaudio1ModalVisible(true);
   };
 
   const handleCyberaudio2Select = async () => {
-    const details = await fetchCyberDetails(29, "cyberaudio");
+    const details = await fetchCyberaudio2Details();
     setCyberaudio2ModalContent(details);
     setCyberaudio2ModalVisible(true);
   };
 
   const handleCyberaudio3Select = async () => {
-    const details = await fetchCyberDetails(35, "cyberaudio");
+    const details = await fetchCyberaudio3Details();
     setCyberaudio3ModalContent(details);
     setCyberaudio3ModalVisible(true);
   };
 
-  // Fonctions pour fermer les modales
+  // Fermeture des modales
   const closeCyberfashion1Modal = () => setCyberfashion1ModalVisible(false);
   const closeCyberfashion2Modal = () => setCyberfashion2ModalVisible(false);
   const closeCyberaudio1Modal = () => setCyberaudio1ModalVisible(false);
@@ -761,44 +858,183 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const renderCyberfashion1ModalContent = () => {
     if (!cyberfashion1ModalContent) return null;
     return (
-      <ScrollView contentContainerStyle={styles.modalScrollContent}>
-        <Text style={styles.modalTitle}>CYBERFASHION 1</Text>
-        <View style={styles.modalContentContainer}>
-          <View style={styles.modalPair}>
-            <Text style={styles.modalKey}>Lieu d'installation:</Text>
-            <Text style={styles.modalValue}>
+      <Modal
+        visible={cyberfashion1ModalVisible}
+        onRequestClose={closeCyberfashion1Modal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              Lieu d'installation:{" "}
               {cyberfashion1ModalContent.lieu_installation || "Aucun(e)"}
             </Text>
-          </View>
-          <View style={styles.modalPair}>
-            <Text style={styles.modalKey}>Description:</Text>
-            <Text style={styles.modalValue}>
-              {cyberfashion1ModalContent.description || "Aucun(e)"}
+            <Text style={styles.modalDescription}>
+              Description: {cyberfashion1ModalContent.description || "Aucun(e)"}
             </Text>
-          </View>
-          <View style={styles.modalPair}>
-            <Text style={styles.modalKey}>Perte d'Humanité:</Text>
-            <Text style={styles.modalValue}>
+            <Text style={styles.modalDescription}>
+              Perte d'Humanité:{" "}
               {cyberfashion1ModalContent.perte_humanite || "Aucun(e)"}
             </Text>
-          </View>
-          <View style={styles.modalPair}>
-            <Text style={styles.modalKey}>Quantité:</Text>
-            <Text style={styles.modalValue}>1</Text>
+            <Text style={styles.modalDescription}>Quantité: 1</Text>
+            <TouchableOpacity
+              onPress={closeCyberfashion1Modal}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>FERMER</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={closeCyberfashion1Modal}
-          style={styles.closeButton}
-        >
-          <Text style={styles.buttonText}>FERMER</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      </Modal>
     );
   };
 
-  // Répétez cette structure pour les autres modales (cyberfashion2, cyberaudio1, cyberaudio2, cyberaudio3)
+  const renderCyberfashion2ModalContent = () => {
+    if (!cyberfashion2ModalContent) return null;
+    return (
+      <Modal
+        visible={cyberfashion2ModalVisible}
+        onRequestClose={closeCyberfashion2Modal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              Lieu d'installation:{" "}
+              {cyberfashion2ModalContent.lieu_installation || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Description: {cyberfashion2ModalContent.description || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Perte d'Humanité:{" "}
+              {cyberfashion2ModalContent.perte_humanite || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>Quantité: 1</Text>
+            <TouchableOpacity
+              onPress={closeCyberfashion2Modal}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>FERMER</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
 
+  const renderCyberaudio1ModalContent = () => {
+    if (!cyberaudio1ModalContent) return null;
+    return (
+      <Modal
+        visible={cyberaudio1ModalVisible}
+        onRequestClose={closeCyberaudio1Modal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              Lieu d'installation:{" "}
+              {cyberaudio1ModalContent.lieu_installation || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Description: {cyberaudio1ModalContent.description || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Perte d'Humanité:{" "}
+              {cyberaudio1ModalContent.perte_humanite || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>Quantité: 1</Text>
+            <TouchableOpacity
+              onPress={closeCyberaudio1Modal}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>FERMER</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderCyberaudio2ModalContent = () => {
+    if (!cyberaudio2ModalContent) return null;
+    return (
+      <Modal
+        visible={cyberaudio2ModalVisible}
+        onRequestClose={closeCyberaudio2Modal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              Lieu d'installation:{" "}
+              {cyberaudio2ModalContent.lieu_installation || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Description: {cyberaudio2ModalContent.description || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Perte d'Humanité:{" "}
+              {cyberaudio2ModalContent.perte_humanite || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>Quantité: 1</Text>
+            <TouchableOpacity
+              onPress={closeCyberaudio2Modal}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>FERMER</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderCyberaudio3ModalContent = () => {
+    if (!cyberaudio3ModalContent) return null;
+    return (
+      <Modal
+        visible={cyberaudio3ModalVisible}
+        onRequestClose={closeCyberaudio3Modal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              Lieu d'installation:{" "}
+              {cyberaudio3ModalContent.lieu_installation || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Description: {cyberaudio3ModalContent.description || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>
+              Perte d'Humanité:{" "}
+              {cyberaudio3ModalContent.perte_humanite || "Aucun(e)"}
+            </Text>
+            <Text style={styles.modalDescription}>Quantité: 1</Text>
+            <TouchableOpacity
+              onPress={closeCyberaudio3Modal}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>FERMER</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const cyberfashion1Name = await fetchCyberfashionNames(2);
+      setSelectedCyberfashion1(cyberfashion1Name);
+      const cyberfashion2Name = await fetchCyberfashionNames(7);
+      setSelectedCyberfashion2(cyberfashion2Name);
+      const cyberaudio1Name = await fetchCyberaudioNames(9);
+      setSelectedCyberaudio1(cyberaudio1Name);
+      const cyberaudio2Name = await fetchCyberaudioNames(1);
+      setSelectedCyberaudio2(cyberaudio2Name);
+    };
+    fetchInitialData();
+  }, [user?.token]);
+
+  
   return (
     <ImageBackground
       source={require("../../../../assets/Inscription.png")}
@@ -806,458 +1042,482 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Text style={styles.mainTitle}>EQUIPEMENT :</Text>
-        <LinearGradient colors={["#868686", "#484848"]} style={styles.descriptionContainer}>
-  <Text style={styles.descriptionTitle}>ARMES ET ARMURES</Text>
-  <View style={styles.sectionContainer}>
-    <View style={styles.row}>
-      <TouchableOpacity
-        onPress={openModal}
-        style={styles.clickableTitle}
-      >
-        <Text style={styles.clickableTitleText}>ARME A DISTANCE</Text>
-      </TouchableOpacity>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedWeapon}
-          style={styles.picker}
-          onValueChange={(itemValue) => handleWeaponSelect(itemValue)}
+        <LinearGradient
+          colors={["#868686", "#484848"]}
+          style={styles.descriptionContainer}
         >
-          {weapons.map((weapon) => (
-            <Picker.Item
-              key={weapon.id_arme}
-              label={weapon.nom}
-              value={weapon}
-            />
-          ))}
-        </Picker>
-      </View>
-    </View>
-    <View style={styles.row}>
-      <TouchableOpacity
-        onPress={selectedMeleeWeapon ? openMeleeModal : null}
-        style={[
-          styles.clickableTitle,
-          { borderColor: "yellow" },
-          !selectedMeleeWeapon && { opacity: 0.5 },
-        ]}
-        disabled={!selectedMeleeWeapon}
-      >
-        <Text style={styles.clickableTitleText}>ARME DE MÊLÉE</Text>
-      </TouchableOpacity>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedMeleeWeapon}
-          style={[
-            styles.picker,
-            selectedMeleeWeapon
-              ? { borderColor: "yellow", borderWidth: 2 }
-              : {},
-          ]}
-          onValueChange={(itemValue) =>
-            handleMeleeWeaponSelect(itemValue)
-          }
+          <Text style={styles.descriptionTitle}>ARMES ET ARMURES</Text>
+          <View style={styles.sectionContainer}>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={openModal}
+                style={styles.clickableTitle}
+              >
+                <Text style={styles.clickableTitleText}>ARME A DISTANCE</Text>
+              </TouchableOpacity>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedWeapon}
+                  style={styles.picker}
+                  onValueChange={(itemValue) => handleWeaponSelect(itemValue)}
+                >
+                  {weapons.map((weapon) => (
+                    <Picker.Item
+                      key={weapon.id_arme}
+                      label={weapon.nom}
+                      value={weapon}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={selectedMeleeWeapon ? openMeleeModal : null}
+                style={[
+                  styles.clickableTitle,
+                  { borderColor: "yellow" },
+                  !selectedMeleeWeapon && { opacity: 0.5 },
+                ]}
+                disabled={!selectedMeleeWeapon}
+              >
+                <Text style={styles.clickableTitleText}>ARME DE MÊLÉE</Text>
+              </TouchableOpacity>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedMeleeWeapon}
+                  style={[
+                    styles.picker,
+                    selectedMeleeWeapon
+                      ? { borderColor: "yellow", borderWidth: 2 }
+                      : {},
+                  ]}
+                  onValueChange={(itemValue) =>
+                    handleMeleeWeaponSelect(itemValue)
+                  }
+                >
+                  <Picker.Item label="Veuillez sélectionner" value={null} />
+                  {meleeWeapons.map((weapon) => (
+                    <Picker.Item
+                      key={weapon.id_arme}
+                      label={weapon.nom}
+                      value={weapon}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={
+                  selectedGrenade ? () => setGrenade1ModalVisible(true) : null
+                }
+                style={[
+                  styles.clickableTitle,
+                  !selectedGrenade && { opacity: 0.5 },
+                ]}
+                disabled={!selectedGrenade}
+              >
+                <Text style={styles.clickableTitleText}>GRENADES 1</Text>
+              </TouchableOpacity>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedGrenade}
+                  style={[
+                    styles.picker,
+                    selectedGrenade
+                      ? { borderColor: "white", borderWidth: 2 }
+                      : {},
+                  ]}
+                  onValueChange={(itemValue) => handleGrenadeSelect(itemValue)}
+                >
+                  {grenades
+                    .filter((grenade) => grenade.id === 11)
+                    .map((grenade) => (
+                      <Picker.Item
+                        key={grenade.id}
+                        label={`${grenade.nom} (x2)`}
+                        value={grenade}
+                      />
+                    ))}
+                </Picker>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={
+                  selectedGrenadeType
+                    ? () => setGrenade2ModalVisible(true)
+                    : null
+                }
+                style={[
+                  styles.clickableTitle,
+                  { borderColor: "yellow" },
+                  !selectedGrenadeType && { opacity: 0.5 },
+                ]}
+                disabled={!selectedGrenadeType}
+              >
+                <Text style={styles.clickableTitleText}>GRENADES 2</Text>
+              </TouchableOpacity>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedGrenadeType}
+                  style={[
+                    styles.picker,
+                    selectedGrenadeType
+                      ? { borderColor: "yellow", borderWidth: 2 }
+                      : {},
+                  ]}
+                  onValueChange={(itemValue) =>
+                    handleGrenadeTypeSelect(itemValue)
+                  }
+                >
+                  <Picker.Item label="Veuillez sélectionner" value={null} />
+                  {grenades
+                    .filter((grenade) => grenade.id === 5)
+                    .map((grenade) => (
+                      <Picker.Item
+                        key={grenade.id}
+                        label={grenade.nom}
+                        value={grenade}
+                      />
+                    ))}
+                </Picker>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={() => {
+                  fetchAmmunitionDetails();
+                  setAmmunitionModalVisible(true);
+                }}
+                style={[styles.clickableTitle, { borderColor: "white" }]}
+              >
+                <Text style={styles.clickableTitleText}>MUNITIONS</Text>
+              </TouchableOpacity>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedAmmunition}
+                  style={styles.picker}
+                  onValueChange={(itemValue) =>
+                    setSelectedAmmunition(itemValue)
+                  }
+                >
+                  <Picker.Item
+                    label="Munitions Standard de Pistolet TL (x50)"
+                    value="Munitions Standard de Pistolet TL (x50)"
+                  />
+                </Picker>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                style={[styles.clickableTitle, { borderColor: "white" }]}
+                onPress={handleHeadArmorSelect}
+              >
+                <Text style={styles.clickableTitleText}>Armure Tête</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedHeadArmor}
+                style={[styles.picker, styles.headArmorPicker]}
+                onValueChange={(itemValue) => setSelectedHeadArmor(itemValue)}
+              >
+                <Picker.Item
+                  label="Protection de Tête (PA 11)"
+                  value="Protection de Tête (PA 11)"
+                />
+              </Picker>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                style={[styles.clickableTitle, { borderColor: "white" }]}
+                onPress={handleBodyArmorSelect}
+              >
+                <Text style={styles.clickableTitleText}>Armure Corps</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedBodyArmor}
+                style={[styles.picker, styles.bodyArmorPicker]}
+                onValueChange={(itemValue) => setSelectedBodyArmor(itemValue)}
+              >
+                <Picker.Item
+                  label="Protection de Corps (PA 11)"
+                  value="Protection de Corps (PA 11)"
+                />
+              </Picker>
+            </View>
+          </View>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={closeModal}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={meleeModalVisible}
+            onRequestClose={closeMeleeModal}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderMeleeModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={grenade1ModalVisible}
+            onRequestClose={() => setGrenade1ModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderGrenade1ModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={grenade2ModalVisible}
+            onRequestClose={() => setGrenade2ModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderGrenade2ModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={ammunitionModalVisible}
+            onRequestClose={() => setAmmunitionModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderAmmunitionModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={headArmorModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closeHeadArmorModal}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderHeadArmorModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={bodyArmorModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closeBodyArmorModal}
+          >
+            <View style={styles.modalContainer}>
+              <LinearGradient
+                colors={["#484848", "#868686"]}
+                style={styles.modalContent}
+              >
+                {renderBodyArmorModalContent()}
+              </LinearGradient>
+            </View>
+          </Modal>
+        </LinearGradient>
+        <LinearGradient
+          colors={["#868686", "#484848"]}
+          style={styles.descriptionContainer}
         >
-          <Picker.Item label="Veuillez sélectionner" value={null} />
-          {meleeWeapons.map((weapon) => (
-            <Picker.Item
-              key={weapon.id_arme}
-              label={weapon.nom}
-              value={weapon}
-            />
-          ))}
-        </Picker>
-      </View>
-    </View>
-    <View style={styles.row}>
-      <TouchableOpacity
-        onPress={
-          selectedGrenade ? () => setGrenade1ModalVisible(true) : null
-        }
-        style={[
-          styles.clickableTitle,
-          !selectedGrenade && { opacity: 0.5 },
-        ]}
-        disabled={!selectedGrenade}
-      >
-        <Text style={styles.clickableTitleText}>GRENADES 1</Text>
-      </TouchableOpacity>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedGrenade}
-          style={[
-            styles.picker,
-            selectedGrenade
-              ? { borderColor: "white", borderWidth: 2 }
-              : {},
-          ]}
-          onValueChange={(itemValue) => handleGrenadeSelect(itemValue)}
-        >
-          {grenades
-            .filter((grenade) => grenade.id === 11)
-            .map((grenade) => (
-              <Picker.Item
-                key={grenade.id}
-                label={`${grenade.nom} (x2)`}
-                value={grenade}
-              />
-            ))}
-        </Picker>
-      </View>
-    </View>
-    <View style={styles.row}>
-      <TouchableOpacity
-        onPress={
-          selectedGrenadeType
-            ? () => setGrenade2ModalVisible(true)
-            : null
-        }
-        style={[
-          styles.clickableTitle,
-          { borderColor: "yellow" },
-          !selectedGrenadeType && { opacity: 0.5 },
-        ]}
-        disabled={!selectedGrenadeType}
-      >
-        <Text style={styles.clickableTitleText}>GRENADES 2</Text>
-      </TouchableOpacity>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedGrenadeType}
-          style={[
-            styles.picker,
-            selectedGrenadeType
-              ? { borderColor: "yellow", borderWidth: 2 }
-              : {},
-          ]}
-          onValueChange={(itemValue) =>
-            handleGrenadeTypeSelect(itemValue)
-          }
-        >
-          <Picker.Item label="Veuillez sélectionner" value={null} />
-          {grenades
-            .filter((grenade) => grenade.id === 5)
-            .map((grenade) => (
-              <Picker.Item
-                key={grenade.id}
-                label={grenade.nom}
-                value={grenade}
-              />
-            ))}
-        </Picker>
-      </View>
-    </View>
-    <View style={styles.row}>
-      <TouchableOpacity
-        onPress={() => {
-          fetchAmmunitionDetails();
-          setAmmunitionModalVisible(true);
-        }}
-        style={[styles.clickableTitle, { borderColor: "white" }]}
-      >
-        <Text style={styles.clickableTitleText}>MUNITIONS</Text>
-      </TouchableOpacity>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedAmmunition}
-          style={styles.picker}
-          onValueChange={(itemValue) =>
-            setSelectedAmmunition(itemValue)
-          }
-        >
-          <Picker.Item
-            label="Munitions Standard de Pistolet TL (x50)"
-            value="Munitions Standard de Pistolet TL (x50)"
-          />
-        </Picker>
-      </View>
-    </View>
-    <View style={styles.row}>
-      <TouchableOpacity
-        style={[styles.clickableTitle, { borderColor: "white" }]}
-        onPress={handleHeadArmorSelect}
-      >
-        <Text style={styles.clickableTitleText}>Armure Tête</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedHeadArmor}
-        style={[styles.picker, styles.headArmorPicker]}
-        onValueChange={(itemValue) => setSelectedHeadArmor(itemValue)}
-      >
-        <Picker.Item label="Protection de Tête (PA 11)" value="Protection de Tête (PA 11)" />
-      </Picker>
-    </View>
-    <View style={styles.row}>
-      <TouchableOpacity
-        style={[styles.clickableTitle, { borderColor: "white" }]}
-        onPress={handleBodyArmorSelect}
-      >
-        <Text style={styles.clickableTitleText}>Armure Corps</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedBodyArmor}
-        style={[styles.picker, styles.bodyArmorPicker]}
-        onValueChange={(itemValue) => setSelectedBodyArmor(itemValue)}
-      >
-        <Picker.Item label="Protection de Corps (PA 11)" value="Protection de Corps (PA 11)" />
-      </Picker>
-    </View>
-  </View>
+          <Text style={styles.descriptionTitle}>Objets</Text>
+          <View style={styles.sectionContainer}>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={styles.objectButton}
+                onPress={() => handleObjectSelect(1)}
+              >
+                <Text style={styles.clickableTitleText}>Objet 1</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject(itemValue)}
+              >
+                <Picker.Item label="Agent" value="1" />
+              </Picker>
+            </View>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={styles.objectButton}
+                onPress={() => handleObjectSelect(36)}
+              >
+                <Text style={styles.clickableTitleText}>Objet 2</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject(itemValue)}
+              >
+                <Picker.Item label="Ordinateur" value="36" />
+              </Picker>
+            </View>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={[
+                  styles.objectButton,
+                  { borderColor: "yellow" },
+                  !selectedObject3 && { opacity: 0.5 }, // Griser le bouton si aucune sélection
+                ]}
+                onPress={() => handleObjectSelect(25)}
+                disabled={!selectedObject3} // Désactiver le bouton si aucune sélection
+              >
+                <Text style={styles.clickableTitleText}>Objet 3</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject3}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject3(itemValue)}
+              >
+                <Picker.Item label="Veuillez sélectionner" value="" />
+                <Picker.Item label="Guitare Électrique" value="25" />
+              </Picker>
+            </View>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={styles.objectButton}
+                onPress={() => handleObjectSelect(41)}
+              >
+                <Text style={styles.clickableTitleText}>Objet 4</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject(itemValue)}
+              >
+                <Picker.Item label="Peinture Phosphorescente" value="41" />
+              </Picker>
+            </View>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={styles.objectButton}
+                onPress={() => handleObjectSelect(2)}
+              >
+                <Text style={styles.clickableTitleText}>Objet 5</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject(itemValue)}
+              >
+                <Picker.Item label="Amplificateur Portable" value="2" />
+              </Picker>
+            </View>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={styles.objectButton}
+                onPress={() => handleObjectSelect(45)}
+              >
+                <Text style={styles.clickableTitleText}>Objet 6</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject(itemValue)}
+              >
+                <Picker.Item
+                  label="Récepteur Radio / Lecteur de Musique"
+                  value="45"
+                />
+              </Picker>
+            </View>
+            <View style={styles.objectRow}>
+              <TouchableOpacity
+                style={styles.objectButton}
+                onPress={() => handleObjectSelect(7)}
+              >
+                <Text style={styles.clickableTitleText}>Objet 7</Text>
+              </TouchableOpacity>
+              <Picker
+                selectedValue={selectedObject}
+                style={styles.objectPicker}
+                onValueChange={(itemValue) => setSelectedObject(itemValue)}
+              >
+                <Picker.Item label="Caméra" value="7" />
+              </Picker>
+            </View>
+          </View>
 
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={modalVisible}
-    onRequestClose={closeModal}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={meleeModalVisible}
-    onRequestClose={closeMeleeModal}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderMeleeModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={grenade1ModalVisible}
-    onRequestClose={() => setGrenade1ModalVisible(false)}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderGrenade1ModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={grenade2ModalVisible}
-    onRequestClose={() => setGrenade2ModalVisible(false)}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderGrenade2ModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={ammunitionModalVisible}
-    onRequestClose={() => setAmmunitionModalVisible(false)}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderAmmunitionModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-
-  <Modal
-    visible={headArmorModalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={closeHeadArmorModal}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderHeadArmorModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-
-  <Modal
-    visible={bodyArmorModalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={closeBodyArmorModal}
-  >
-    <View style={styles.modalContainer}>
-      <LinearGradient
-        colors={["#484848", "#868686"]}
-        style={styles.modalContent}
-      >
-        {renderBodyArmorModalContent()}
-      </LinearGradient>
-    </View>
-  </Modal>
-</LinearGradient>
-        <LinearGradient colors={["#868686", "#484848"]} style={styles.descriptionContainer}>
-  <Text style={styles.descriptionTitle}>Objets</Text>
-  <View style={styles.sectionContainer}>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={styles.objectButton}
-        onPress={() => handleObjectSelect(1)}
-      >
-        <Text style={styles.clickableTitleText}>Objet 1</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject(itemValue)}
-      >
-        <Picker.Item label="Agent" value="1" />
-      </Picker>
-    </View>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={styles.objectButton}
-        onPress={() => handleObjectSelect(36)}
-      >
-        <Text style={styles.clickableTitleText}>Objet 2</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject(itemValue)}
-      >
-        <Picker.Item label="Ordinateur" value="36" />
-      </Picker>
-    </View>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={[
-          styles.objectButton,
-          { borderColor: 'yellow' },
-          !selectedObject3 && { opacity: 0.5 }, // Griser le bouton si aucune sélection
-        ]}
-        onPress={() => handleObjectSelect(25)}
-        disabled={!selectedObject3} // Désactiver le bouton si aucune sélection
-      >
-        <Text style={styles.clickableTitleText}>Objet 3</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject3}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject3(itemValue)}
-      >
-        <Picker.Item label="Veuillez sélectionner" value="" />
-        <Picker.Item label="Guitare Électrique" value="25" />
-      </Picker>
-    </View>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={styles.objectButton}
-        onPress={() => handleObjectSelect(41)}
-      >
-        <Text style={styles.clickableTitleText}>Objet 4</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject(itemValue)}
-      >
-        <Picker.Item label="Peinture Phosphorescente" value="41" />
-      </Picker>
-    </View>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={styles.objectButton}
-        onPress={() => handleObjectSelect(2)}
-      >
-        <Text style={styles.clickableTitleText}>Objet 5</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject(itemValue)}
-      >
-        <Picker.Item label="Amplificateur Portable" value="2" />
-      </Picker>
-    </View>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={styles.objectButton}
-        onPress={() => handleObjectSelect(45)}
-      >
-        <Text style={styles.clickableTitleText}>Objet 6</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject(itemValue)}
-      >
-        <Picker.Item label="Récepteur Radio / Lecteur de Musique" value="45" />
-      </Picker>
-    </View>
-    <View style={styles.objectRow}>
-      <TouchableOpacity
-        style={styles.objectButton}
-        onPress={() => handleObjectSelect(7)}
-      >
-        <Text style={styles.clickableTitleText}>Objet 7</Text>
-      </TouchableOpacity>
-      <Picker
-        selectedValue={selectedObject}
-        style={styles.objectPicker}
-        onValueChange={(itemValue) => setSelectedObject(itemValue)}
-      >
-        <Picker.Item label="Caméra" value="7" />
-      </Picker>
-    </View>
-  </View>
-
-  {/* Modale pour afficher les détails de l'objet */}
-  <Modal
-    visible={objectModalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={closeObjectModal}
-  >
-    <View style={styles.modalContainer}>
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>Détails de l'objet</Text>
-        <View style={styles.modalContentContainer}>
-          <Text style={styles.modalKey}>Nom :</Text>
-          <Text style={styles.modalValue}>{objectModalContent.nom_obj || 'Aucun(e)'}</Text>
-          <Text style={styles.modalKey}>Description :</Text>
-          <Text style={styles.modalValue}>{objectModalContent.desc_obj || 'Aucun(e)'}</Text>
-          <Text style={styles.modalKey}>Particularité :</Text>
-          <Text style={styles.modalValue}>{objectModalContent.particularite || 'Aucun(e)'}</Text>
-          <Text style={styles.modalKey}>Quantité :</Text>
-          <Text style={styles.modalValue}>1</Text>
-        </View>
-        <TouchableOpacity style={styles.closeButton} onPress={closeObjectModal}>
-          <Text style={styles.closeButtonText}>FERMER</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </Modal>
-</LinearGradient>
+          {/* Modale pour afficher les détails de l'objet */}
+          <Modal
+            visible={objectModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={closeObjectModal}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Détails de l'objet</Text>
+                <View style={styles.modalContentContainer}>
+                  <Text style={styles.modalKey}>Nom :</Text>
+                  <Text style={styles.modalValue}>
+                    {objectModalContent.nom_obj || "Aucun(e)"}
+                  </Text>
+                  <Text style={styles.modalKey}>Description :</Text>
+                  <Text style={styles.modalValue}>
+                    {objectModalContent.desc_obj || "Aucun(e)"}
+                  </Text>
+                  <Text style={styles.modalKey}>Particularité :</Text>
+                  <Text style={styles.modalValue}>
+                    {objectModalContent.particularite || "Aucun(e)"}
+                  </Text>
+                  <Text style={styles.modalKey}>Quantité :</Text>
+                  <Text style={styles.modalValue}>1</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={closeObjectModal}
+                >
+                  <Text style={styles.closeButtonText}>FERMER</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        </LinearGradient>
         <LinearGradient
           colors={["#868686", "#484848"]}
           style={styles.descriptionContainer}
@@ -1266,106 +1526,116 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
 
           <Text style={styles.subtitle}>CYBERFASHION :</Text>
           <View style={styles.cyberMaterialContainer}>
-            <View style={styles.row}>
+            {/* Cyberfashion 1 */}
+            <View style={styles.objectRow}>
               <TouchableOpacity
                 onPress={handleCyberfashion1Select}
-                style={styles.clickableTitle}
+                style={styles.objectButton}
               >
                 <Text style={styles.clickableTitleText}>Cyberfashion 1</Text>
               </TouchableOpacity>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={selectedCyberfashion1}
-                  style={styles.picker}
-                  onValueChange={(itemValue) =>
-                    setSelectedCyberfashion1(itemValue)
-                  }
-                >
-                  <Picker.Item label="Nom Cyberfashion 1" value="2" />
-                </Picker>
-              </View>
+              <Picker
+                selectedValue={selectedCyberfashion1}
+                onValueChange={(itemValue) =>
+                  setSelectedCyberfashion1(itemValue)
+                }
+                style={styles.objectPicker}
+              >
+                <Picker.Item
+                  label={selectedCyberfashion1 || "Veuillez sélectionner"}
+                  value={selectedCyberfashion1}
+                />
+              </Picker>
             </View>
-            <View style={styles.row}>
+            {renderCyberfashion1ModalContent()}
+
+            {/* Cyberfashion 2 */}
+            <View style={styles.objectRow}>
               <TouchableOpacity
                 onPress={handleCyberfashion2Select}
-                style={styles.clickableTitle}
+                style={styles.objectButton}
               >
                 <Text style={styles.clickableTitleText}>Cyberfashion 2</Text>
               </TouchableOpacity>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={selectedCyberfashion2}
-                  style={styles.picker}
-                  onValueChange={(itemValue) =>
-                    setSelectedCyberfashion2(itemValue)
-                  }
-                >
-                  <Picker.Item label="Nom Cyberfashion 2" value="7" />
-                </Picker>
-              </View>
+              <Picker
+                selectedValue={selectedCyberfashion2}
+                onValueChange={(itemValue) =>
+                  setSelectedCyberfashion2(itemValue)
+                }
+                style={styles.objectPicker}
+              >
+                <Picker.Item
+                  label={selectedCyberfashion2 || "Veuillez sélectionner"}
+                  value={selectedCyberfashion2}
+                />
+              </Picker>
             </View>
+            {renderCyberfashion2ModalContent()}
           </View>
 
           <Text style={styles.subtitle}>CYBERAUDIO :</Text>
           <View style={styles.cyberMaterialContainer}>
-            <View style={styles.row}>
+            {/* Cyberaudio 1 */}
+            <View style={styles.objectRow}>
               <TouchableOpacity
                 onPress={handleCyberaudio1Select}
-                style={styles.clickableTitle}
+                style={styles.objectButton}
               >
                 <Text style={styles.clickableTitleText}>Cyberaudio 1</Text>
               </TouchableOpacity>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={selectedCyberaudio1}
-                  style={styles.picker}
-                  onValueChange={(itemValue) =>
-                    setSelectedCyberaudio1(itemValue)
-                  }
-                >
-                  <Picker.Item label="Nom Cyberaudio 1" value="9" />
-                </Picker>
-              </View>
+              <Picker
+                selectedValue={selectedCyberaudio1}
+                onValueChange={(itemValue) => setSelectedCyberaudio1(itemValue)}
+                style={styles.objectPicker}
+              >
+                <Picker.Item
+                  label={selectedCyberaudio1 || "Veuillez sélectionner"}
+                  value={selectedCyberaudio1}
+                />
+              </Picker>
             </View>
-            <View style={styles.row}>
+            {renderCyberaudio1ModalContent()}
+
+            {/* Cyberaudio 2 */}
+            <View style={styles.objectRow}>
               <TouchableOpacity
                 onPress={handleCyberaudio2Select}
-                style={styles.clickableTitle}
+                style={styles.objectButton}
               >
                 <Text style={styles.clickableTitleText}>Cyberaudio 2</Text>
               </TouchableOpacity>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={selectedCyberaudio2}
-                  style={styles.picker}
-                  onValueChange={(itemValue) =>
-                    setSelectedCyberaudio2(itemValue)
-                  }
-                >
-                  <Picker.Item label="Nom Cyberaudio 2" value="1" />
-                </Picker>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <TouchableOpacity
-                onPress={handleCyberaudio3Select}
-                style={[styles.clickableTitle, { borderColor: "yellow" }]}
+              <Picker
+                selectedValue={selectedCyberaudio2}
+                onValueChange={(itemValue) => setSelectedCyberaudio2(itemValue)}
+                style={styles.objectPicker}
               >
-                <Text style={styles.clickableTitleText}>Cyberaudio 3</Text>
-              </TouchableOpacity>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={selectedCyberaudio3}
-                  style={styles.picker}
-                  onValueChange={(itemValue) =>
-                    setSelectedCyberaudio3(itemValue)
-                  }
-                >
-                  <Picker.Item label="Veuillez sélectionner" value="" />
-                  <Picker.Item label="Nom Cyberaudio 3" value="7" />
-                </Picker>
-              </View>
+                <Picker.Item
+                  label={selectedCyberaudio2 || "Veuillez sélectionner"}
+                  value={selectedCyberaudio2}
+                />
+              </Picker>
             </View>
+            {renderCyberaudio2ModalContent()}
+
+            {/* Cyberaudio 3 */}
+            <View style={styles.objectRow}>
+            <TouchableOpacity
+        style={[styles.objectButton, { borderColor: "yellow" }, !selectedCyberaudio3 && { opacity: 0.5 }]}
+        disabled={!selectedCyberaudio3}
+        onPress={handleCyberaudio3Select}
+      >
+        <Text style={styles.clickableTitleText}>Cyberaudio 3</Text>
+      </TouchableOpacity>
+              <Picker
+        selectedValue={selectedCyberaudio3}
+        onValueChange={(itemValue) => setSelectedCyberaudio3(itemValue)}
+        style={styles.objectPicker}
+      >
+        <Picker.Item label="Veuillez sélectionner" value="" />
+        <Picker.Item label="Détecteur de Micros" value="detecteur_de_micros" />
+      </Picker>
+            </View>
+            {renderCyberaudio3ModalContent()}
           </View>
         </LinearGradient>
       </ScrollView>

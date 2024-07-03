@@ -159,7 +159,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)', // Assurez-vous que le fond est semi-transparent pour une meilleure visibilité
     flexShrink: 1,  // Allow the modal to shrink if needed
-    flexGrow: 1,  // Allow the modal to grow if needed
+    flexGrow: 0,  // Allow the modal to grow if needed
   },
   modalScrollContent: {
     flexGrow: 1,
