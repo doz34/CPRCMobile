@@ -285,4 +285,42 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 10,
+    textShadowColor: 'black',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 2,
+  },
+  cyberMaterialContainer: {
+    marginBottom: 50, // Maintain spacing between sections
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'center', // Center horizontally
+  },
+  objectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%', // Réduire la largeur pour qu'elle soit contenue à l'intérieur du placeholder
+    marginBottom: 10,
+  },
+  objectPicker: {
+    height: 60,
+    width: '60%', // Réduire la largeur du picker
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    color: 'black',
+    borderRadius: 10,
+  },
+  objectButton: {
+    borderWidth: 2,
+    borderColor: 'white',
+    padding: 5,
+    height: 60, // Ajuster la hauteur pour correspondre au dropdown
+    justifyContent: 'center', // Centrer le texte verticalement
+    width: '35%', // Réduire la largeur du bouton
+  },
 });
