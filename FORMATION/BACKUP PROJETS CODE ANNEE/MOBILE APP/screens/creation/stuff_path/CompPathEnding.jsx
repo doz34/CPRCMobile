@@ -18,6 +18,7 @@ const CompPathEnding = ({ navigation, route }) => {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [idPerso, setIdPerso] = useState(user?.idPerso || route.params?.idPerso);
+  const [idRole, setIdRole] = useState(user?.idRole || route.params?.idRole);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -52,7 +53,7 @@ const CompPathEnding = ({ navigation, route }) => {
   };
 
   const onContinue = () => {
-    navigation.navigate("StuffPathDisclaimer", { idPerso });
+    navigation.navigate("StuffPathDisclaimer", { idPerso, idRole });
   };
 
   if (loading) {

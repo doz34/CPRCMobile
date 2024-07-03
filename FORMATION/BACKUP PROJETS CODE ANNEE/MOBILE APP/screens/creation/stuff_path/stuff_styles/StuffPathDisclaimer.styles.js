@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   placeholderContainer: {
     borderRadius: 10,
     paddingHorizontal: 15,
-    opacity: 0.9,
+    opacity: 0.7,
     justifyContent: "center",
     zIndex: 2,
     flexShrink: 1,
