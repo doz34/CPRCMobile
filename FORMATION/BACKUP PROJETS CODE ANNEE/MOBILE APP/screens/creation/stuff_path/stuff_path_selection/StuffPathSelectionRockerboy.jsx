@@ -102,7 +102,8 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [microphoneModalContent, setMicrophoneModalContent] = useState({});
   const [meleeWeaponModalVisible, setMeleeWeaponModalVisible] = useState(false);
   const [meleeWeaponModalContent, setMeleeWeaponModalContent] = useState({});
-  const [grenade2DistinctModalVisible, setGrenade2DistinctModalVisible] = useState(false);
+  const [grenade2DistinctModalVisible, setGrenade2DistinctModalVisible] =
+    useState(false);
   const [isContinueModalVisible, setContinueModalVisible] = useState(false);
   const [isQuitModalVisible, setQuitModalVisible] = useState(false);
 
@@ -115,70 +116,64 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
 
   useEffect(() => {
     const initialize = async () => {
-      console.log('Initializing with idUtilisateur:', idUtilisateur, 'and idPerso:', idPerso);
+      console.log(
+        "Initializing with idUtilisateur:",
+        idUtilisateur,
+        "and idPerso:",
+        idPerso
+      );
       if (idUtilisateur && idPerso) {
         await storeInitialIds();
         await fetchUserAndCharacterIds();
       } else {
-        console.error('ID utilisateur ou ID personnage non défini');
-        Alert.alert('Erreur', 'ID utilisateur ou ID personnage non défini.');
+        console.error("ID utilisateur ou ID personnage non défini");
+        Alert.alert("Erreur", "ID utilisateur ou ID personnage non défini.");
       }
     };
 
     // Fonction pour stocker les IDs utilisateur et personnage dans AsyncStorage
     const storeInitialIds = async () => {
       try {
-        console.log('Storing IDs in AsyncStorage');
+        console.log("Storing IDs in AsyncStorage");
         await AsyncStorage.multiSet([
-          ['id_utilisateur', idUtilisateur.toString()],
-          ['id_perso', idPerso.toString()]
+          ["id_utilisateur", idUtilisateur.toString()],
+          ["id_perso", idPerso.toString()],
         ]);
-        console.log('IDs stored successfully');
+        console.log("IDs stored successfully");
       } catch (error) {
-        console.error('Erreur lors du stockage des IDs:', error);
+        console.error("Erreur lors du stockage des IDs:", error);
       }
     };
 
     // Fonction pour récupérer les IDs stockés et effectuer les opérations nécessaires
     const fetchUserAndCharacterIds = async () => {
       try {
-          console.log('Fetching stored IDs from AsyncStorage');
-          const storedIds = await AsyncStorage.multiGet(['id_utilisateur', 'id_perso']);
-          const storedIdUtilisateur = storedIds[0][1];
-          const storedIdPerso = storedIds[1][1];
-          console.log('Stored IDs:', { storedIdUtilisateur, storedIdPerso });
-          if (!storedIdUtilisateur || !storedIdPerso) {
-              Alert.alert('Erreur', 'ID utilisateur ou ID personnage non défini.');
-              return;
-          }
-          await transmitIdPerso(storedIdPerso);
-          const equipmentData = [
-              { id_arme: 10, quantite: 1, id_perso: storedIdPerso },
-              // autres entrées...
-          ];
-          // La boucle for a été supprimée ici
+        console.log("Fetching stored IDs from AsyncStorage");
+        const storedIds = await AsyncStorage.multiGet([
+          "id_utilisateur",
+          "id_perso",
+        ]);
+        const storedIdUtilisateur = storedIds[0][1];
+        const storedIdPerso = storedIds[1][1];
+        console.log("Stored IDs:", { storedIdUtilisateur, storedIdPerso });
+        if (!storedIdUtilisateur || !storedIdPerso) {
+          Alert.alert("Erreur", "ID utilisateur ou ID personnage non défini.");
+          return;
+        }
+        await transmitIdPerso(storedIdPerso);
+        const equipmentData = [
+          { id_arme: 10, quantite: 1, id_perso: storedIdPerso },
+          // autres entrées...
+        ];
+        // La boucle for a été supprimée ici
       } catch (error) {
-          console.error('Error updating equipment:', error);
-          Alert.alert('Erreur', 'Une erreur est survenue lors de la mise à jour de l\'équipement.');
+        console.error("Error updating equipment:", error);
+        Alert.alert(
+          "Erreur",
+          "Une erreur est survenue lors de la mise à jour de l'équipement."
+        );
       }
-  };
-
-    if (idUtilisateur !== null) {
-      initialize();
-    }
-  }, [user?.token, idPerso, idUtilisateur]);
-
-  // Définir la fonction transmitIdPerso
-  const transmitIdPerso = async (idPerso) => {
-    try {
-      console.log('Transmitting idPerso:', idPerso);
-      // Ajoutez ici la logique pour transmettre l'idPerso
-    } catch (error) {
-      console.error('Erreur lors de la transmission de l\'idPerso:', error);
-    }
-  };
-
-  useEffect(() => {
+    };
 
     const fetchInitialData = async () => {
       try {
@@ -198,6 +193,24 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
       }
     };
 
+    if (idUtilisateur !== null) {
+      initialize();
+      fetchInitialData();
+    }
+  }, [user?.token, idPerso, idUtilisateur]);
+
+  // Définir la fonction transmitIdPerso
+  const transmitIdPerso = async (idPerso) => {
+    try {
+      console.log("Transmitting idPerso:", idPerso);
+      // Ajoutez ici la logique pour transmettre l'idPerso
+    } catch (error) {
+      console.error("Erreur lors de la transmission de l'idPerso:", error);
+    }
+  };
+
+  useEffect(() => {
+  
     const fetchWeapons = async () => {
       try {
         const response = await axios.get(
@@ -530,6 +543,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     const details = await fetchCyberaudio3Details();
     setCyberaudio3ModalContent(details);
     setCyberaudio3ModalVisible(true);
+    setSelectedCyberaudio3({ id: 7, ...details }); // Assurez-vous que l'ID est bien 7
   };
 
   const handleCyberaudio3Change = (itemValue) => {
@@ -809,7 +823,7 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const handleGrenadeTypeSelect = (grenadeType) => {
     setSelectedGrenadeType(grenadeType);
     setGrenade2ModalContent({ ...grenadeType, quantity: 1 });
-};
+  };
 
   const handleAmmunitionSelect = () => {
     fetchAmmunitionDetails();
@@ -1534,95 +1548,192 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     );
   };
 
-  const handleContinue = async () => {
-    console.log("Début de handleContinue");
-    if (!selectedMeleeWeapon && !selectedGrenadeType) {
+  const getCharacterStyle = async (idPerso) => {
+    try {
+        const response = await axios.get(`http://192.168.1.17:3000/api/user/character-style/${idPerso}`);
+        return response.data.id_style;
+    } catch (error) {
+        console.error('Error fetching character style:', error);
+        return null;
+    }
+};
+
+const getVêtementId = async (table, idStyle) => {
+    try {
+        const response = await axios.get(`http://192.168.1.17:3000/api/user/vetement-id/${table}/${idStyle}`);
+        return response.data.id_vetement;
+    } catch (error) {
+        console.error('Error fetching vetement id:', error);
+        return null;
+    }
+};
+
+const sendEquipmentData = async (equipmentData, idUtilisateur) => {
+  try {
+    for (const item of equipmentData) {
+      let table;
+      if (item.id_arme) {
+        table = "personnage_armes";
+      } else if (item.id_armure) {
+        table = "personnage_armures";
+      } else if (item.id_obj) {
+        table = "personnage_equipement";
+      } else if (item.id_cyberfashion) {
+        table = "personnage_cyberfashion";
+      } else if (item.id_cyberaudio) {
+        table = "personnage_cyberaudio";
+      } else if (item.id_vetement) {
+        table = "personnage_vetements";
+      } else if (item.id === 28 || item.id === 1) {
+        table = "personnage_munitions";
+      } else if (item.id) {
+        table = "personnage_equipement"; // ou une autre table appropriée
+      } else if (item.id_attribut) {
+        table = "personnage_cyberaudio"; // ou une autre table appropriée
+      } else if (item.id_attribut) {
+        table = "personnage_cyberfashion";
+      }
+      // Ajoutez id_utilisateur à chaque item
+      item.id_utilisateur = idUtilisateur;
+      await axios.post(`http://192.168.1.17:3000/api/roles/${table}`, item, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      console.log("Envoi de l'équipement:", item);
+    }
+    console.log("Navigation vers StuffPathEnding");
+    navigation.navigate("StuffPathEnding");
+  } catch (error) {
+    console.error("Error updating equipment:", error);
+    Alert.alert("Erreur", "Une erreur est survenue lors de la mise à jour de l'équipement.");
+  }
+};
+
+const handleContinue = async () => {
+  console.log("Début de handleContinue");
+  if (!selectedMeleeWeapon && !selectedGrenadeType) {
       Alert.alert(
-        "Erreur",
-        "Veuillez sélectionner au moins une valeur pour Arme de mêlée ou pour Grenades."
+          "Erreur",
+          "Veuillez sélectionner au moins une valeur pour Arme de mêlée ou pour Grenades."
       );
       console.log(
-        "Erreur: Aucune arme de mêlée ou type de grenade sélectionné"
+          "Erreur: Aucune arme de mêlée ou type de grenade sélectionné"
       );
       return;
-    }
-    if (!selectedObject3 && !selectedCyberaudio3) {
+  }
+  if (!selectedObject3 && !selectedCyberaudio3) {
       Alert.alert(
-        "Erreur",
-        "Veuillez sélectionner au moins une valeur pour Objet 3 ou pour Cyberaudio 3."
+          "Erreur",
+          "Veuillez sélectionner au moins une valeur pour Objet 3 ou pour Cyberaudio 3."
       );
       console.log("Erreur: Aucun objet 3 ou cyberaudio 3 sélectionné");
       return;
-    }
-    try {
+  }
+  try {
       const idUtilisateur = await AsyncStorage.getItem("id_utilisateur");
       const idPerso = await AsyncStorage.getItem("id_perso");
       console.log("idUtilisateur récupéré:", idUtilisateur);
       console.log("id_perso récupéré:", idPerso);
       if (!idUtilisateur) {
-        Alert.alert("Erreur", "ID utilisateur non défini.");
-        console.log("Erreur: ID utilisateur non défini");
-        return;
+          Alert.alert("Erreur", "ID utilisateur non défini.");
+          console.log("Erreur: ID utilisateur non défini");
+          return;
       }
       if (!idPerso) {
-        Alert.alert("Erreur", "ID personnage non défini.");
-        console.log("Erreur: ID personnage non défini");
-        return;
+          Alert.alert("Erreur", "ID personnage non défini.");
+          console.log("Erreur: ID personnage non défini");
+          return;
       }
       // Transmettre id_perso avant d'exécuter la requête POST
       await transmitIdPerso(idPerso);
 
+      // Récupérer le id_style du personnage
+      const idStyle = await getCharacterStyle(idPerso);
+
+      // Récupérer les id_vetement des tables héritées
+      const vesteId = await getVêtementId('veste', idStyle);
+      const bijouxId = await getVêtementId('bijoux', idStyle);
+      const hautId = await getVêtementId('haut', idStyle);
+      console.log("Valeur de selectedCyberaudio3:", selectedCyberaudio3);
+      console.log("ID de selectedCyberaudio3:", selectedCyberaudio3 ? selectedCyberaudio3.id : "Non défini");
       // Ajouter les nouvelles entrées
       const equipmentData = [
-        { id_arme: 10, quantite: 1, id_perso: idPerso },
-        { id_equipement: selectedMeleeWeapon, quantite: 1, id_perso: idPerso },
-        { id_equipement: 28, quantite: 1, id_perso: idPerso },
-        { id_equipement: selectedGrenadeType, quantite: 1, id_perso: idPerso },
-        { id_equipement: 1, quantite: 5, id_perso: idPerso },
-        { id_equipement: 5, quantite: 1, id_perso: idPerso },
-        { id_equipement: 6, quantite: 1, id_perso: idPerso },
-        { id_equipement: 1, quantite: 1, id_perso: idPerso },
-        { id_equipement: 36, quantite: 1, id_perso: idPerso },
-        { id_equipement: selectedObject3, quantite: 1, id_perso: idPerso },
-        { id_equipement: 41, quantite: 1, id_perso: idPerso },
-        { id_equipement: 2, quantite: 1, id_perso: idPerso },
-        { id_equipement: 45, quantite: 1, id_perso: idPerso },
-        { id_equipement: 7, quantite: 1, id_perso: idPerso },
-        { id_equipement: 2, quantite: 1, id_attribut: 2, id_perso: idPerso },
-        { id_equipement: 7, quantite: 1, id_attribut: 7, id_perso: idPerso },
-        { id_equipement: 9, quantite: 1, id_attribut: 37, id_perso: idPerso },
-        { id_equipement: 1, quantite: 1, id_attribut: 29, id_perso: idPerso },
-        {
-          id_equipement: selectedCyberaudio3,
-          quantite: 1,
-          id_attribut: 35,
-          id_perso: idPerso,
-        },
+          // Arme à distance
+          { id_arme: 10, quantite: 1, id_perso: idPerso },
+
+          // Arme de Mêlée (seulement si un des 3 id cités est sélectionné)
+          ...(selectedMeleeWeapon &&
+          [6, 7, 8].includes(selectedMeleeWeapon.id_arme)
+              ? [
+                  {
+                      id_arme: selectedMeleeWeapon.id_arme,
+                      quantite: 1,
+                      id_perso: idPerso,
+                  },
+              ]
+              : []),
+
+          // Grenades
+          { id: 28, quantite: 1, id_perso: idPerso },
+          ...(selectedGrenadeType && selectedGrenadeType.id === 24
+              ? [{ id: 24, quantite: 1, id_perso: idPerso }]
+              : []),
+
+          // Munitions
+          { id: 1, quantite: 5, id_perso: idPerso },
+
+          // Armures
+          { id_armure: 5, quantite: 1, id_perso: idPerso },
+          { id_armure: 6, quantite: 1, id_perso: idPerso },
+
+          // Objets
+          { id_obj: 1, quantite: 1, id_perso: idPerso },
+          { id_obj: 36, quantite: 1, id_perso: idPerso },
+          ...(selectedObject3 && selectedObject3.id === 18
+              ? [{ id_obj: 18, quantite: 1, id_perso: idPerso }]
+              : []),
+          { id_obj: 41, quantite: 1, id_perso: idPerso },
+          { id_obj: 2, quantite: 1, id_perso: idPerso },
+          { id_obj: 45, quantite: 1, id_perso: idPerso },
+          { id_obj: 7, quantite: 1, id_perso: idPerso },
+
+          // Cyberfashion
+          { id_cyberfashion: 2, id_attribut: 2, quantite: 1, id_perso: idPerso },
+          { id_cyberfashion: 7, id_attribut: 7, quantite: 1, id_perso: idPerso },
+
+          // Cyberaudio
+          { id_cyberaudio: 9, id_attribut: 37, quantite: 1, id_perso: idPerso },
+          { id_cyberaudio: 1, id_attribut: 29, quantite: 1, id_perso: idPerso },
+          ...(selectedCyberaudio3 && selectedCyberaudio3.id === 7
+              ? [
+                  {
+                      id_cyberaudio: 7,
+                      id_attribut: 35,
+                      quantite: 1,
+                      id_perso: idPerso,
+                  },
+              ]
+              : []),
+
+          // Vêtements
+          { id_vetement: vesteId, quantite: 1, id_perso: idPerso },
+          { id_vetement: bijouxId, quantite: 1, id_perso: idPerso },
+          { id_vetement: hautId, quantite: 1, id_perso: idPerso },
       ];
 
       console.log("Données d'équipement à envoyer:", equipmentData);
 
-      for (const item of equipmentData) {
-        console.log("Envoi de l'équipement:", item);
-        await axios.post(
-          "http://192.168.1.17:3000/api/roles/personnage_equipement",
-          item,
-          {
-            headers: { Authorization: `Bearer ${user?.token}` },
-          }
-        );
-      }
+      // Appel de la fonction sendEquipmentData
+      await sendEquipmentData(equipmentData, idUtilisateur);
 
-      console.log("Navigation vers StuffPathEnding");
-      navigation.navigate("StuffPathEnding");
-    } catch (error) {
+  } catch (error) {
       console.error("Error updating equipment:", error);
       Alert.alert(
-        "Erreur",
-        "Une erreur est survenue lors de la mise à jour de l'équipement."
+          "Erreur",
+          "Une erreur est survenue lors de la mise à jour de l'équipement."
       );
-    }
-  };
+  }
+};
+
 
   return (
     <ImageBackground
