@@ -79,6 +79,20 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
   const [cyberaudio2ModalContent, setCyberaudio2ModalContent] = useState({});
   const [cyberaudio3ModalContent, setCyberaudio3ModalContent] = useState({});
 
+  const [selectedVeste, setSelectedVeste] = useState(null);
+  const [selectedBijoux, setSelectedBijoux] = useState(null);
+  const [selectedHaut, setSelectedHaut] = useState(null);
+
+  const [vesteModalVisible, setVesteModalVisible] = useState(false);
+  const [bijouxModalVisible, setBijouxModalVisible] = useState(false);
+  const [hautModalVisible, setHautModalVisible] = useState(false);
+
+  const [otherModalVisible, setOtherModalVisible] = useState(false);
+
+  const [vesteModalContent, setVesteModalContent] = useState({});
+  const [bijouxModalContent, setBijouxModalContent] = useState({});
+  const [hautModalContent, setHautModalContent] = useState({});
+
   useEffect(() => {
     const fetchWeapons = async () => {
       try {
@@ -329,6 +343,42 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     }
   };
 
+  const fetchVesteDetails = async () => {
+    try {
+        const response = await axios.get(`http://192.168.1.17:3000/api/roles/veste-details/${idPerso}`, {
+            headers: { Authorization: `Bearer ${user?.token}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Erreur lors de la récupération des détails de la veste:", error);
+        return {};
+    }
+};
+
+const fetchBijouxDetails = async () => {
+    try {
+        const response = await axios.get(`http://192.168.1.17:3000/api/roles/bijoux-details/${idPerso}`, {
+            headers: { Authorization: `Bearer ${user?.token}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Erreur lors de la récupération des détails des bijoux:", error);
+        return {};
+    }
+};
+
+const fetchHautDetails = async () => {
+    try {
+        const response = await axios.get(`http://192.168.1.17:3000/api/roles/haut-details/${idPerso}`, {
+            headers: { Authorization: `Bearer ${user?.token}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Erreur lors de la récupération des détails du haut:", error);
+        return {};
+    }
+};
+
   // Fonctions de sélection
   const handleCyberfashion1Select = async () => {
     const details = await fetchCyberfashion1Details();
@@ -360,12 +410,42 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     setCyberaudio3ModalVisible(true);
   };
 
+  const handleVesteSelect = async () => {
+    const details = await fetchVesteDetails();
+    setVesteModalContent(details);
+    setVesteModalVisible(true);
+    setOtherModalVisible(false); // Assurez-vous que l'autre modale est fermée
+  };
+  
+  const handleOtherSelect = async () => {
+    const details = await fetchOtherDetails();
+    setOtherModalContent(details);
+    setOtherModalVisible(true);
+    setVesteModalVisible(false); // Assurez-vous que la modale de veste est fermée
+  };
+
+  const handleBijouxSelect = async () => {
+    const details = await fetchBijouxDetails();
+    setBijouxModalContent(details);
+    setBijouxModalVisible(true);
+  };
+
+  const handleHautSelect = async () => {
+    const details = await fetchHautDetails();
+    setHautModalContent(details);
+    setHautModalVisible(true);
+  };
+
   // Fermeture des modales
   const closeCyberfashion1Modal = () => setCyberfashion1ModalVisible(false);
   const closeCyberfashion2Modal = () => setCyberfashion2ModalVisible(false);
   const closeCyberaudio1Modal = () => setCyberaudio1ModalVisible(false);
   const closeCyberaudio2Modal = () => setCyberaudio2ModalVisible(false);
   const closeCyberaudio3Modal = () => setCyberaudio3ModalVisible(false);
+
+  const closeVesteModal = () => setVesteModalVisible(false);
+  const closeBijouxModal = () => setBijouxModalVisible(false);
+  const closeHautModal = () => setHautModalVisible(false);
 
   const handleObjectSelect = async (objectId) => {
     const objectDetails = await fetchObjectDetails(objectId);
@@ -1020,6 +1100,51 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     );
   };
 
+  const renderVesteModalContent = () => {
+    if (!vesteModalContent) return null;
+    return (
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>Type de vêtement: Veste</Text>
+        <Text style={styles.modalDescription}>Style du vêtement: {vesteModalContent.nom || "Aucun(e)"}</Text>
+        <Text style={styles.modalDescription}>Image renvoyée: {vesteModalContent.description || "Aucun(e)"}</Text>
+        <Text style={styles.modalDescription}>Quantité: 1</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={() => setVesteModalVisible(false)}>
+          <Text style={styles.closeButtonText}>FERMER</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderBijouxModalContent = () => {
+    if (!bijouxModalContent) return null;
+    return (
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>Type de vêtement: Bijou</Text>
+        <Text style={styles.modalDescription}>Style du vêtement: {bijouxModalContent.nom || "Aucun(e)"}</Text>
+        <Text style={styles.modalDescription}>Image renvoyée: {bijouxModalContent.description || "Aucun(e)"}</Text>
+        <Text style={styles.modalDescription}>Quantité: 3</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={() => setBijouxModalVisible(false)}>
+          <Text style={styles.closeButtonText}>FERMER</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderHautModalContent = () => {
+    if (!hautModalContent) return null;
+    return (
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>Type de vêtement: Haut</Text>
+        <Text style={styles.modalDescription}>Style du vêtement: {hautModalContent.nom || "Aucun(e)"}</Text>
+        <Text style={styles.modalDescription}>Image renvoyée: {hautModalContent.description || "Aucun(e)"}</Text>
+        <Text style={styles.modalDescription}>Quantité: 1</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={() => setHautModalVisible(false)}>
+          <Text style={styles.closeButtonText}>FERMER</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   useEffect(() => {
     const fetchInitialData = async () => {
       const cyberfashion1Name = await fetchCyberfashionNames(2);
@@ -1034,7 +1159,6 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
     fetchInitialData();
   }, [user?.token]);
 
-  
   return (
     <ImageBackground
       source={require("../../../../assets/Inscription.png")}
@@ -1619,25 +1743,110 @@ const StuffPathSelectionRockerboy = ({ navigation, route }) => {
 
             {/* Cyberaudio 3 */}
             <View style={styles.objectRow}>
-            <TouchableOpacity
-        style={[styles.objectButton, { borderColor: "yellow" }, !selectedCyberaudio3 && { opacity: 0.5 }]}
-        disabled={!selectedCyberaudio3}
-        onPress={handleCyberaudio3Select}
-      >
-        <Text style={styles.clickableTitleText}>Cyberaudio 3</Text>
-      </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.objectButton,
+                  { borderColor: "yellow" },
+                  !selectedCyberaudio3 && { opacity: 0.5 },
+                ]}
+                disabled={!selectedCyberaudio3}
+                onPress={handleCyberaudio3Select}
+              >
+                <Text style={styles.clickableTitleText}>Cyberaudio 3</Text>
+              </TouchableOpacity>
               <Picker
-        selectedValue={selectedCyberaudio3}
-        onValueChange={(itemValue) => setSelectedCyberaudio3(itemValue)}
-        style={styles.objectPicker}
-      >
-        <Picker.Item label="Veuillez sélectionner" value="" />
-        <Picker.Item label="Détecteur de Micros" value="detecteur_de_micros" />
-      </Picker>
+                selectedValue={selectedCyberaudio3}
+                onValueChange={(itemValue) => setSelectedCyberaudio3(itemValue)}
+                style={styles.objectPicker}
+              >
+                <Picker.Item label="Veuillez sélectionner" value="" />
+                <Picker.Item
+                  label="Détecteur de Micros"
+                  value="detecteur_de_micros"
+                />
+              </Picker>
             </View>
             {renderCyberaudio3ModalContent()}
           </View>
         </LinearGradient>
+        <View style={styles.sectionContainer}>
+  <LinearGradient
+    colors={['#868686', '#484848']}
+    style={styles.descriptionContainer}
+  >
+    <Text style={styles.descriptionTitle}>VÊTEMENTS</Text>
+    <View style={styles.sectionContainer}>
+      <View style={styles.row}>
+        <TouchableOpacity onPress={handleVesteSelect} style={styles.clickableTitle}>
+          <Text style={styles.clickableTitleText}>VESTE</Text>
+        </TouchableOpacity>
+      </View>
+      {vesteModalVisible && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={vesteModalVisible}
+          onRequestClose={closeVesteModal}
+        >
+          <View style={styles.modalContainer}>
+            <LinearGradient
+              colors={["#484848", "#868686"]}
+              style={styles.modalContent}
+            >
+              {renderVesteModalContent()}
+            </LinearGradient>
+          </View>
+        </Modal>
+      )}
+
+      <View style={styles.row}>
+        <TouchableOpacity onPress={handleBijouxSelect} style={styles.clickableTitle}>
+          <Text style={styles.clickableTitleText}>BIJOUX</Text>
+        </TouchableOpacity>
+      </View>
+      {bijouxModalVisible && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={bijouxModalVisible}
+          onRequestClose={closeBijouxModal}
+        >
+          <View style={styles.modalContainer}>
+            <LinearGradient
+              colors={["#484848", "#868686"]}
+              style={styles.modalContent}
+            >
+              {renderBijouxModalContent()}
+            </LinearGradient>
+          </View>
+        </Modal>
+      )}
+
+      <View style={styles.row}>
+        <TouchableOpacity onPress={handleHautSelect} style={styles.clickableTitle}>
+          <Text style={styles.clickableTitleText}>HAUT</Text>
+        </TouchableOpacity>
+      </View>
+      {hautModalVisible && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={hautModalVisible}
+          onRequestClose={closeHautModal}
+        >
+          <View style={styles.clothingModalContainer}>
+            <LinearGradient
+              colors={["#484848", "#868686"]}
+              style={styles.modalContent}
+            >
+              {renderHautModalContent()}
+            </LinearGradient>
+          </View>
+        </Modal>
+      )}
+    </View>
+  </LinearGradient>
+</View>
       </ScrollView>
     </ImageBackground>
   );

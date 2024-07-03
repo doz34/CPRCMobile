@@ -323,4 +323,5 @@ export default StyleSheet.create({
     justifyContent: 'center', // Centrer le texte verticalement
     width: '35%', // Réduire la largeur du bouton
   },
+  
 });
