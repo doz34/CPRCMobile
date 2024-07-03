@@ -7,7 +7,9 @@ import styles from './character_styles/CulturalOrigin.styles';
 import { LinearGradient } from "expo-linear-gradient";
 import MyTextSimple from "../MyTextSimple";
 
+// Composant principal pour gérer les origines culturelles
 const CulturalOrigin = ({ navigation, route }) => {
+  // Récupération de l'utilisateur depuis le contexte
   const { user } = useContext(UserContext);
   const [origins, setOrigins] = useState([]);
   const [languages, setLanguages] = useState([]);
